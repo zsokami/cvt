@@ -1,0 +1,104 @@
+import { decodeBase64, encodeBase64 } from 'https://raw.githubusercontent.com/denoland/std/main/encoding/base64.ts'
+export { encodeBase64 }
+export { encodeBase64Url } from 'https://raw.githubusercontent.com/denoland/std/main/encoding/base64url.ts'
+export { parse as parseYAML } from 'https://raw.githubusercontent.com/denoland/std/main/yaml/parse.ts'
+
+const textDecoder = new TextDecoder()
+
+export function decodeBase64Url(b64url: string): string {
+  if (!/^[-_+/A-Za-z0-9]*={0,2}$/.test(b64url)) {
+    throw new TypeError('Failed to decode base64url: invalid character')
+  }
+  if (b64url.length % 4 === 2) b64url + '=='
+  if (b64url.length % 4 === 3) b64url + '='
+  if (b64url.length % 4 === 1) {
+    throw new TypeError('Illegal base64url string')
+  }
+  return textDecoder.decode(decodeBase64(b64url.replaceAll('-', '+').replaceAll('_', '/')))
+}
+
+export const urlDecode = (x: string | null | undefined): string => {
+  x ??= ''
+  try {
+    x = decodeURIComponent(x)
+  } catch {
+    // pass
+  }
+  return x
+}
+export const urlDecodePlus = (x: string | null | undefined): string => urlDecode(x?.replaceAll('+', ' '))
+
+export function pickTruthy<T, K>(o: T, ...keys: K[]): Partial<Pick<T, K & keyof T>> {
+  const r = {}
+  if (!o) return r
+  for (const k of keys) {
+    // @ts-ignore:
+    const v = o[k]
+    // @ts-ignore:
+    if (v) r[k] = v
+  }
+  return r
+}
+
+export function pickNonEmptyString<T, K>(o: T, ...keys: K[]): Partial<Record<K & keyof T, string>> {
+  const r = {}
+  if (!o) return r
+  for (const k of keys) {
+    // @ts-ignore:
+    const v = o[k]
+    // @ts-ignore:
+    if (v != null && v !== '') r[k] = String(v)
+  }
+  return r
+}
+
+export function pickNumber<T, K>(o: T, ...keys: K[]): Partial<Record<K & keyof T, number>> {
+  const r = {}
+  if (!o) return r
+  for (const k of keys) {
+    // @ts-ignore:
+    const v = o[k]
+    // @ts-ignore:
+    if (v != null && v !== '') r[k] = Number(v)
+  }
+  return r
+}
+
+export function pickTrue<T, K>(o: T, ...keys: K[]): Partial<Record<K & keyof T, true>> {
+  const r = {}
+  if (!o) return r
+  for (const k of keys) {
+    // @ts-ignore:
+    const v = o[k]
+    // @ts-ignore:
+    if (v) r[k] = true
+  }
+  return r
+}
+
+export function splitLeft(str: string, separator: string, maxSplit = 1): string[] {
+  const result: string[] = []
+  let i = 0
+  while (maxSplit-- > 0) {
+    const j = str.indexOf(separator, i)
+    if (j < 0) break
+    result.push(str.slice(i, j))
+    i = j + separator.length
+  }
+  result.push(str.slice(i))
+  return result
+}
+
+export function splitRight(str: string, separator: string, maxSplit = 1): string[] {
+  const result: string[] = []
+  let i = str.length
+  while (maxSplit-- > 0) {
+    if (i <= 0) break
+    const j = str.lastIndexOf(separator, i - 1)
+    if (j < 0) break
+    result.push(str.slice(j + separator.length, i))
+    i = j
+  }
+  result.push(str.slice(0, i))
+  return result.reverse()
+}
