@@ -129,7 +129,8 @@ export async function cvt(
         console.timeEnd('text')
         if (resp.ok) return [...from(text), resp.headers]
         return [[], 0]
-      } catch {
+      } catch (e) {
+        console.error('fetch error', e)
         return [[], 0]
       }
     }
