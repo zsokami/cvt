@@ -28,6 +28,8 @@ function to(proxies: Proxy[], target: string = 'clash'): string {
   switch (target) {
     case 'clash':
       return toClash(proxies)
+    case 'clash-proxies':
+      return toClash(proxies, true)
     case 'uri':
       return toURIs(proxies)
     case 'base64':

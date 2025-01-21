@@ -17,6 +17,7 @@ async function main(req: Request, _ctx: Context) {
     if ('auto' in args) to = 'auto'
     else if ('base64' in args) to = 'base64'
     else if ('uri' in args) to = 'uri'
+    else if ('clash-proxies' in args) to = 'clash-proxies'
     else to = args['to'] || 'clash'
   }
   let from
