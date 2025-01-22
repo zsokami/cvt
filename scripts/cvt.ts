@@ -8,14 +8,14 @@ if (~oidx) {
 }
 
 if (!Deno.args.length) {
-  console.log(`用于在 Clash、Clash proxies、base64 和 uri 订阅格式之间进行快速转换
+  console.log(`用于在 Clash(Meta/mihomo)、Clash proxies、base64 和 uri 订阅格式之间进行快速转换
 
 deno run -A cvt.ts [-o <path>] [<from>] [<to>] [<ua>]
   -o <path>
   输出路径
 
   <from>
-  http/s 订阅链接、除 http/s 代理的 uri 或用 base64url 编码的订阅内容, 多个用 | 分隔
+  http/s 订阅链接、除 http/s 代理的 uri 或用 base64/base64url 编码的订阅内容, 多个用 | 分隔
   获取零节点订阅用 empty, 可用于去广告
 
   <to>
