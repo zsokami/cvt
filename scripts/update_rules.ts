@@ -29,7 +29,7 @@ const supported_types = new Set([
 ])
 
 Deno.writeTextFileSync(
-  'rules.ts',
+  'netlify/edge-functions/main/rules.ts',
   `export const RULES = \`rules:
 ${
     (await Promise.all(rulesets.map(async ([url, name]) =>
