@@ -50,6 +50,7 @@ export const RULES = `rules:
 - DOMAIN-SUFFIX,ogithub.xyz,DIRECT
 - DOMAIN-SUFFIX,pgithub.xyz,DIRECT
 - DOMAIN,hub.whtrys.space,DIRECT
+- DOMAIN-SUFFIX,arx.cc,🛩️ ‍墙内
 - DOMAIN-SUFFIX,mnnx.cc,🛩️ ‍墙内
 - DOMAIN-SUFFIX,jsd.f5.si,🛩️ ‍墙内
 - DOMAIN-SUFFIX,ghraw.f5.si,🛩️ ‍墙内
