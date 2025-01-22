@@ -6,20 +6,20 @@ import { Proxy } from './types.ts'
 import { RE_EMOJI, RE_EMOJI_CN, RE_EMOJI_INFO, RE_EMOJI_SINGLE, RE_EXCLUDE } from './consts.ts'
 
 function from(input: string): [Proxy[], number] {
-  console.time('decodeBase64Url')
+  // console.time('decodeBase64Url')
   try {
     input = decodeBase64Url(input)
   } catch {
     // pass
   }
-  console.timeEnd('decodeBase64Url')
-  console.time('fromURIs')
+  // console.timeEnd('decodeBase64Url')
+  // console.time('fromURIs')
   let [proxies, total] = fromURIs(input)
-  console.timeEnd('fromURIs')
+  // console.timeEnd('fromURIs')
   if (total === 0) {
-    console.time('fromClash')
+    // console.time('fromClash')
     ;[proxies, total] = fromClash(input)
-    console.timeEnd('fromClash')
+    // console.timeEnd('fromClash')
   }
   return [proxies, total]
 }
@@ -115,24 +115,24 @@ export async function cvt(
   ua: string = 'ClashMetaForAndroid/2.11.5.Meta',
   proxy?: string,
 ): Promise<[string, [number, number, number], Headers | undefined]> {
-  console.time('from')
+  // console.time('from')
   const proxy_urls = proxy?.split('|') ?? []
   const promises = _from.split('|').map(async (x, i) => {
     if (/^https?:/i.test(x)) {
       try {
-        console.time('fetch')
+        // console.time('fetch')
         const resp = await fetch(x, {
           headers: { 'user-agent': ua },
           ...proxy_urls[i] && { client: Deno.createHttpClient({ proxy: { url: proxy_urls[i] } }) },
         })
-        console.timeEnd('fetch')
-        console.time('text')
+        // console.timeEnd('fetch')
+        // console.time('text')
         const text = await resp.text()
-        console.timeEnd('text')
+        // console.timeEnd('text')
         if (resp.ok) return [...from(text), resp.headers]
         return [[], 0]
       } catch (e) {
-        console.error('fetch error', e)
+        console.error('Fetch Error:', e)
         return [[], 0]
       }
     }
@@ -153,20 +153,20 @@ export async function cvt(
       }
     }
   }
-  console.timeEnd('from')
+  // console.timeEnd('from')
   const count_before_filter = proxies.length
-  console.time('filter')
+  // console.time('filter')
   proxies = filter(proxies)
-  console.timeEnd('filter')
-  console.time('handleEmoji')
+  // console.timeEnd('filter')
+  // console.time('handleEmoji')
   for (const proxy of proxies) {
     proxy.name = handleEmoji(proxy.name)
   }
-  console.timeEnd('handleEmoji')
-  console.time('renameDuplicates')
+  // console.timeEnd('handleEmoji')
+  // console.time('renameDuplicates')
   proxies = renameDuplicates(proxies)
-  console.timeEnd('renameDuplicates')
-  console.time('to')
+  // console.timeEnd('renameDuplicates')
+  // console.time('to')
   const result: [string, [number, number, number], Headers | undefined] = [
     proxies.length === 0 && _from !== 'empty'
       ? ''
@@ -178,6 +178,6 @@ export async function cvt(
       ? other_headers[0]
       : undefined,
   ]
-  console.timeEnd('to')
+  // console.timeEnd('to')
   return result
 }
