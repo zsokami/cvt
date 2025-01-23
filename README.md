@@ -6,6 +6,8 @@ emoji、代理策略组和路由规则与 [ACL4SSR_Online_Full_Mannix.ini](https
 
 ## 远程转换
 
+[配套 Web 前端](https://github.com/zsokami/scweb)
+
 用法
 
 ```
