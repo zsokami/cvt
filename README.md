@@ -60,6 +60,12 @@ deno run -A https://raw.githubusercontent.com/zsokami/cvt/main/scripts/server.ts
 deno run -A https://raw.githubusercontent.com/zsokami/cvt/main/scripts/server.ts 8000
 ```
 
+指定主机名/IP:端口
+
+```sh
+deno run -A https://raw.githubusercontent.com/zsokami/cvt/main/scripts/server.ts [::1]:8000
+```
+
 更新版本并运行
 
 ```sh
