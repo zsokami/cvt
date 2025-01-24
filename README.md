@@ -44,7 +44,37 @@ https://arx.cc/!auto/https://example.com/subscribe?token=xxx
 
 ## 本地转换
 
-使用命令行，需先安装 [Deno](https://deno.com/)
+### 本地服务
+
+需先安装 [Deno](https://deno.com/)
+
+运行
+
+```sh
+deno run -A https://raw.githubusercontent.com/zsokami/cvt/main/scripts/server.ts
+```
+
+指定端口
+
+```sh
+deno run -A https://raw.githubusercontent.com/zsokami/cvt/main/scripts/server.ts 8000
+```
+
+更新版本并运行
+
+```sh
+deno run -A -r https://raw.githubusercontent.com/zsokami/cvt/main/scripts/server.ts
+```
+
+查看版本
+
+```
+http://127.0.0.1:8000/version
+```
+
+### 命令行
+
+需先安装 [Deno](https://deno.com/)
 
 用法
 
