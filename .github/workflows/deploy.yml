@@ -1,0 +1,18 @@
+name: Deploy
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+  repository_dispatch:
+jobs:
+  deploy_worker:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: denoland/setup-deno@v2
+      - name: Build Worker
+        run: deno run -A scripts/worker_build.ts
+      - name: Deploy Worker
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CF_API_TOKEN }}
