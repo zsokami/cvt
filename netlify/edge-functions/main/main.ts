@@ -1,9 +1,8 @@
-import type { Config, Context } from 'https://edge.netlify.com/'
 import { cvt } from './cvt.ts'
 import { pickTruthy, urlDecode } from './utils.ts'
 import { VERSION } from './version.ts'
 
-async function main(req: Request, _ctx: Context) {
+async function main(req: Request) {
   const reqURL = new URL(req.url)
   if (reqURL.pathname === '/version') {
     return new Response(VERSION)
@@ -73,14 +72,14 @@ async function main(req: Request, _ctx: Context) {
   return new Response(result, { headers })
 }
 
-export default async (req: Request, ctx: Context) => {
+export default async (req: Request) => {
   try {
-    return await main(req, ctx)
+    return await main(req)
   } catch (e) {
     return new Response(String(e), { status: 500 })
   }
 }
 
-export const config: Config = {
+export const config = {
   path: '/*',
 }
