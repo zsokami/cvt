@@ -1,0 +1,4 @@
+{
+  "installCommand": "npm install -g deno",
+  "buildCommand": "deno run -A scripts/middleware_build.ts"
+}
