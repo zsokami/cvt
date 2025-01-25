@@ -42,6 +42,32 @@ https://arx.cc/https://example.com/subscribe?token=xxx
 https://arx.cc/!auto/https://example.com/subscribe?token=xxx
 ```
 
+### Serverless / Edge 部署
+
+#### Cloudflare Workers
+
+[![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/zsokami/cvt)
+
+Demo: `https://c.arx.cc/`
+
+#### Vercel
+
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/zsokami/cvt)
+
+Demo: `https://v.arx.cc/`
+
+#### Netlify
+
+[![Deploy to Netlify](https://www.netlify.com/img/deploy/button.svg)](https://app.netlify.com/start/deploy?repository=https://github.com/zsokami/cvt)
+
+Demo: `https://arx.cc/`
+
+#### Deno Deploy
+
+先 Fork 仓库，然后登录 [Deno Deploy](https://dash.deno.com/new_project) 选择仓库，Entrypoint 选 `scripts/server.ts`，点击部署即可
+
+Demo: `https://d.arx.cc/`
+
 ## 本地转换
 
 ### 本地服务
