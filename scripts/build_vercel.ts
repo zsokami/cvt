@@ -1,7 +1,7 @@
 import { build } from './esbuild.ts'
 
 await build(
-  `import handler from '../netlify/edge-functions/main/main.ts'
+  `import handler from './netlify/edge-functions/main/main.ts'
 export default handler`,
   '.vercel/output/functions/_middleware.func/index.js',
 )
