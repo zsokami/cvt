@@ -10,10 +10,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: denoland/setup-deno@v2
-      - name: Build Worker
-        run: deno run -A scripts/worker_build.ts
-      - name: Deploy Worker
-        uses: cloudflare/wrangler-action@v3
+      - name: Build
+        run: deno run -A scripts/build_cloudflare_workers.ts
+      - uses: cloudflare/wrangler-action@v3
         with:
           apiToken: ${{ secrets.CF_API_TOKEN }}
           accountId: ${{ secrets.CF_ACCOUNT_ID }}

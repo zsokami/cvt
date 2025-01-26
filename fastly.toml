@@ -1,0 +1,9 @@
+# This file describes a Fastly Compute package. To learn more visit:
+# https://www.fastly.com/documentation/reference/compute/fastly-toml
+
+name = "cvt"
+manifest_version = 3
+language = "javascript"
+
+[scripts]
+  build = "deno run -A scripts/build_fastly_compute.ts && js-compute-runtime scripts/__fastly_compute.js bin/main.wasm"

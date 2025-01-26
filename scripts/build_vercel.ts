@@ -1,7 +1,10 @@
 import { build } from './esbuild.ts'
 
-await build('scripts/middleware.ts', '.vercel/output/functions/_middleware.func/index.js')
-
+await build(
+  `import handler from '../netlify/edge-functions/main/main.ts'
+export default handler`,
+  '.vercel/output/functions/_middleware.func/index.js',
+)
 Deno.writeTextFileSync(
   '.vercel/output/functions/_middleware.func/.vc-config.json',
   '{"runtime":"edge","entrypoint":"index.js"}',

@@ -1,9 +1,10 @@
 import * as esbuild from 'https://deno.land/x/esbuild@v0.24.2/mod.js'
 
-export async function build(input: string, output: string) {
+export async function build(
+  input: string | string[] | Record<string, string> | { in: string; out: string }[],
+  outfile_or_options: string | esbuild.BuildOptions,
+) {
   await esbuild.build({
-    entryPoints: [input],
-    outfile: output,
     bundle: true,
     format: 'esm',
     charset: 'utf8',
@@ -24,6 +25,8 @@ export async function build(input: string, output: string) {
         })
       },
     }],
+    ...typeof input === 'string' ? { stdin: { contents: input } } : { entryPoints: input },
+    ...typeof outfile_or_options === 'string' ? { outfile: outfile_or_options } : outfile_or_options,
   })
   await esbuild.stop()
 }

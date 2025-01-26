@@ -1,2 +1,6 @@
 __*
-.vercel
+
+/.vercel
+
+/bin
+/pkg

@@ -1,3 +1,3 @@
 name = "cvt"
-main = "scripts/__worker.js"
+main = "scripts/__cloudflare_workers.js"
 compatibility_date = "2025-01-23"
