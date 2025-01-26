@@ -1,11 +1,11 @@
-name: Deploy
+name: Cloudflare Workers
 on:
   push:
   pull_request:
   workflow_dispatch:
   repository_dispatch:
 jobs:
-  deploy_worker:
+  deploy:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
