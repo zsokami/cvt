@@ -25,7 +25,7 @@ export async function build(
         })
       },
     }],
-    ...typeof input === 'string' ? { stdin: { contents: input } } : { entryPoints: input },
+    ...typeof input === 'string' ? { stdin: { contents: input, resolveDir: '.' } } : { entryPoints: input },
     ...typeof outfile_or_options === 'string' ? { outfile: outfile_or_options } : outfile_or_options,
   })
   await esbuild.stop()
