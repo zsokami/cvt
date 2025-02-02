@@ -68,6 +68,16 @@ Demo: `https://arx.cc/`
 
 Demo: `https://d.arx.cc/`
 
+#### Fermyon Cloud
+
+登录 [Fermyon Cloud](https://cloud.fermyon.com/user-settings)，生成 Token 并复制
+
+Fork 仓库，进入 Settings > Secrets and variables > Actions > New repository secret (`https://github.com/{用户名}/cvt/settings/secrets/actions/new`)，将生成的 Token 粘贴到 Secret，名为 `FERMYON_CLOUD_TOKEN`，点击 Add secret
+
+切换到 Actions 启用 Workflows，运行 Fermyon Cloud，等待部署成功，回到 [Fermyon Cloud](https://cloud.fermyon.com/) 查看部署
+
+Demo: `https://cvt.fermyon.app/`
+
 ## 本地转换
 
 ### 本地服务
