@@ -11,4 +11,3 @@ __*
 /.spin
 /package.json
 /package-lock.json
-*.buildData.json
