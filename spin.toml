@@ -1,0 +1,22 @@
+spin_manifest_version = 2
+
+[application]
+name = "cvt"
+version = "1.0"
+
+[[trigger.http]]
+route = "/..."
+component = "main"
+
+[component.main]
+source = "dist/main.wasm"
+exclude_files = ["**/*"]
+allowed_outbound_hosts = ["*://*:*"]
+[component.main.build]
+command = [
+  "deno run -A scripts/build_fermyon_cloud.ts",
+  "npx knitwit --out-dir build/wit/knitwit --out-world combined",
+  "npx mkdirp dist",
+  "npx j2w -i scripts/__fermyon_cloud.js -d build/wit/knitwit -n combined -o dist/main.wasm"
+]
+watch = ["netlify/edge-functions/main/*.ts"]
