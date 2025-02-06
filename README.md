@@ -70,7 +70,7 @@ Demo: `https://d.arx.cc/`
 
 #### Koyeb
 
-[![Deploy to Koyeb](https://www.koyeb.com/static/images/deploy/button.svg)](https://app.koyeb.com/deploy?name=cvt&repository=zsokami%2Fcvt&branch=main&builder=dockerfile&instance_type=free&ports=8000%3Bhttp2%3B%2F)
+[![Deploy to Koyeb](https://www.koyeb.com/static/images/deploy/button.svg)](https://app.koyeb.com/deploy?type=git&name=cvt&repository=zsokami%2Fcvt&branch=main&builder=dockerfile&instance_type=free&ports=8000%3Bhttp2%3B%2F)
 
 Demo: `https://cvt.koyeb.app/`
 
