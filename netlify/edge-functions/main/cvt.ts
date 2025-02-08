@@ -123,7 +123,16 @@ export async function cvt(
         // console.time('fetch')
         const resp = await fetch(x, {
           headers: { 'user-agent': ua },
-          ...proxy_urls[i] && { client: Deno.createHttpClient({ proxy: { url: proxy_urls[i] } }) },
+          ...proxy_urls[i] && {
+            client: Deno.createHttpClient({
+              proxy: {
+                url: proxy_urls[i].replace(
+                  /^(https?:|socks5h?:)?\/*/i,
+                  (_, $1) => `${$1?.toLowerCase() || 'http:'}//`,
+                ),
+              },
+            }),
+          },
         })
         // console.timeEnd('fetch')
         // console.time('text')
