@@ -20,7 +20,7 @@ async function main(req: Request) {
     else to = args['to'] || 'clash'
   }
   let from
-  if (reqURL.pathname.match(/^\/https?:/i)) {
+  if (reqURL.pathname.match(/^\/(?:https?|data):/i)) {
     from = reqURL.pathname.slice(1) + reqURL.search
   } else {
     from = urlDecode(reqURL.pathname.slice(1))

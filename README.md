@@ -25,7 +25,7 @@ https://arx.cc[/!<args>]/<from>
 
 `<from>`
 
-http/s 订阅链接或用 base64/base64url 编码的订阅内容
+http/s 订阅链接、用 base64/base64url 编码的订阅内容或 Data URL
 
 可以是除 http/s 代理的 uri，但需 URL 编码
 
@@ -134,7 +134,7 @@ deno run -A https://raw.githubusercontent.com/zsokami/cvt/main/scripts/cvt.ts [-
 
 - `-o <path>` 输出路径
 
-- `<from>` http/s 订阅链接、除 http/s 代理的 uri 或用 base64/base64url 编码的订阅内容，多个用 | 分隔。获取零节点订阅用 empty，可用于去广告
+- `<from>` http/s 订阅链接、除 http/s 代理的 uri、用 base64/base64url 编码的订阅内容或 Data URL，多个用 | 分隔。获取零节点订阅用 empty，可用于去广告
 
 - `<to>` clash、clash-proxies、base64、uri 或 auto(若 ua 含 clash 则 clash 否则 base64)
 

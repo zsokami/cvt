@@ -118,7 +118,7 @@ export async function cvt(
   // console.time('from')
   const proxy_urls = proxy?.split('|') ?? []
   const promises = _from.split('|').map(async (x, i) => {
-    if (/^https?:/i.test(x)) {
+    if (/^(?:https?|data):/i.test(x)) {
       try {
         // console.time('fetch')
         const resp = await fetch(x, {
@@ -138,7 +138,7 @@ export async function cvt(
         // console.time('text')
         const text = await resp.text()
         // console.timeEnd('text')
-        if (resp.ok) return [...from(text), resp.headers]
+        if (resp.ok) return [...from(text), /^data:/i.test(x) ? undefined : resp.headers]
         return [[], 0]
       } catch (e) {
         console.error('Fetch Error:', e)

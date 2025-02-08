@@ -15,7 +15,7 @@ deno run -A cvt.ts [-o <path>] [<from>] [<to>] [<ua>]
   输出路径
 
   <from>
-  http/s 订阅链接、除 http/s 代理的 uri 或用 base64/base64url 编码的订阅内容, 多个用 | 分隔
+  http/s 订阅链接、除 http/s 代理的 uri、用 base64/base64url 编码的订阅内容或 Data URL, 多个用 | 分隔
   获取零节点订阅用 empty, 可用于去广告
 
   <to>
