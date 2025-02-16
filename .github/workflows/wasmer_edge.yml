@@ -1,0 +1,18 @@
+name: Wasmer Edge
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - uses: denoland/setup-deno@v2
+    - name: Build
+      run: deno run -A scripts/build_wasmer_edge.ts
+    - uses: wasmerio/setup-wasmer@v3.1
+    - name: Deploy
+      run: |
+        wasmer login ${{ secrets.WASMER_TOKEN }}
+        wasmer deploy --non-interactive --no-persist-id --owner "$(wasmer whoami | awk '{print $NF}')"

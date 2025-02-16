@@ -1,0 +1,3 @@
+name: cvt
+package: '.'
+kind: wasmer.io/App.v0
