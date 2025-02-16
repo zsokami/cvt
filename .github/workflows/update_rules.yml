@@ -2,22 +2,22 @@ name: update_rules.ts
 on:
   workflow_dispatch:
   schedule:
-    - cron: 0 1 * * 1
+  - cron: 0 1 * * 1
 permissions: write-all
 jobs:
   main:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: denoland/setup-deno@v2
-      - name: Run update_rules.ts
-        run: deno run -A scripts/update_rules.ts
-      - name: Commit & Push
-        run: |
-          git config user.email github-actions@github.com
-          git config user.name github-actions
-          git add .
-          git commit -m "Auto update rules.ts"
-          git pull --rebase
-          git push
-        continue-on-error: true
+    - uses: actions/checkout@v4
+    - uses: denoland/setup-deno@v2
+    - name: Run update_rules.ts
+      run: deno run -A scripts/update_rules.ts
+    - name: Commit & Push
+      run: |
+        git config user.email github-actions@github.com
+        git config user.name github-actions
+        git add .
+        git commit -m "Auto update rules.ts"
+        git pull --rebase
+        git push
+      continue-on-error: true
