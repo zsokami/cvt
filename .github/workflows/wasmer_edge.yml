@@ -14,5 +14,5 @@ jobs:
     - uses: wasmerio/setup-wasmer@v3.1
     - name: Deploy
       run: |
-        wasmer login ${{ secrets.WASMER_TOKEN }}
+        wasmer login --no-browser ${{ secrets.WASMER_TOKEN }}
         wasmer deploy --non-interactive --no-persist-id --owner "$(wasmer whoami | awk '{print $NF}')"
