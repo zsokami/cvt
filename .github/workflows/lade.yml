@@ -1,0 +1,20 @@
+name: Lade
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - name: Install Lade
+      run: |
+        curl -L https://github.com/sachnun/lade/releases/latest/download/lade-linux-amd64.tar.gz | tar xz
+        sudo mv lade /usr/local/bin
+    - name: Deploy
+      run: |
+        lade login --username ${{ secrets.LADE_USERNAME }} --password ${{ secrets.LADE_PASSWORD }}
+        lade apps create cvt --region syd || true
+        lade env set PORT=8000 --app cvt
+        lade deploy --app cvt
