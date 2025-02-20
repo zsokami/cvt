@@ -1,7 +1,6 @@
 name: Fermyon Cloud
 on:
   push:
-  pull_request:
   workflow_dispatch:
 jobs:
   deploy:

@@ -1,7 +1,6 @@
 name: Cloudflare Workers
 on:
   push:
-  pull_request:
   workflow_dispatch:
   repository_dispatch:
 jobs:
