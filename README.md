@@ -90,7 +90,7 @@ Demo: `https://cvt.fermyon.app/`
 
 Fork 仓库，进入 Settings > Secrets and variables > Actions > New repository secret (`https://github.com/{用户名}/cvt/settings/secrets/actions/new`)，将生成的 Token 粘贴到 Secret，名为 `WASMER_TOKEN`，点击 Add secret
 
-切换到 Actions 启用 Workflows，运行 Wasmer Edge，等待部署成功，回到 [Wasmer](https://wasmer.io/trsub?tab=apps) 查看部署
+切换到 Actions 启用 Workflows，运行 Wasmer Edge，等待部署成功，回到 [Wasmer](https://wasmer.io/) 查看部署
 
 Demo: `https://w.arx.cc/`
 
