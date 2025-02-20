@@ -12,5 +12,5 @@ jobs:
         ssh-private-key: ${{ secrets.ALWAYSDATA_SSH_PRIVATE_KEY }}
     - name: Deploy
       run: |
-        ssh -o StrictHostKeyChecking=no ${{ secrets.ALWAYSDATA_SSH_USER_HOST }} "cd cvt && git pull"
+        ssh -o StrictHostKeyChecking=accept-new -o LogLevel=ERROR ${{ secrets.ALWAYSDATA_SSH_USER_HOST }} "cd cvt && git pull"
         curl -X POST --basic --user "${{ secrets.ALWAYSDATA_TOKEN }} account=${{ secrets.ALWAYSDATA_ACCOUNT }}:" https://api.alwaysdata.com/v1/site/${{ secrets.ALWAYSDATA_SITE_ID }}/restart/
