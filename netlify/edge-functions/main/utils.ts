@@ -6,13 +6,12 @@ export { parse as parseYAML } from 'https://raw.githubusercontent.com/denoland/s
 const textDecoder = new TextDecoder()
 
 export function decodeBase64Url(b64url: string): string {
+  b64url = b64url.replaceAll(/\s/g, '')
+  if (b64url.length % 4 === 1) {
+    throw new TypeError('Failed to decode base64url: b64url’s length divides by 4 leaving a remainder of 1')
+  }
   if (!/^[-_+/A-Za-z0-9]*={0,2}$/.test(b64url)) {
     throw new TypeError('Failed to decode base64url: invalid character')
-  }
-  if (b64url.length % 4 === 2) b64url + '=='
-  if (b64url.length % 4 === 3) b64url + '='
-  if (b64url.length % 4 === 1) {
-    throw new TypeError('Illegal base64url string')
   }
   return textDecoder.decode(decodeBase64(b64url.replaceAll('-', '+').replaceAll('_', '/')))
 }
