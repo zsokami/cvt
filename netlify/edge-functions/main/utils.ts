@@ -6,7 +6,7 @@ export { parse as parseYAML } from 'https://raw.githubusercontent.com/denoland/s
 const textDecoder = new TextDecoder()
 
 export function decodeBase64Url(b64url: string): string {
-  b64url = b64url.replaceAll(/\s/g, '')
+  b64url = b64url.replaceAll(/\s/g, '').replaceAll('%2B', '+').replaceAll('%2F', '/')
   if (b64url.length % 4 === 1) {
     throw new TypeError('Failed to decode base64url: b64url’s length divides by 4 leaving a remainder of 1')
   }
