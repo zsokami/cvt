@@ -348,6 +348,21 @@ export interface SSH extends ProxyBase {
   'host-key-algorithms'?: string[]
 }
 
+export interface AnyTLS extends ProxyBase {
+  type: 'anytls'
+  port: number
+  password: string
+  sni?: string
+  fingerprint?: string
+  'client-fingerprint'?: string
+  alpn?: string[]
+  'skip-cert-verify'?: boolean
+  udp?: boolean
+  'idle-session-check-interval'?: number
+  'idle-session-timeout'?: number
+  'min-idle-session'?: number
+}
+
 export type Proxy =
   | HTTP
   | Socks5
@@ -363,3 +378,4 @@ export type Proxy =
   | TUIC
   | WireGuard
   | SSH
+  | AnyTLS

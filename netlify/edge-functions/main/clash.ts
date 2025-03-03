@@ -1,4 +1,5 @@
 import type {
+  AnyTLS,
   Empty,
   GRPCNetwork,
   H2Network,
@@ -269,6 +270,18 @@ const FROM_CLASH = {
       ...Array.isArray(o['host-key']) && o['host-key'].length && { 'host-key': o['host-key'] as string[] },
       ...Array.isArray(o['host-key-algorithms']) && o['host-key-algorithms'].length &&
         { 'host-key-algorithms': o['host-key-algorithms'] as string[] },
+    }
+  },
+  anytls(o: unknown): AnyTLS {
+    checkType(o, 'anytls')
+    return {
+      ...baseFrom(o),
+      password: String(o.password),
+      ...pickNonEmptyString(o, 'sni', 'fingerprint', 'client-fingerprint'),
+      ...Array.isArray(o.alpn) && o.alpn.length && { alpn: o.alpn as string[] },
+      ...scv,
+      ...udp,
+      ...pickNumber(o, 'idle-session-check-interval', 'idle-session-timeout', 'min-idle-session'),
     }
   },
 }

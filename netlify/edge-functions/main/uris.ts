@@ -1,4 +1,5 @@
 import type {
+  AnyTLS,
   Empty,
   GRPCNetwork,
   H2Network,
@@ -243,6 +244,19 @@ const FROM_URI = {
       ...udp,
     }
   },
+  anytls(uri: string): AnyTLS {
+    const u = new URL(uri)
+    const ps = Object.fromEntries(u.searchParams)
+    const { alpn } = ps
+    return {
+      ...baseFrom(u),
+      password: u.username,
+      ...pickNonEmptyString(ps, 'sni'),
+      ...alpn && { alpn: alpn.split(',') },
+      ...scv,
+      ...udp,
+    }
+  },
 }
 
 const TO_URI = {
@@ -397,6 +411,17 @@ const TO_URI = {
       ...reserved && { reserved: reserved.join(',') },
       address: [ip, ipv6].filter((x) => x).join(','),
       ...mtu && { mtu: String(mtu) },
+    }).toString()
+    return u.href
+  },
+  anytls(proxy: Proxy): string {
+    checkType(proxy, 'anytls')
+    const { password, alpn } = proxy
+    const u = baseTo(proxy)
+    u.username = password
+    u.search = new URLSearchParams({
+      ...pickNonEmptyString(proxy, 'sni'),
+      ...alpn?.length && { alpn: alpn.join(',') },
     }).toString()
     return u.href
   },
@@ -618,6 +643,7 @@ const TYPE_MAP: Record<
   | 'hysteria2'
   | 'tuic'
   | 'wireguard'
+  | 'anytls'
   | undefined
 > = Object.assign(Object.create(null), {
   http: 'http',
@@ -637,6 +663,7 @@ const TYPE_MAP: Record<
   tuic: 'tuic',
   wireguard: 'wireguard',
   wg: 'wireguard',
+  anytls: 'anytls',
 })
 
 export function fromURI(uri: string): Proxy {
