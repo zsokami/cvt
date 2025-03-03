@@ -8,6 +8,7 @@ import type {
   Hysteria,
   Hysteria2,
   ObfsPlugin,
+  PortOrPorts,
   Proxy,
   ProxyBase,
   Reality,
@@ -214,7 +215,7 @@ const FROM_URI = {
     const ps = Object.fromEntries(u.searchParams)
     const { alpn } = ps
     return {
-      ...baseFrom(u),
+      ...baseFromForPorts(u),
       password: urlDecode(u.username),
       ...pickNonEmptyString(ps, 'up', 'down', 'obfs', 'obfs-password', 'sni'),
       ...alpn && { alpn: alpn.split(',') },
@@ -383,10 +384,11 @@ const TO_URI = {
   },
   hysteria2(proxy: Proxy): string {
     checkType(proxy, 'hysteria2')
-    const { password, up, down, alpn } = proxy
+    const { ports, password, up, down, alpn } = proxy
     const u = baseTo(proxy)
     u.username = password
     u.search = new URLSearchParams({
+      ...ports && { mport: ports },
       ...up && { up: toMbps(up) },
       ...down && { down: toMbps(down) },
       ...pickNonEmptyString(proxy, 'obfs', 'obfs-password', 'sni'),
@@ -447,9 +449,28 @@ function baseFrom<T extends Proxy['type']>(u: URL): ProxyBase & { port: number; 
   }
 }
 
+function baseFromForPorts<T extends Proxy['type']>(u: URL): ProxyBase & PortOrPorts & { type: T } {
+  const { protocol, hostname, port, host, hash } = u
+  const mport = u.searchParams.get('mport')
+  const ports = {
+    ...port && { port: +port },
+    ...mport && { ports: mport },
+  }
+  if (!('port' in ports || 'ports' in ports)) {
+    ports.port = protocol === 'http:' ? 80 : 443
+  }
+  return {
+    name: u.searchParams.get('remarks') || hash && urlDecodePlus(hash.substring(1)) || host,
+    server: hostname[0] === '[' ? hostname.slice(1, -1) : hostname,
+    ...ports as PortOrPorts,
+    type: TYPE_MAP[protocol.slice(0, -1)] as T,
+  }
+}
+
 function baseTo(p: ProxyBase & Pick<Proxy, 'type'> & { port?: number }): URL {
   const { name, type, server, port } = p
-  const u = new URL(`${type}://${server.includes(':') ? `[${server}]` : server}:${port || 443}`)
+  const u = new URL(`${type}://${server.includes(':') ? `[${server}]` : server}`)
+  if (port) u.port = String(port)
   u.hash = name.replaceAll('%', '%25')
   return u
 }
