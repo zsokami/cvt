@@ -51,6 +51,9 @@ const FROM_URI = {
       } catch {
         // pass
       }
+    } else {
+      username = urlDecode(username)
+      password = urlDecode(password)
     }
     return {
       ...baseFrom(u),
@@ -71,6 +74,9 @@ const FROM_URI = {
       } catch {
         // pass
       }
+    } else {
+      username = urlDecode(username)
+      password = urlDecode(password)
     }
     return {
       ...baseFrom(u),
@@ -157,7 +163,7 @@ const FROM_URI = {
       : {}
     return {
       ...baseFrom(u),
-      uuid: u.username,
+      uuid: urlDecode(u.username),
       ...networkFrom(ps),
       ...flow && { flow },
       ...tlsOpts,
@@ -176,7 +182,7 @@ const FROM_URI = {
     const { sni, alpn, fp, pbk, sid } = ps
     return {
       ...baseFrom(u),
-      password: u.username,
+      password: urlDecode(u.username),
       ...netOpts,
       ...sni && { sni },
       ...alpn && { alpn: alpn.split(',') },
@@ -209,7 +215,7 @@ const FROM_URI = {
     const { alpn } = ps
     return {
       ...baseFrom(u),
-      password: u.username,
+      password: urlDecode(u.username),
       ...pickNonEmptyString(ps, 'up', 'down', 'obfs', 'obfs-password', 'sni'),
       ...alpn && { alpn: alpn.split(',') },
       ...scv,
@@ -221,8 +227,8 @@ const FROM_URI = {
     const { alpn, sni, congestion_control } = ps
     return {
       ...baseFrom(u),
-      uuid: u.username,
-      password: u.password,
+      uuid: urlDecode(u.username),
+      password: urlDecode(u.password),
       ...alpn && { alpn: alpn.split(',') },
       ...sni && { sni },
       ...congestion_control && { 'congestion-controller': congestion_control },
@@ -250,7 +256,7 @@ const FROM_URI = {
     const { alpn } = ps
     return {
       ...baseFrom(u),
-      password: u.username,
+      password: urlDecode(u.username),
       ...pickNonEmptyString(ps, 'sni'),
       ...alpn && { alpn: alpn.split(',') },
       ...scv,
