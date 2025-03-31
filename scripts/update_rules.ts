@@ -10,7 +10,7 @@ const rulesets = [
   ['https://raw.githubusercontent.com/ACL4SSR/ACL4SSR/master/Clash/Ruleset/SteamCN.list', '🛩️ ‍墙内'],
   ['https://raw.githubusercontent.com/ACL4SSR/ACL4SSR/master/Clash/Ruleset/BilibiliHMT.list', '📺 ‍B站'],
   ['https://raw.githubusercontent.com/ACL4SSR/ACL4SSR/master/Clash/Ruleset/Bilibili.list', '📺 ‍B站'],
-  ['https://raw.githubusercontent.com/zsokami/ACL4SSR/main/AI.list', '🤖 ‍AI'],
+  ['https://raw.githubusercontent.com/ACL4SSR/ACL4SSR/master/Clash/Ruleset/AI.list', '🤖 ‍AI'],
   ['https://raw.githubusercontent.com/ACL4SSR/ACL4SSR/master/Clash/ProxyGFWlist.list', '✈️ ‍起飞'],
   ['https://raw.githubusercontent.com/ACL4SSR/ACL4SSR/master/Clash/ChinaDomain.list', '🛩️ ‍墙内'],
   ['https://raw.githubusercontent.com/ACL4SSR/ACL4SSR/master/Clash/ChinaCompanyIp.list', '🛩️ ‍墙内'],
