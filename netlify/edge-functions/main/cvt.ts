@@ -79,6 +79,9 @@ function handleEmoji(name: string): string {
   }
   if (arr.length) {
     arr.sort((a, b) => b[0] - a[0])
+    for (const [i, flag] of arr) {
+      if (name[i] !== '.' && name[i] !== '-') return `${flag} ${name}`
+    }
     return `${arr[0][1]} ${name}`
   }
 
