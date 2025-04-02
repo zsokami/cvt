@@ -1,6 +1,7 @@
 import type {
   AnyTLS,
   Empty,
+  GostPlugin,
   GRPCNetwork,
   H2Network,
   HTTP,
@@ -475,7 +476,7 @@ function baseTo(p: ProxyBase & Pick<Proxy, 'type'> & { port?: number }): URL {
   return u
 }
 
-function pluginFromSearchParam(p: string | null): Empty | ObfsPlugin | V2rayPlugin | ShadowTlsPlugin {
+function pluginFromSearchParam(p: string | null): Empty | ObfsPlugin | V2rayPlugin | GostPlugin | ShadowTlsPlugin {
   if (!p) return {}
   const [plugin, ...strOpts] = p.split(';')
   const opts = Object.fromEntries(strOpts.map((s) => splitLeft(s, '=')))
@@ -503,6 +504,18 @@ function pluginFromSearchParam(p: string | null): Empty | ObfsPlugin | V2rayPlug
           ...!('mux' in opts) && { mux: false },
         },
       } as V2rayPlugin
+    case 'gost-plugin':
+      return {
+        plugin,
+        'plugin-opts': {
+          ...pickNonEmptyString(opts, 'mode', 'host', 'path'),
+          ...'tls' in opts && {
+            tls: true,
+            ...scv,
+          },
+          ...!('mux' in opts) && { mux: false },
+        },
+      } as GostPlugin
     case 'shadow-tls':
       return {
         plugin,
@@ -516,7 +529,9 @@ function pluginFromSearchParam(p: string | null): Empty | ObfsPlugin | V2rayPlug
   throw new Error(`Unsupported plugin: ${plugin}`)
 }
 
-function pluginToSearchParam(p: Empty | ObfsPlugin | V2rayPlugin | ShadowTlsPlugin | RestlsPlugin): string {
+function pluginToSearchParam(
+  p: Empty | ObfsPlugin | V2rayPlugin | GostPlugin | ShadowTlsPlugin | RestlsPlugin,
+): string {
   if (!('plugin' in p)) return ''
   const { plugin, 'plugin-opts': opts } = p
   switch (plugin) {
@@ -524,7 +539,8 @@ function pluginToSearchParam(p: Empty | ObfsPlugin | V2rayPlugin | ShadowTlsPlug
       const { mode, host } = opts
       return `obfs-local;obfs=${mode}${host ? `;obfs-host=${host}` : ''}`
     }
-    case 'v2ray-plugin': {
+    case 'v2ray-plugin':
+    case 'gost-plugin': {
       const { mode, host, path, tls, mux } = opts
       return `${plugin};mode=${mode}${tls ? ';tls' : ''}${mux !== false ? ';mux=4' : ''}${
         host ? `;host=${host}` : ''

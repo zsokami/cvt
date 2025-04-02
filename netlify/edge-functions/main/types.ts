@@ -68,6 +68,20 @@ export interface V2rayPlugin {
   }
 }
 
+export interface GostPlugin {
+  plugin: 'gost-plugin'
+  'plugin-opts': {
+    mode: string
+    host?: string
+    path?: string
+    tls?: boolean
+    fingerprint?: string
+    'skip-cert-verify'?: boolean
+    headers?: Record<string, string>
+    mux?: boolean
+  }
+}
+
 export interface ShadowTlsPlugin {
   plugin: 'shadow-tls'
   'client-fingerprint'?: string
@@ -91,7 +105,7 @@ export interface RestlsPlugin {
   }
 }
 
-export type SS = SSBase & (Empty | ObfsPlugin | V2rayPlugin | ShadowTlsPlugin | RestlsPlugin)
+export type SS = SSBase & (Empty | ObfsPlugin | V2rayPlugin | GostPlugin | ShadowTlsPlugin | RestlsPlugin)
 
 export interface SSR extends ProxyBase {
   type: 'ssr'
@@ -113,6 +127,7 @@ interface MieruBase extends ProxyBase {
   password: string
   transport: string
   multiplexing?: string
+  udp?: boolean
 }
 
 export type Mieru = MieruBase & PortOrPortRange

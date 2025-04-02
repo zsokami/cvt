@@ -1,6 +1,7 @@
 import type {
   AnyTLS,
   Empty,
+  GostPlugin,
   GRPCNetwork,
   H2Network,
   HTTP,
@@ -99,6 +100,7 @@ const FROM_CLASH = {
       password: String(o.password),
       transport: String(o.transport),
       ...pickNonEmptyString(o, 'multiplexing'),
+      ...udp,
     }
   },
   snell(o: unknown): Snell {
@@ -348,7 +350,7 @@ function baseFromForPortRange<T extends Proxy['type']>(
 
 function pluginFrom(
   o: { type: 'ss'; [key: string]: unknown },
-): Empty | ObfsPlugin | V2rayPlugin | ShadowTlsPlugin | RestlsPlugin {
+): Empty | ObfsPlugin | V2rayPlugin | GostPlugin | ShadowTlsPlugin | RestlsPlugin {
   const { plugin } = o
   const opts = o['plugin-opts'] as Record<string, unknown> | undefined
   if (opts && typeof opts === 'object') {
@@ -371,10 +373,27 @@ function pluginFrom(
               tls: true,
               ...pickNonEmptyString(opts, 'fingerprint'),
               ...scv,
-              ...!!opts.headers && typeof opts.headers === 'object' &&
-                { headers: opts.headers as Record<string, string> },
-              ...pickTrue(opts, 'mux', 'v2ray-http-upgrade', 'v2ray-http-upgrade-fast-open'),
             },
+            ...!!opts.headers && typeof opts.headers === 'object' &&
+              { headers: opts.headers as Record<string, string> },
+            ...opts.mux === false && { mux: false },
+            ...pickTrue(opts, 'v2ray-http-upgrade', 'v2ray-http-upgrade-fast-open'),
+          },
+        }
+      case 'gost-plugin':
+        return {
+          plugin,
+          'plugin-opts': {
+            mode: String(opts.mode),
+            ...pickNonEmptyString(opts, 'host', 'path'),
+            ...!!opts.tls && {
+              tls: true,
+              ...pickNonEmptyString(opts, 'fingerprint'),
+              ...scv,
+            },
+            ...!!opts.headers && typeof opts.headers === 'object' &&
+              { headers: opts.headers as Record<string, string> },
+            ...opts.mux === false && { mux: false },
           },
         }
       case 'shadow-tls':
