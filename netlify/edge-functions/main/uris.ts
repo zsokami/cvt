@@ -197,10 +197,10 @@ const FROM_URI = {
   hysteria(uri: string): Hysteria {
     const u = new URL(uri)
     const ps = Object.fromEntries(u.searchParams)
-    const { protocol, auth, peer, upmbps, downmbps, alpn, obfsParam, fastopen } = ps
+    const { protocol, auth, auth_str, peer, upmbps, downmbps, alpn, obfsParam, fastopen } = ps
     return {
       ...baseFrom(u),
-      ...auth && { 'auth-str': auth },
+      ...(auth || auth_str) && { 'auth-str': auth || auth_str },
       up: upmbps,
       down: downmbps,
       ...obfsParam && { obfs: obfsParam },
