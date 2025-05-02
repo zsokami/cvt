@@ -3,6 +3,8 @@ on:
   push:
   workflow_dispatch:
   repository_dispatch:
+    types:
+      - deploy_to_cf_workers
 jobs:
   deploy:
     runs-on: ubuntu-latest
