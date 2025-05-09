@@ -717,10 +717,10 @@ export function toClash(
           ? [
             `# 排除了 ${counts[2] - counts[1]} 个 Clash${meta ? '.Meta' : ''} 不支持的节点${
               count_unsupported ? `: ${Object.entries(count_unsupported).map(([k, v]) => `${v} ${k}`).join(', ')}` : ''
-            }`,
+            }\n`,
           ]
           : [],
-        ...counts[1] > counts[0] ? [`# 按名称排除了 ${counts[1] - counts[0]} 个节点`] : [],
+        ...counts[1] > counts[0] ? [`# 按名称排除了 ${counts[1] - counts[0]} 个节点\n`] : [],
       ]
       : [],
     'proxies:\n',
