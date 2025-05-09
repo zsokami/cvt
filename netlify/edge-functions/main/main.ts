@@ -26,7 +26,12 @@ async function main(req: Request) {
     from = urlDecode(reqURL.pathname.slice(1))
   }
 
-  const [result, counts, _headers] = await cvt(from, to, req.headers.get('user-agent') || undefined, args['proxy'])
+  const [result, counts, _headers] = await cvt(
+    from,
+    to,
+    args['ua'] || req.headers.get('user-agent') || undefined,
+    args['proxy'],
+  )
 
   const headers: Record<string, string> = {
     ...counts[2] && { 'x-count': counts.join('/') },
@@ -46,27 +51,24 @@ async function main(req: Request) {
     )
   }
   if (!req.headers.get('accept')?.includes('text/html')) {
-    const disposition = _headers?.get('content-disposition')
-    if (disposition) {
+    let m, name, disposition
+    if ((name = args['filename'])) {
+      // pass
+    } else if ((disposition = _headers?.get('content-disposition'))) {
       headers['content-disposition'] = disposition
-    } else {
-      let m, name
-      if (args['filename']) {
-        name = args['filename']
-      } else if ((m = from.match(/^https?:\/\/raw\.githubusercontent\.com\/+([^/|]+)(?:\/+[^/|]+){2,}\/+([^/|]+)$/))) {
-        name = m[1] === m[2] ? m[1] : m[1] + ' - ' + urlDecode(m[2])
-      } else if (
-        (m = from.match(
-          /^(https?:\/\/raw\.githubusercontent\.com\/+([^/|]+))(?:\/+[^/|]+){3,}(?:\|+\1(?:\/+[^/|]+){3,})*$/,
-        ))
-      ) {
-        name = m[2]
-      } else if ((m = from.match(/^(https?:\/\/gist\.githubusercontent\.com\/+([^/|]+))\/[^|]+(?:\|+\1\/[^|]+)*$/))) {
-        name = m[2] + ' - gist'
-      }
-      if (name) {
-        headers['content-disposition'] = `attachment; filename*=UTF-8''${encodeURIComponent(name)}`
-      }
+    } else if ((m = from.match(/^https?:\/\/raw\.githubusercontent\.com\/+([^/|]+)(?:\/+[^/|]+){2,}\/+([^/|]+)$/))) {
+      name = m[1] === m[2] ? m[1] : m[1] + ' - ' + urlDecode(m[2])
+    } else if (
+      (m = from.match(
+        /^(https?:\/\/raw\.githubusercontent\.com\/+([^/|]+))(?:\/+[^/|]+){3,}(?:\|+\1(?:\/+[^/|]+){3,})*$/,
+      ))
+    ) {
+      name = m[2]
+    } else if ((m = from.match(/^(https?:\/\/gist\.githubusercontent\.com\/+([^/|]+))\/[^|]+(?:\|+\1\/[^|]+)*$/))) {
+      name = m[2] + ' - gist'
+    }
+    if (name) {
+      headers['content-disposition'] = `attachment; filename*=UTF-8''${encodeURIComponent(name)}`
     }
   }
   return new Response(result, { headers })

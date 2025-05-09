@@ -20,8 +20,9 @@ https://arx.cc[/!<args>]/<from>
 
 | 参数 | 默认 | 说明 |
 | - | - | - |
-| to | clash | 目标订阅类型，支持 clash、clash-proxies、base64、uri 或 auto(Clash 客户端则 clash 否则 base64)，该参数可省略 `to=` 前缀 |
-| filename | 无 | 文件名 |
+| to | clash | 目标订阅格式，支持 clash、clash-proxies、base64、uri 或 auto(Clash 客户端则 clash 否则 base64)，该参数可省略 `to=` 前缀 |
+| ua | 无 | 覆盖 User-Agent 请求头 |
+| filename | 无 | 覆盖文件名 |
 
 `<from>`
 
