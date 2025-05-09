@@ -539,7 +539,7 @@ export function fromClash(clash: string, meta = true): [Proxy[], number] {
 }
 
 function genProxyGroups(proxies: Proxy[], meta = true) {
-  const reject = ['REJECT', ...meta ? ['REJECT-DROP', 'PASS'] : []]
+  const reject = ['REJECT', ...meta ? ['REJECT-DROP'] : []]
   const all = proxies.map((x) => x.name)
   const map: Record<string, string[]> = {
     '🇭🇰 ‍香港': [],
@@ -635,7 +635,7 @@ function genProxyGroups(proxies: Proxy[], meta = true) {
     groups[0].proxies.push('👆🏻 ‍指定')
   }
   groups.push({ name: '🛩️ ‍墙内', proxies: ['DIRECT', ...reject, '✈️ ‍起飞'], type: 'select' })
-  groups.push({ name: '💩 ‍广告', proxies: [...reject, '🛩️ ‍墙内', '✈️ ‍起飞'], type: 'select' })
+  groups.push({ name: '💩 ‍广告', proxies: [...reject, ...meta ? ['PASS'] : [], '🛩️ ‍墙内', '✈️ ‍起飞'], type: 'select' })
   groups.push({
     name: '📺 ‍B站',
     proxies: [
