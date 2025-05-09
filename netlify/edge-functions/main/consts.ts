@@ -48,7 +48,7 @@ export const CIPHERS_OLD_CLASH_SUPPORTED = {
 }
 
 export const RE_EXCLUDE =
-  /Data Left|Remain:|Traffic:|Expir[ey]|Reset|(?:\d[\d.]*\s*[MG]B[^\dA-Za-z]+|[:：]\s*)\d[\d.]*\s*GB(?![\dA-Za-z])|剩[余餘]流量|流量：|[到过過效]期|[时時][间間]|重置|分割线|残り使用容量|有効期限|リセット|🔰 (?:ID|HSD|SNI):|📝 Gói:/
+  /Data Left|Remain:|Traffic:|Expir[ey]|Reset|(?:\d[\d.]*\s*[MG]B[^\dA-Za-z]+|[:：]\s*)\d[\d.]*\s*GB(?![\dA-Za-z])|剩[余餘]流量|流量：|[到过過效]期|[时時][间間]|重置|分割线|残り使用容量|残りデータ通信量|有効期限|リセット|🔰 (?:ID|HSD|SNI):|📝 Gói:/
 export const RE_EMOJI: [string, RegExp, RegExp][] = String
   .raw`🇺🇸,USA?|UMI?,美[国國]|华盛顿|波特兰|达拉斯|俄勒冈|凤凰城|菲尼克斯|费利蒙|弗里蒙特|硅谷|旧金山|拉斯维加斯|洛杉|圣何塞|圣荷西|圣塔?克拉拉|西雅图|芝加哥|哥伦布|纽约|阿什本|纽瓦克|丹佛|加利福尼亚|弗吉尼亚|马纳萨斯|俄亥俄|得克萨斯|[佐乔]治亚|亚特兰大|佛罗里达|迈阿密,America|United[^a-z]*States|Washington|Portland|Dallas|Oregon|Phoenix|Fremont|Valley|Francisco|Vegas|Los[^a-z]*Angeles|San[^a-z]*Jose|Santa[^a-z]*Clara|Seattle|Chicago|Columbus|York|Ashburn|Newark|Denver|California|Virginia|Manassas|Ohio|Texas|Atlanta|Florida|Miami
 🇭🇰,HKG?|CMI|HGC|HKT|HKBN|WTT|PCCW,香港,Hong
