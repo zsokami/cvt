@@ -734,17 +734,26 @@ export function toURI(proxy: Proxy): string {
   return TO_URI[type](proxy)
 }
 
-export function fromURIs(uris: string, meta = true): [Proxy[], number] {
-  const arr = uris.match(/^[a-z][a-z0-9.+-]*:\/\/.+/gmi) || []
-  return [
-    arr.flatMap((uri) => {
+export function fromURIs(uris: string, meta = true): [Proxy[], number, Record<string, number>] {
+  let total = 0
+  const count_unsupported: Record<string, number> = {}
+  const arr = [
+    ...uris.matchAll(/^([a-z][a-z0-9.+-]*):\/\/.+/gmi).flatMap(([uri, type]) => {
+      total++
       try {
-        return fromURI(uri, meta)
+        return [fromURI(uri, meta)]
       } catch {
+        type = type.toLowerCase()
+        type = TYPE_MAP[type] || type
+        count_unsupported[type] = (count_unsupported[type] || 0) + 1
         return []
       }
     }),
-    arr.length,
+  ]
+  return [
+    arr,
+    total,
+    count_unsupported,
   ]
 }
 

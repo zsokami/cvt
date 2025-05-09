@@ -34,7 +34,7 @@ import { parseYAML, pickNonEmptyString, pickNumber, pickTrue } from './utils.ts'
 import { requireOldClashSupport } from './proxy_utils.ts'
 import { RULES, scv, udp } from './consts.ts'
 
-const FROM_CLASH = {
+const FROM_CLASH = Object.assign(Object.create(null) as Empty, {
   http(o: unknown): HTTP {
     checkType(o, 'http')
     return {
@@ -287,7 +287,7 @@ const FROM_CLASH = {
       ...pickNumber(o, 'idle-session-check-interval', 'idle-session-timeout', 'min-idle-session'),
     }
   },
-}
+})
 
 function checkType<T extends Proxy['type']>(o: unknown, type: T): asserts o is { type: T; [key: string]: unknown } {
   if (!(o && typeof o === 'object' && 'type' in o)) throw new Error('Invalid proxy')
@@ -514,27 +514,42 @@ function realityFrom(o: Record<string, unknown>): Empty | Reality {
     : {}
 }
 
-export function fromClash(clash: string, meta = true): [Proxy[], number] {
+function isSupportedType(type: string): type is keyof typeof FROM_CLASH {
+  return type in FROM_CLASH
+}
+
+export function fromClash(clash: string, meta = true): [Proxy[], number, Record<string, number>] {
   try {
     const doc = parseYAML(clash) as { proxies?: unknown; Proxy?: unknown }
-    if (!doc) return [[], 0]
+    if (!doc) return [[], 0, {}]
     const proxies = doc.proxies || doc.Proxy
-    if (!Array.isArray(proxies)) return [[], 0]
+    if (!Array.isArray(proxies)) return [[], 0, {}]
+    let total = 0
+    const count_unsupported: Record<string, number> = {}
+    const arr = proxies.flatMap((x: unknown) => {
+      if (!x || typeof x !== 'object' || !('type' in x) || typeof x.type !== 'string') return []
+      total++
+      if (!isSupportedType(x.type)) {
+        const k = x.type || 'unknown'
+        count_unsupported[k] = (count_unsupported[k] || 0) + 1
+        return []
+      }
+      try {
+        const proxy = FROM_CLASH[x.type](x)
+        if (!meta) requireOldClashSupport(proxy)
+        return [proxy]
+      } catch {
+        count_unsupported[x.type] = (count_unsupported[x.type] || 0) + 1
+        return []
+      }
+    })
     return [
-      proxies.flatMap((x) => {
-        if (!x || !(x.type in FROM_CLASH)) return []
-        try {
-          const proxy = FROM_CLASH[x.type as keyof typeof FROM_CLASH](x)
-          if (!meta) requireOldClashSupport(proxy)
-          return proxy
-        } catch {
-          return []
-        }
-      }),
-      proxies.length,
+      arr,
+      total,
+      count_unsupported,
     ]
   } catch {
-    return [[], 0]
+    return [[], 0, {}]
   }
 }
 
@@ -679,7 +694,13 @@ function genProxyGroups(proxies: Proxy[], meta = true) {
   return groups
 }
 
-export function toClash(proxies: Proxy[], proxiesOnly = false, meta = true): string {
+export function toClash(
+  proxies: Proxy[],
+  proxiesOnly = false,
+  meta = true,
+  counts?: [number, number, number],
+  count_unsupported?: Record<string, number>,
+): string {
   if (proxiesOnly) {
     return ['proxies:\n', ...proxies.map((x) => `- ${JSON.stringify(x)}\n`)].join('')
   }
@@ -690,6 +711,18 @@ export function toClash(proxies: Proxy[], proxiesOnly = false, meta = true): str
     'unified-delay: true\n',
     'tcp-concurrent: true\n',
     'global-client-fingerprint: chrome\n',
+    ...counts
+      ? [
+        ...counts[2] > counts[1]
+          ? [
+            `# 排除了 ${counts[2] - counts[1]} 个 Clash${meta ? '.Meta' : ''} 不支持的节点${
+              count_unsupported ? `: ${Object.entries(count_unsupported).map(([k, v]) => `${v} ${k}`).join(', ')}` : ''
+            }`,
+          ]
+          : [],
+        ...counts[1] > counts[0] ? [`# 按名称排除了 ${counts[1] - counts[0]} 个节点`] : [],
+      ]
+      : [],
     'proxies:\n',
     ...proxies.map((x) => `- ${JSON.stringify(x)}\n`),
     'proxy-groups:\n',
