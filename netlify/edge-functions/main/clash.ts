@@ -31,6 +31,7 @@ import type {
   WSNetwork,
 } from './types.ts'
 import { parseYAML, pickNonEmptyString, pickNumber, pickTrue } from './utils.ts'
+import { requireOldClashSupport } from './proxy_utils.ts'
 import { RULES, scv, udp } from './consts.ts'
 
 const FROM_CLASH = {
@@ -513,7 +514,7 @@ function realityFrom(o: Record<string, unknown>): Empty | Reality {
     : {}
 }
 
-export function fromClash(clash: string): [Proxy[], number] {
+export function fromClash(clash: string, meta = true): [Proxy[], number] {
   try {
     const doc = parseYAML(clash) as { proxies?: unknown; Proxy?: unknown }
     if (!doc) return [[], 0]
@@ -523,7 +524,9 @@ export function fromClash(clash: string): [Proxy[], number] {
       proxies.flatMap((x) => {
         if (!x || !(x.type in FROM_CLASH)) return []
         try {
-          return FROM_CLASH[x.type as keyof typeof FROM_CLASH](x)
+          const proxy = FROM_CLASH[x.type as keyof typeof FROM_CLASH](x)
+          if (!meta) requireOldClashSupport(proxy)
+          return proxy
         } catch {
           return []
         }
@@ -535,7 +538,8 @@ export function fromClash(clash: string): [Proxy[], number] {
   }
 }
 
-function genProxyGroups(proxies: Proxy[]) {
+function genProxyGroups(proxies: Proxy[], meta = true) {
+  const reject = ['REJECT', ...meta ? ['REJECT-DROP', 'PASS'] : []]
   const all = proxies.map((x) => x.name)
   const map: Record<string, string[]> = {
     '🇭🇰 ‍香港': [],
@@ -630,8 +634,8 @@ function genProxyGroups(proxies: Proxy[]) {
     groups.push({ name: '👆🏻 ‍指定', proxies: all, type: 'select' })
     groups[0].proxies.push('👆🏻 ‍指定')
   }
-  groups.push({ name: '🛩️ ‍墙内', proxies: ['DIRECT', 'REJECT', '✈️ ‍起飞'], type: 'select' })
-  groups.push({ name: '💩 ‍广告', proxies: ['REJECT', '🛩️ ‍墙内', '✈️ ‍起飞'], type: 'select' })
+  groups.push({ name: '🛩️ ‍墙内', proxies: ['DIRECT', ...reject, '✈️ ‍起飞'], type: 'select' })
+  groups.push({ name: '💩 ‍广告', proxies: [...reject, '🛩️ ‍墙内', '✈️ ‍起飞'], type: 'select' })
   groups.push({
     name: '📺 ‍B站',
     proxies: [
@@ -671,11 +675,11 @@ function genProxyGroups(proxies: Proxy[]) {
     groups.push({ name, proxies: v, type: 'select' })
     groups[0].proxies.push(name)
   }
-  groups[0].proxies.push('DIRECT', 'REJECT')
+  groups[0].proxies.push('DIRECT', ...reject)
   return groups
 }
 
-export function toClash(proxies: Proxy[], proxiesOnly = false): string {
+export function toClash(proxies: Proxy[], proxiesOnly = false, meta = true): string {
   if (proxiesOnly) {
     return ['proxies:\n', ...proxies.map((x) => `- ${JSON.stringify(x)}\n`)].join('')
   }
@@ -689,7 +693,7 @@ export function toClash(proxies: Proxy[], proxiesOnly = false): string {
     'proxies:\n',
     ...proxies.map((x) => `- ${JSON.stringify(x)}\n`),
     'proxy-groups:\n',
-    ...genProxyGroups(proxies).map((x) => `- ${JSON.stringify(x)}\n`),
+    ...genProxyGroups(proxies, meta).map((x) => `- ${JSON.stringify(x)}\n`),
     RULES,
   ].join('')
 }

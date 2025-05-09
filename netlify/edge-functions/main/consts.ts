@@ -4,6 +4,49 @@ export { RULES } from './rules.ts'
 export const udp = { udp: true } as const
 export const scv = { 'skip-cert-verify': true } as const
 
+export const TYPES_OLD_CLASH_SUPPORTED = new Set([
+  'http',
+  'socks5',
+  'ss',
+  'ssr',
+  'snell',
+  'vmess',
+  'vless',
+  'trojan',
+  'wireguard',
+])
+export const CIPHERS_OLD_CLASH_SUPPORTED = {
+  'ss': new Set([
+    'dummy',
+    'rc4-md5',
+    'aes-128-ctr',
+    'aes-192-ctr',
+    'aes-256-ctr',
+    'aes-128-cfb',
+    'aes-192-cfb',
+    'aes-256-cfb',
+    'aes-128-gcm',
+    'aes-192-gcm',
+    'aes-256-gcm',
+    'chacha20-ietf',
+    'xchacha20',
+    'chacha20-ietf-poly1305',
+    'xchacha20-ietf-poly1305',
+  ]),
+  'ssr': new Set([
+    'dummy',
+    'rc4-md5',
+    'aes-128-ctr',
+    'aes-192-ctr',
+    'aes-256-ctr',
+    'aes-128-cfb',
+    'aes-192-cfb',
+    'aes-256-cfb',
+    'chacha20-ietf',
+    'xchacha20',
+  ]),
+}
+
 export const RE_EXCLUDE =
   /Data Left|Remain:|Traffic:|Expir[ey]|Reset|(?:\d[\d.]*\s*[MG]B[^\dA-Za-z]+|[:：]\s*)\d[\d.]*\s*GB(?![\dA-Za-z])|剩[余餘]流量|流量：|[到过過效]期|[时時][间間]|重置|分割线|残り使用容量|有効期限|リセット|🔰 (?:ID|HSD|SNI):|📝 Gói:/
 export const RE_EMOJI: [string, RegExp, RegExp][] = String

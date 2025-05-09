@@ -36,7 +36,8 @@ import {
   urlDecode,
   urlDecodePlus,
 } from './utils.ts'
-import { scv, udp } from './consts.ts'
+import { requireOldClashSupport } from './proxy_utils.ts'
+import { scv, TYPES_OLD_CLASH_SUPPORTED, udp } from './consts.ts'
 
 const FROM_URI = {
   http(uri: string): HTTP {
@@ -115,7 +116,7 @@ const FROM_URI = {
       server,
       port: +port,
       type: 'ssr',
-      cipher,
+      cipher: cipher === 'none' ? 'dummy' : cipher,
       password: decodeBase64Url(password),
       obfs,
       protocol,
@@ -310,10 +311,18 @@ const TO_URI = {
       'obfs-param': obfsparam,
       'protocol-param': protoparam,
     } = proxy
-    const ssr = [server, port, protocol, cipher, obfs, encodeBase64Url(password)].join(':')
-    const params = [['remarks', name], ['obfsparam', obfsparam], ['protoparam', protoparam]].filter(([, v]) => v).map((
-      [k, v],
-    ) => `${k}=${encodeBase64Url(v!)}`).join('&')
+    const ssr = [
+      server,
+      port,
+      protocol,
+      cipher === 'dummy' ? 'none' : cipher,
+      obfs,
+      encodeBase64Url(password),
+    ].join(':')
+    const params = [['remarks', name], ['obfsparam', obfsparam], ['protoparam', protoparam]]
+      .filter(([, v]) => v)
+      .map(([k, v]) => `${k}=${encodeBase64Url(v!)}`)
+      .join('&')
     return `${type}://` + encodeBase64Url(`${ssr}/?${params}`)
   },
   vmess(proxy: Proxy): string {
@@ -709,12 +718,14 @@ const TYPE_MAP: Record<
   anytls: 'anytls',
 })
 
-export function fromURI(uri: string): Proxy {
+export function fromURI(uri: string, meta = true): Proxy {
   uri = uri.trim()
   const _type = uri.split('://')[0].toLowerCase()
   const type = TYPE_MAP[_type]
-  if (!type) throw Error(`Unsupported type: ${_type}`)
-  return FROM_URI[type](uri)
+  if (!type || (!meta && !TYPES_OLD_CLASH_SUPPORTED.has(type))) throw Error(`Unsupported type: ${_type}`)
+  const proxy = FROM_URI[type](uri)
+  if (!meta) requireOldClashSupport(proxy)
+  return proxy
 }
 
 export function toURI(proxy: Proxy): string {
@@ -723,12 +734,12 @@ export function toURI(proxy: Proxy): string {
   return TO_URI[type](proxy)
 }
 
-export function fromURIs(uris: string): [Proxy[], number] {
+export function fromURIs(uris: string, meta = true): [Proxy[], number] {
   const arr = uris.match(/^[a-z][a-z0-9.+-]*:\/\/.+/gmi) || []
   return [
     arr.flatMap((uri) => {
       try {
-        return fromURI(uri)
+        return fromURI(uri, meta)
       } catch {
         return []
       }

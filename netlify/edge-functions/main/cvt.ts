@@ -5,7 +5,7 @@ import { Proxy } from './types.ts'
 
 import { RE_EMOJI, RE_EMOJI_CN, RE_EMOJI_INFO, RE_EMOJI_SINGLE, RE_EXCLUDE } from './consts.ts'
 
-function from(input: string): [Proxy[], number] {
+function from(input: string, meta = true): [Proxy[], number] {
   // console.time('decodeBase64Url')
   try {
     input = decodeBase64Url(input)
@@ -14,22 +14,25 @@ function from(input: string): [Proxy[], number] {
   }
   // console.timeEnd('decodeBase64Url')
   // console.time('fromURIs')
-  let [proxies, total] = fromURIs(input)
+  let [proxies, total] = fromURIs(input, meta)
   // console.timeEnd('fromURIs')
   if (total === 0) {
     // console.time('fromClash')
-    ;[proxies, total] = fromClash(input)
+    ;[proxies, total] = fromClash(input, meta)
     // console.timeEnd('fromClash')
   }
   return [proxies, total]
 }
 
-function to(proxies: Proxy[], target: string = 'clash'): string {
+function to(proxies: Proxy[], target = 'clash', meta = true): string {
   switch (target) {
     case 'clash':
-      return toClash(proxies)
     case 'clash-proxies':
-      return toClash(proxies, true)
+      return toClash(
+        proxies,
+        target === 'clash-proxies',
+        meta,
+      )
     case 'uri':
       return toURIs(proxies)
     case 'base64':
@@ -118,6 +121,12 @@ export async function cvt(
   ua: string = 'ClashMetaForAndroid/2.11.5.Meta',
   proxy?: string,
 ): Promise<[string, [number, number, number], Headers | undefined]> {
+  const ua_lower = ua.toLowerCase()
+  const clash = ua_lower.includes('clash')
+  const meta = !clash || /meta|mihomo|verge|nyanpasu/.test(ua_lower)
+  if (_to === 'auto') {
+    _to = clash ? 'clash' : 'base64'
+  }
   // console.time('from')
   const proxy_urls = proxy?.split('|') ?? []
   const promises = _from.split('|').map(async (x, i) => {
@@ -141,14 +150,14 @@ export async function cvt(
         // console.time('text')
         const text = await resp.text()
         // console.timeEnd('text')
-        if (resp.ok) return [...from(text), /^data:/i.test(x) ? undefined : resp.headers]
+        if (resp.ok) return [...from(text, meta), /^data:/i.test(x) ? undefined : resp.headers]
         return [[], 0]
       } catch (e) {
         console.error('Fetch Error:', e)
         return [[], 0]
       }
     }
-    return from(x)
+    return from(x, meta)
   }) as Promise<[Proxy[], number, Headers | undefined]>[]
   let proxies = []
   let total = 0
@@ -180,9 +189,7 @@ export async function cvt(
   // console.timeEnd('renameDuplicates')
   // console.time('to')
   const result: [string, [number, number, number], Headers | undefined] = [
-    proxies.length === 0 && _from !== 'empty'
-      ? ''
-      : to(proxies, _to === 'auto' ? ua.toLowerCase().includes('clash') ? 'clash' : 'base64' : _to),
+    proxies.length === 0 && _from !== 'empty' ? '' : to(proxies, _to, meta),
     [proxies.length, count_before_filter, total],
     subinfo_headers.length === 1
       ? subinfo_headers[0]
