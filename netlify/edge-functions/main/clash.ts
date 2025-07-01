@@ -200,7 +200,15 @@ const FROM_CLASH = Object.assign(Object.create(null) as Empty, {
       ...pickNonEmptyString(o, 'up', 'down', 'obfs', 'obfs-password', 'sni', 'fingerprint', 'ca-str'),
       ...Array.isArray(o.alpn) && o.alpn.length && { alpn: o.alpn as string[] },
       ...scv,
-      ...pickNumber(o, 'cwnd', 'udp-mtu'),
+      ...pickNumber(
+        o,
+        'cwnd',
+        'udp-mtu',
+        'initial-stream-receive-window',
+        'max-stream-receive-window',
+        'initial-connection-receive-window',
+        'max-connection-receive-window',
+      ),
     }
   },
   tuic(o: unknown): TUIC {

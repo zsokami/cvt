@@ -280,6 +280,10 @@ interface Hysteria2Base extends ProxyBase {
   'skip-cert-verify'?: boolean
   'cwnd'?: number
   'udp-mtu'?: number
+  'initial-stream-receive-window'?: number
+  'max-stream-receive-window'?: number
+  'initial-connection-receive-window'?: number
+  'max-connection-receive-window'?: number
 }
 
 export type Hysteria2 = Hysteria2Base & PortOrPorts
