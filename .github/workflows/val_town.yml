@@ -1,0 +1,14 @@
+name: Val Town
+on:
+  push:
+  workflow_dispatch:
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - uses: denoland/setup-deno@v2
+    - name: Update Val
+      run: deno run -A scripts/val_town.ts
+      env:
+        VAL_TOWN_API_KEY: ${{ secrets.VAL_TOWN_API_KEY }}
