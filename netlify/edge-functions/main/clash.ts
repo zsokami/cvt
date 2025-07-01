@@ -530,7 +530,7 @@ function realityFrom(o: Record<string, unknown>): Option<Reality> {
       'reality-opts': {
         'public-key': String(opts['public-key']),
         'short-id': String(opts['short-id'] || ''),
-        ...!!opts['support-x25519mlkem768'] && { 'support-x25519mlkem768': true },
+        ...pickTrue(opts, 'support-x25519mlkem768'),
       },
     }
     : {}
