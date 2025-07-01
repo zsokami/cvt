@@ -1,6 +1,5 @@
 import type {
   AnyTLS,
-  Empty,
   GostPlugin,
   GRPCNetwork,
   H2Network,
@@ -10,6 +9,7 @@ import type {
   Hysteria2,
   Mieru,
   ObfsPlugin,
+  Option,
   PortOrPortRange,
   PortOrPorts,
   Proxy,
@@ -30,11 +30,11 @@ import type {
   WireGuard,
   WSNetwork,
 } from './types.ts'
-import { parseYAML, pickNonEmptyString, pickNumber, pickTrue } from './utils.ts'
+import { createPure, parseYAML, pickNonEmptyString, pickNumber, pickTrue } from './utils.ts'
 import { requireOldClashSupport } from './proxy_utils.ts'
 import { RULES, scv, udp } from './consts.ts'
 
-const FROM_CLASH = Object.assign(Object.create(null) as Empty, {
+const FROM_CLASH = createPure({
   http(o: unknown): HTTP {
     checkType(o, 'http')
     return {
@@ -157,10 +157,14 @@ const FROM_CLASH = Object.assign(Object.create(null) as Empty, {
   trojan(o: unknown): Trojan {
     checkType(o, 'trojan')
     const ssOpts = o['ss-opts'] as Record<string, unknown> | undefined
+    const networkOpts = networkFrom(o)
+    if (networkOpts.network === 'http' || networkOpts.network === 'h2') {
+      throw new Error('Trojan network not support http/h2')
+    }
     return {
       ...baseFrom(o),
       password: String(o.password),
-      ...networkFrom(o),
+      ...networkOpts,
       ...pickNonEmptyString(o, 'sni', 'fingerprint', 'client-fingerprint'),
       ...Array.isArray(o.alpn) && o.alpn.length && { alpn: o.alpn as string[] },
       ...realityFrom(o),
@@ -359,7 +363,7 @@ function baseFromForPortRange<T extends Proxy['type']>(
 
 function pluginFrom(
   o: { type: 'ss'; [key: string]: unknown },
-): Empty | ObfsPlugin | V2rayPlugin | GostPlugin | ShadowTlsPlugin | RestlsPlugin {
+): Option<ObfsPlugin | V2rayPlugin | GostPlugin | ShadowTlsPlugin | RestlsPlugin> {
   const { plugin } = o
   const opts = o['plugin-opts'] as Record<string, unknown> | undefined
   if (opts && typeof opts === 'object') {
@@ -411,9 +415,10 @@ function pluginFrom(
           ...pickNonEmptyString(o, 'client-fingerprint'),
           'plugin-opts': {
             host: String(opts.host),
-            password: String(opts.password),
+            ...pickNonEmptyString(opts, 'password'),
             ...pickNumber(opts, 'version'),
             ...pickNonEmptyString(opts, 'fingerprint'),
+            ...Array.isArray(opts.alpn) && opts.alpn.length && { alpn: opts.alpn as string[] },
             ...scv,
           },
         }
@@ -442,7 +447,7 @@ function pluginFrom(
   return {}
 }
 
-function networkFrom(o: Record<string, unknown>): Empty | WSNetwork | GRPCNetwork | HTTPNetwork | H2Network {
+function networkFrom(o: Record<string, unknown>): Option<WSNetwork | GRPCNetwork | HTTPNetwork | H2Network> {
   const { network } = o
   switch (network) {
     case 'ws': {
@@ -468,14 +473,14 @@ function networkFrom(o: Record<string, unknown>): Empty | WSNetwork | GRPCNetwor
     }
     case 'grpc': {
       const opts1 = o['grpc-opts'] as Record<string, unknown>
-      const opts2 = !!opts1 && typeof opts1 === 'object'
+      const opts2: Option<{ 'grpc-service-name': string }> = !!opts1 && typeof opts1 === 'object'
         ? {
           ...pickNonEmptyString(opts1, 'grpc-service-name'),
         }
         : {}
       return {
         network,
-        ...Object.keys(opts2).length && { 'grpc-opts': opts2 },
+        ...opts2['grpc-service-name'] && { 'grpc-opts': opts2 },
       }
     }
     case 'http': {
@@ -510,13 +515,14 @@ function networkFrom(o: Record<string, unknown>): Empty | WSNetwork | GRPCNetwor
   return {}
 }
 
-function realityFrom(o: Record<string, unknown>): Empty | Reality {
+function realityFrom(o: Record<string, unknown>): Option<Reality> {
   const opts1 = o['reality-opts'] as Record<string, unknown>
-  return !!opts1 && typeof opts1 === 'object'
+  return opts1 && typeof opts1 === 'object'
     ? {
       'reality-opts': {
         'public-key': String(opts1['public-key']),
         'short-id': String(opts1['short-id'] || ''),
+        ...!!opts1['support-x25519mlkem768'] && { 'support-x25519mlkem768': true },
       },
     }
     : {}

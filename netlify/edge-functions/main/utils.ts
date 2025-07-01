@@ -101,3 +101,7 @@ export function splitRight(str: string, separator: string, maxSplit = 1): string
   result.push(str.slice(0, i))
   return result.reverse()
 }
+
+export function createPure<T extends Record<PropertyKey, unknown>>(o: T): T {
+  return Object.assign(Object.create(null), o)
+}

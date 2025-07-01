@@ -1,5 +1,5 @@
-// deno-lint-ignore ban-types
-export type Empty = {}
+export type None<T> = { [K in keyof T]?: never }
+export type Option<T> = T | None<T>
 
 export interface ProxyBase {
   name: string
@@ -87,9 +87,10 @@ export interface ShadowTlsPlugin {
   'client-fingerprint'?: string
   'plugin-opts': {
     host: string
-    password: string
+    password?: string
     version?: number
     fingerprint?: string
+    alpn?: string[]
     'skip-cert-verify'?: boolean
   }
 }
@@ -105,7 +106,7 @@ export interface RestlsPlugin {
   }
 }
 
-export type SS = SSBase & (Empty | ObfsPlugin | V2rayPlugin | GostPlugin | ShadowTlsPlugin | RestlsPlugin)
+export type SS = SSBase & Option<ObfsPlugin | V2rayPlugin | GostPlugin | ShadowTlsPlugin | RestlsPlugin>
 
 export interface SSR extends ProxyBase {
   type: 'ssr'
@@ -231,14 +232,15 @@ export interface Reality {
   'reality-opts': {
     'public-key': string
     'short-id': string
+    'support-x25519mlkem768'?: boolean
   }
 }
 
-export type VMess = VMessBase & (Empty | WSNetwork | GRPCNetwork | HTTPNetwork | H2Network) & (Empty | Reality)
+export type VMess = VMessBase & Option<WSNetwork | GRPCNetwork | HTTPNetwork | H2Network> & Option<Reality>
 
-export type VLESS = VLESSBase & (Empty | WSNetwork | GRPCNetwork | HTTPNetwork | H2Network) & (Empty | Reality)
+export type VLESS = VLESSBase & Option<WSNetwork | GRPCNetwork | HTTPNetwork | H2Network> & Option<Reality>
 
-export type Trojan = TrojanBase & (Empty | WSNetwork | GRPCNetwork) & (Empty | Reality)
+export type Trojan = TrojanBase & Option<WSNetwork | GRPCNetwork> & Option<Reality>
 
 export type PortOrPorts = { port: number; ports?: string } | { port?: number; ports: string }
 

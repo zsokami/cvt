@@ -1,6 +1,5 @@
 import type {
   AnyTLS,
-  Empty,
   GostPlugin,
   GRPCNetwork,
   H2Network,
@@ -9,6 +8,7 @@ import type {
   Hysteria,
   Hysteria2,
   ObfsPlugin,
+  Option,
   PortOrPorts,
   Proxy,
   ProxyBase,
@@ -27,10 +27,12 @@ import type {
   WSNetwork,
 } from './types.ts'
 import {
+  createPure,
   decodeBase64Url,
   encodeBase64,
   encodeBase64Url,
   pickNonEmptyString,
+  pickNumber,
   splitLeft,
   splitRight,
   urlDecode,
@@ -485,10 +487,10 @@ function baseTo(p: ProxyBase & Pick<Proxy, 'type'> & { port?: number }): URL {
   return u
 }
 
-function pluginFromSearchParam(p: string | null): Empty | ObfsPlugin | V2rayPlugin | GostPlugin | ShadowTlsPlugin {
+function pluginFromSearchParam(p: string | null): Option<ObfsPlugin | V2rayPlugin | GostPlugin | ShadowTlsPlugin> {
   if (!p) return {}
   const [plugin, ...strOpts] = p.split(';')
-  const opts = Object.fromEntries(strOpts.map((s) => splitLeft(s, '=')))
+  const opts: Record<string, string | undefined> = Object.fromEntries(strOpts.map((s) => splitLeft(s, '=')))
   switch (plugin) {
     case 'simple-obfs':
     case 'obfs-local': {
@@ -529,20 +531,22 @@ function pluginFromSearchParam(p: string | null): Empty | ObfsPlugin | V2rayPlug
       return {
         plugin,
         'plugin-opts': {
-          ...pickNonEmptyString(opts, 'host', 'password'),
-          version: +opts.version,
+          host: opts.host || '',
+          ...pickNonEmptyString(opts, 'password'),
+          ...pickNumber(opts, 'version'),
+          ...opts.alpn && { alpn: opts.alpn.split(',') },
           ...scv,
         },
-      } as ShadowTlsPlugin
+      }
   }
   throw new Error(`Unsupported plugin: ${plugin}`)
 }
 
 function pluginToSearchParam(
-  p: Empty | ObfsPlugin | V2rayPlugin | GostPlugin | ShadowTlsPlugin | RestlsPlugin,
+  p: Option<ObfsPlugin | V2rayPlugin | GostPlugin | ShadowTlsPlugin | RestlsPlugin>,
 ): string {
-  if (!('plugin' in p)) return ''
   const { plugin, 'plugin-opts': opts } = p
+  if (!plugin) return ''
   switch (plugin) {
     case 'obfs': {
       const { mode, host } = opts
@@ -556,19 +560,21 @@ function pluginToSearchParam(
       }${path ? `;path=${path}` : ''}`
     }
     case 'shadow-tls': {
-      const { host, password, version } = opts
-      return `${plugin};host=${host};password=${password}${version ? `;version=${version}` : ''}`
+      const { host, password, version, alpn } = opts
+      return `${plugin};host=${host}${password ? `;password=${password}` : ''}${version ? `;version=${version}` : ''}${
+        alpn?.length ? `;alpn=${alpn}` : ''
+      }`
     }
   }
   throw new Error(`Unsupported plugin: ${plugin}`)
 }
 
 function networkFrom(
-  { net, type, headerType, host, path, serviceName }: Record<string, string | string[]>,
-): Empty | WSNetwork | GRPCNetwork | HTTPNetwork | H2Network {
+  { net, type, headerType, host, path, serviceName }: Record<string, string>,
+): Option<WSNetwork | GRPCNetwork | HTTPNetwork | H2Network> {
   const network = (headerType || type) === 'http' ? 'http' : (net || type)
   if (!network) return {}
-  host = host ? typeof host === 'string' ? host.split(',') : host : []
+  const hosts = host ? host.split(',') : []
   path ||= '/'
   switch (network) {
     case 'tcp':
@@ -579,45 +585,45 @@ function networkFrom(
         network: 'ws',
         'ws-opts': {
           path,
-          ...host.length && { headers: { Host: host[0] } },
+          ...hosts.length && { headers: { Host: hosts[0] } },
           ...network === 'httpupgrade' && { 'v2ray-http-upgrade': true },
         },
-      } as WSNetwork
+      }
     case 'grpc':
       return {
         network,
         'grpc-opts': {
           'grpc-service-name': serviceName || path,
         },
-      } as GRPCNetwork
+      }
     case 'http':
       return {
         network,
         'http-opts': {
           path: [path],
-          ...host.length && { headers: { Host: host } },
+          ...hosts.length && { headers: { Host: hosts } },
         },
-      } as HTTPNetwork
+      }
     case 'h2':
       return {
         network,
         'h2-opts': {
           path,
-          ...host.length && { host },
+          ...hosts.length && { host: hosts },
         },
-      } as H2Network
+      }
   }
   throw new Error(`Unsupported network: ${network}`)
 }
 
 function networkTo(
-  netOpts: Empty | WSNetwork | GRPCNetwork | HTTPNetwork | H2Network,
+  netOpts: Option<WSNetwork | GRPCNetwork | HTTPNetwork | H2Network>,
   kNet = 'net',
   kType = 'type',
   kServiceName = 'path',
 ) {
-  if (!('network' in netOpts)) return {}
   const net = netOpts.network
+  if (!net) return {}
   switch (net) {
     case 'ws': {
       const { path, headers, 'v2ray-http-upgrade': httpupgrade } = netOpts['ws-opts'] || {}
@@ -652,26 +658,27 @@ function networkTo(
   }
 }
 
-function networkToStd(netOpts: Empty | WSNetwork | GRPCNetwork | HTTPNetwork | H2Network) {
+function networkToStd(netOpts: Option<WSNetwork | GRPCNetwork | HTTPNetwork | H2Network>) {
   return networkTo(netOpts, 'type', 'headerType', 'serviceName')
 }
 
-function realityFrom(pbk: string, sid?: string): Empty | Reality {
+function realityFrom(pbk: string, sid?: string): Option<Reality> {
   if (!pbk) return {}
   return {
     'reality-opts': {
       'public-key': pbk,
       'short-id': sid || '',
     },
-  } as Reality
+  }
 }
 
 function realityTo<R extends Record<string, string>>(
-  opts: Empty | Reality,
+  opts: Option<Reality>,
   defaultValue?: R,
 ): { security?: 'reality'; pbk?: string; sid?: string } | R {
-  if (!('reality-opts' in opts)) return defaultValue || {}
-  const { 'public-key': pbk, 'short-id': sid } = opts['reality-opts']
+  const realityOpts = opts['reality-opts']
+  if (!realityOpts) return defaultValue || {}
+  const { 'public-key': pbk, 'short-id': sid } = realityOpts
   return { security: 'reality', pbk, sid }
 }
 
@@ -682,22 +689,7 @@ function toMbps(s: string): string {
   return (+d * 1e3 ** ('KMGT'.indexOf(u) - 1) * 8 ** +(b === 'B')).toFixed()
 }
 
-const TYPE_MAP: Record<
-  string,
-  | 'http'
-  | 'socks5'
-  | 'ss'
-  | 'ssr'
-  | 'vmess'
-  | 'vless'
-  | 'trojan'
-  | 'hysteria'
-  | 'hysteria2'
-  | 'tuic'
-  | 'wireguard'
-  | 'anytls'
-  | undefined
-> = Object.assign(Object.create(null), {
+const TYPE_MAP: Record<string, keyof typeof FROM_URI | undefined> = createPure({
   http: 'http',
   https: 'http',
   socks: 'socks5',
