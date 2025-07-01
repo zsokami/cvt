@@ -1,5 +1,6 @@
 import type {
   AnyTLS,
+  ECH,
   GostPlugin,
   GRPCNetwork,
   H2Network,
@@ -45,7 +46,7 @@ const FROM_CLASH = createPure({
         ...pickNonEmptyString(o, 'sni', 'fingerprint'),
         ...scv,
       },
-      ...!!o.headers && typeof o.headers === 'object' && { headers: o.headers as Record<string, string> },
+      ...isRecord(o.headers) && { headers: o.headers as Record<string, string> },
     }
   },
   socks5(o: unknown): Socks5 {
@@ -110,8 +111,7 @@ const FROM_CLASH = createPure({
       ...baseFrom(o),
       psk: String(o.psk),
       ...pickNumber(o, 'version'),
-      ...!!o['obfs-opts'] && typeof o['obfs-opts'] === 'object' &&
-        { 'obfs-opts': o['obfs-opts'] as Record<string, string> },
+      ...isRecord(o['obfs-opts']) && { 'obfs-opts': o['obfs-opts'] as Record<string, string> },
       ...udp,
     }
   },
@@ -130,6 +130,7 @@ const FROM_CLASH = createPure({
         tls: true,
         ...pickNonEmptyString(o, 'servername', 'fingerprint', 'client-fingerprint'),
         ...Array.isArray(o.alpn) && o.alpn.length && { alpn: o.alpn as string[] },
+        ...echFrom(o),
         ...realityFrom(o),
         ...scv,
       },
@@ -148,6 +149,7 @@ const FROM_CLASH = createPure({
         tls: true,
         ...pickNonEmptyString(o, 'servername', 'fingerprint', 'client-fingerprint'),
         ...Array.isArray(o.alpn) && o.alpn.length && { alpn: o.alpn as string[] },
+        ...echFrom(o),
         ...realityFrom(o),
         ...scv,
       },
@@ -167,6 +169,7 @@ const FROM_CLASH = createPure({
       ...networkOpts,
       ...pickNonEmptyString(o, 'sni', 'fingerprint', 'client-fingerprint'),
       ...Array.isArray(o.alpn) && o.alpn.length && { alpn: o.alpn as string[] },
+      ...echFrom(o),
       ...realityFrom(o),
       ...scv,
       ...!!(ssOpts?.enabled && ssOpts.password) && {
@@ -190,6 +193,7 @@ const FROM_CLASH = createPure({
       down: String(o.down),
       ...pickNonEmptyString(o, 'obfs', 'protocol', 'sni', 'fingerprint', 'ca-str'),
       ...Array.isArray(o.alpn) && o.alpn.length && { alpn: o.alpn as string[] },
+      ...echFrom(o),
       ...scv,
       ...pickNumber(o, 'recv-window-conn', 'recv-window'),
       ...pickTrue(o, 'disable-mtu-discovery', 'fast-open'),
@@ -203,6 +207,7 @@ const FROM_CLASH = createPure({
       ...pickNumber(o, 'hop-interval'),
       ...pickNonEmptyString(o, 'up', 'down', 'obfs', 'obfs-password', 'sni', 'fingerprint', 'ca-str'),
       ...Array.isArray(o.alpn) && o.alpn.length && { alpn: o.alpn as string[] },
+      ...echFrom(o),
       ...scv,
       ...pickNumber(
         o,
@@ -232,6 +237,7 @@ const FROM_CLASH = createPure({
         'ca-str',
       ),
       ...Array.isArray(o.alpn) && o.alpn.length && { alpn: o.alpn as string[] },
+      ...echFrom(o),
       ...scv,
       ...pickNumber(
         o,
@@ -257,7 +263,7 @@ const FROM_CLASH = createPure({
       ...Array.isArray(o.reserved) && o.reserved.length && { reserved: o.reserved as number[] },
       ...Array.isArray(o['allowed-ips']) && o['allowed-ips'].length && { 'allowed-ips': o['allowed-ips'] as string[] },
       ...pickNumber(o, 'workers', 'mtu', 'persistent-keepalive', 'refresh-server-ip-interval'),
-      ...!!o['amnezia-wg-option'] && typeof o['amnezia-wg-option'] === 'object' &&
+      ...isRecord(o['amnezia-wg-option']) &&
         {
           'amnezia-wg-option': o['amnezia-wg-option'] as {
             jc: number
@@ -294,6 +300,7 @@ const FROM_CLASH = createPure({
       password: String(o.password),
       ...pickNonEmptyString(o, 'sni', 'fingerprint', 'client-fingerprint'),
       ...Array.isArray(o.alpn) && o.alpn.length && { alpn: o.alpn as string[] },
+      ...echFrom(o),
       ...scv,
       ...udp,
       ...pickNumber(o, 'idle-session-check-interval', 'idle-session-timeout', 'min-idle-session'),
@@ -302,7 +309,7 @@ const FROM_CLASH = createPure({
 })
 
 function checkType<T extends Proxy['type']>(o: unknown, type: T): asserts o is { type: T; [key: string]: unknown } {
-  if (!(o && typeof o === 'object' && 'type' in o)) throw new Error('Invalid proxy')
+  if (!(isRecord(o) && 'type' in o)) throw new Error('Invalid proxy')
   if (o.type !== type) throw new Error(`Proxy type is not ${type}: ${o.type}`)
 }
 
@@ -366,7 +373,7 @@ function pluginFrom(
 ): Option<ObfsPlugin | V2rayPlugin | GostPlugin | ShadowTlsPlugin | RestlsPlugin> {
   const { plugin } = o
   const opts = o['plugin-opts'] as Record<string, unknown> | undefined
-  if (opts && typeof opts === 'object') {
+  if (isRecord(opts)) {
     switch (plugin) {
       case 'obfs':
         return {
@@ -384,11 +391,11 @@ function pluginFrom(
             ...pickNonEmptyString(opts, 'host', 'path'),
             ...!!opts.tls && {
               tls: true,
+              ...echFrom(opts),
               ...pickNonEmptyString(opts, 'fingerprint'),
               ...scv,
             },
-            ...!!opts.headers && typeof opts.headers === 'object' &&
-              { headers: opts.headers as Record<string, string> },
+            ...isRecord(opts.headers) && { headers: opts.headers as Record<string, string> },
             ...opts.mux === false && { mux: false },
             ...pickTrue(opts, 'v2ray-http-upgrade', 'v2ray-http-upgrade-fast-open'),
           },
@@ -401,11 +408,11 @@ function pluginFrom(
             ...pickNonEmptyString(opts, 'host', 'path'),
             ...!!opts.tls && {
               tls: true,
+              ...echFrom(opts),
               ...pickNonEmptyString(opts, 'fingerprint'),
               ...scv,
             },
-            ...!!opts.headers && typeof opts.headers === 'object' &&
-              { headers: opts.headers as Record<string, string> },
+            ...isRecord(opts.headers) && { headers: opts.headers as Record<string, string> },
             ...opts.mux === false && { mux: false },
           },
         }
@@ -452,19 +459,17 @@ function networkFrom(o: Record<string, unknown>): Option<WSNetwork | GRPCNetwork
   switch (network) {
     case 'ws': {
       const opts1 = o['ws-opts'] as Record<string, unknown>
-      const opts2 = !!opts1 && typeof opts1 === 'object'
+      const opts2 = isRecord(opts1)
         ? {
           ...pickNonEmptyString(opts1, 'path'),
-          ...!!opts1.headers && typeof opts1.headers === 'object' &&
-            { headers: opts1.headers as Record<string, string> },
+          ...isRecord(opts1.headers) && { headers: opts1.headers as Record<string, string> },
           ...pickNumber(opts1, 'max-early-data'),
           ...pickNonEmptyString(opts1, 'early-data-header-name'),
           ...pickTrue(opts1, 'v2ray-http-upgrade', 'v2ray-http-upgrade-fast-open'),
         }
         : {
           ...!!o['ws-path'] && { path: String(o['ws-path']) },
-          ...!!o['ws-headers'] && typeof o['ws-headers'] === 'object' &&
-            { headers: o['ws-headers'] as Record<string, string> },
+          ...isRecord(o['ws-headers']) && { headers: o['ws-headers'] as Record<string, string> },
         }
       return {
         network,
@@ -473,7 +478,7 @@ function networkFrom(o: Record<string, unknown>): Option<WSNetwork | GRPCNetwork
     }
     case 'grpc': {
       const opts1 = o['grpc-opts'] as Record<string, unknown>
-      const opts2: Option<{ 'grpc-service-name': string }> = !!opts1 && typeof opts1 === 'object'
+      const opts2: Option<{ 'grpc-service-name': string }> = isRecord(opts1)
         ? {
           ...pickNonEmptyString(opts1, 'grpc-service-name'),
         }
@@ -485,12 +490,11 @@ function networkFrom(o: Record<string, unknown>): Option<WSNetwork | GRPCNetwork
     }
     case 'http': {
       const opts1 = o['http-opts'] as Record<string, unknown>
-      const opts2 = !!opts1 && typeof opts1 === 'object'
+      const opts2 = isRecord(opts1)
         ? {
           ...pickNonEmptyString(opts1, 'method'),
           ...Array.isArray(opts1.path) && opts1.path.length && { path: opts1.path },
-          ...!!opts1.headers && typeof opts1.headers === 'object' &&
-            { headers: opts1.headers as Record<string, string[]> },
+          ...isRecord(opts1.headers) && { headers: opts1.headers as Record<string, string[]> },
         }
         : {}
       return {
@@ -500,7 +504,7 @@ function networkFrom(o: Record<string, unknown>): Option<WSNetwork | GRPCNetwork
     }
     case 'h2': {
       const opts1 = o['h2-opts'] as Record<string, unknown>
-      const opts2 = !!opts1 && typeof opts1 === 'object'
+      const opts2 = isRecord(opts1)
         ? {
           ...pickNonEmptyString(opts1, 'path'),
           ...Array.isArray(opts1.host) && opts1.host.length && { host: opts1.host },
@@ -515,14 +519,30 @@ function networkFrom(o: Record<string, unknown>): Option<WSNetwork | GRPCNetwork
   return {}
 }
 
+function isRecord(o: unknown): o is Record<string, unknown> {
+  return typeof o === 'object' && o !== null
+}
+
 function realityFrom(o: Record<string, unknown>): Option<Reality> {
-  const opts1 = o['reality-opts'] as Record<string, unknown>
-  return opts1 && typeof opts1 === 'object'
+  const opts = o['reality-opts']
+  return isRecord(opts)
     ? {
       'reality-opts': {
-        'public-key': String(opts1['public-key']),
-        'short-id': String(opts1['short-id'] || ''),
-        ...!!opts1['support-x25519mlkem768'] && { 'support-x25519mlkem768': true },
+        'public-key': String(opts['public-key']),
+        'short-id': String(opts['short-id'] || ''),
+        ...!!opts['support-x25519mlkem768'] && { 'support-x25519mlkem768': true },
+      },
+    }
+    : {}
+}
+
+function echFrom(o: Record<string, unknown>): Option<ECH> {
+  const opts = o['ech-opts']
+  return isRecord(opts) && opts.enable
+    ? {
+      'ech-opts': {
+        enable: true,
+        ...pickNonEmptyString(opts, 'config'),
       },
     }
     : {}
@@ -541,7 +561,7 @@ export function fromClash(clash: string, meta = true): [Proxy[], number, Record<
     let total = 0
     const count_unsupported: Record<string, number> = {}
     const arr = proxies.flatMap((x: unknown) => {
-      if (!x || typeof x !== 'object' || !('type' in x) || typeof x.type !== 'string') return []
+      if (!isRecord(x) || !('type' in x) || typeof x.type !== 'string') return []
       total++
       if (!isSupportedType(x.type)) {
         const k = x.type || 'unknown'

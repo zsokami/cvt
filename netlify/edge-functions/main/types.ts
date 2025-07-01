@@ -65,7 +65,7 @@ export interface V2rayPlugin {
     mux?: boolean
     'v2ray-http-upgrade'?: boolean
     'v2ray-http-upgrade-fast-open'?: boolean
-  }
+  } & Option<ECH>
 }
 
 export interface GostPlugin {
@@ -79,7 +79,7 @@ export interface GostPlugin {
     'skip-cert-verify'?: boolean
     headers?: Record<string, string>
     mux?: boolean
-  }
+  } & Option<ECH>
 }
 
 export interface ShadowTlsPlugin {
@@ -236,11 +236,30 @@ export interface Reality {
   }
 }
 
-export type VMess = VMessBase & Option<WSNetwork | GRPCNetwork | HTTPNetwork | H2Network> & Option<Reality>
+export interface ECH {
+  'ech-opts': {
+    enable?: boolean
+    config?: string
+  }
+}
 
-export type VLESS = VLESSBase & Option<WSNetwork | GRPCNetwork | HTTPNetwork | H2Network> & Option<Reality>
+export type VMess =
+  & VMessBase
+  & Option<WSNetwork | GRPCNetwork | HTTPNetwork | H2Network>
+  & Option<Reality>
+  & Option<ECH>
 
-export type Trojan = TrojanBase & Option<WSNetwork | GRPCNetwork> & Option<Reality>
+export type VLESS =
+  & VLESSBase
+  & Option<WSNetwork | GRPCNetwork | HTTPNetwork | H2Network>
+  & Option<Reality>
+  & Option<ECH>
+
+export type Trojan =
+  & TrojanBase
+  & Option<WSNetwork | GRPCNetwork>
+  & Option<Reality>
+  & Option<ECH>
 
 export type PortOrPorts = { port: number; ports?: string } | { port?: number; ports: string }
 
@@ -263,7 +282,7 @@ interface HysteriaBase extends ProxyBase {
   'fast-open'?: boolean
 }
 
-export type Hysteria = HysteriaBase & PortOrPorts
+export type Hysteria = HysteriaBase & PortOrPorts & Option<ECH>
 
 interface Hysteria2Base extends ProxyBase {
   type: 'hysteria2'
@@ -288,9 +307,9 @@ interface Hysteria2Base extends ProxyBase {
   'max-connection-receive-window'?: number
 }
 
-export type Hysteria2 = Hysteria2Base & PortOrPorts
+export type Hysteria2 = Hysteria2Base & PortOrPorts & Option<ECH>
 
-export interface TUIC extends ProxyBase {
+export interface TUICBase extends ProxyBase {
   type: 'tuic'
   port: number
   token?: string
@@ -319,6 +338,8 @@ export interface TUIC extends ProxyBase {
   'udp-over-stream'?: boolean
   'disable-sni'?: boolean
 }
+
+export type TUIC = TUICBase & Option<ECH>
 
 export interface WireGuard extends ProxyBase {
   type: 'wireguard'
@@ -369,7 +390,7 @@ export interface SSH extends ProxyBase {
   'host-key-algorithms'?: string[]
 }
 
-export interface AnyTLS extends ProxyBase {
+export interface AnyTLSBase extends ProxyBase {
   type: 'anytls'
   port: number
   password: string
@@ -383,6 +404,8 @@ export interface AnyTLS extends ProxyBase {
   'idle-session-timeout'?: number
   'min-idle-session'?: number
 }
+
+export type AnyTLS = AnyTLSBase & Option<ECH>
 
 export type Proxy =
   | HTTP
