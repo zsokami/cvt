@@ -140,54 +140,57 @@ export async function cvt(
   // console.time('from')
   const proxy_urls = proxy?.split('|') ?? []
   const froms = _from.split('|')
-  const promises = froms.map(async (x, i): Promise<[Proxy[], number, Record<string, number>, Headers?]> => {
-    if (/^(?:https?|data):/i.test(x)) {
-      // console.time('fetch')
-      const resp = await fetch(x, {
-        headers: { 'user-agent': ua },
-        ...proxy_urls[i] && {
-          client: Deno.createHttpClient({
-            proxy: {
-              url: proxy_urls[i].replace(
-                /^(https?:|socks5h?:)?\/*/i,
-                (_, $1) => `${$1?.toLowerCase() || 'http:'}//`,
-              ),
-            },
-          }),
-        },
-      })
-      if (!resp.ok) throw new Error(`${resp.status} ${resp.statusText}`)
-      // console.timeEnd('fetch')
-      // console.time('text')
-      const text = await resp.text()
-      // console.timeEnd('text')
-      return [...from(text, meta), /^data:/i.test(x) ? undefined : resp.headers]
-    }
-    return from(x, meta)
-  })
+  const results = await Promise.allSettled(
+    froms.map(async (x, i): Promise<[Proxy[], number, Record<string, number>, Headers?]> => {
+      if (/^(?:https?|data):/i.test(x)) {
+        // console.time('fetch')
+        const resp = await fetch(x, {
+          headers: { 'user-agent': ua },
+          ...proxy_urls[i] && {
+            client: Deno.createHttpClient({
+              proxy: {
+                url: proxy_urls[i].replace(
+                  /^(https?:|socks5h?:)?\/*/i,
+                  (_, $1) => `${$1?.toLowerCase() || 'http:'}//`,
+                ),
+              },
+            }),
+          },
+        })
+        if (!resp.ok) throw new Error(`${resp.status} ${resp.statusText}`)
+        // console.timeEnd('fetch')
+        // console.time('text')
+        const text = await resp.text()
+        // console.timeEnd('text')
+        return [...from(text, meta), /^data:/i.test(x) ? undefined : resp.headers]
+      }
+      return from(x, meta)
+    }),
+  )
   let proxies = []
   let total = 0
   const count_unsupported: Record<string, number> = {}
   const subinfo_headers = []
   const other_headers = []
   const errors = []
-  for (let i = 0; i < promises.length; i++) {
-    try {
-      const [list, _total, _count_unsupported, headers] = await promises[i]
-      proxies.push(...list)
-      total += _total
-      for (const [type, count] of Object.entries(_count_unsupported)) {
-        count_unsupported[type] = (count_unsupported[type] || 0) + count
+  for (let i = 0; i < results.length; i++) {
+    const result = results[i]
+    if (result.status === 'rejected') {
+      errors.push(`${froms[i]} ${result.reason}`.replace(/[\r\n]+/g, ''))
+      continue
+    }
+    const [list, _total, _count_unsupported, headers] = result.value
+    proxies.push(...list)
+    total += _total
+    for (const [type, count] of Object.entries(_count_unsupported)) {
+      count_unsupported[type] = (count_unsupported[type] || 0) + count
+    }
+    if (headers) {
+      if (headers.has('subscription-userinfo')) {
+        subinfo_headers.push(headers)
+      } else {
+        other_headers.push(headers)
       }
-      if (headers) {
-        if (headers.has('subscription-userinfo')) {
-          subinfo_headers.push(headers)
-        } else {
-          other_headers.push(headers)
-        }
-      }
-    } catch (e) {
-      errors.push(`${froms[i]} ${e}`.replace(/[\r\n]+/g, ''))
     }
   }
   // console.timeEnd('from')

@@ -758,7 +758,7 @@ export function toClash(
         ...counts[1] > counts[0] ? [`# 按名称排除了 ${counts[1] - counts[0]} 个节点\n`] : [],
       ]
       : [],
-    ...errors
+    ...errors?.length
       ? [
         `# 以下 ${errors.length} 个订阅转换失败：\n`,
         ...errors.map((x) => `# ${x}\n`),
