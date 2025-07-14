@@ -30,6 +30,7 @@ function to(
   meta = true,
   counts?: [number, number, number],
   count_unsupported?: Record<string, number>,
+  errors?: string[],
 ): string {
   switch (target) {
     case 'clash':
@@ -40,6 +41,7 @@ function to(
         meta,
         counts,
         count_unsupported,
+        errors,
       )
     case 'uri':
       return toURIs(proxies)
@@ -137,53 +139,55 @@ export async function cvt(
   }
   // console.time('from')
   const proxy_urls = proxy?.split('|') ?? []
-  const promises = _from.split('|').map(async (x, i) => {
+  const froms = _from.split('|')
+  const promises = froms.map(async (x, i): Promise<[Proxy[], number, Record<string, number>, Headers?]> => {
     if (/^(?:https?|data):/i.test(x)) {
-      try {
-        // console.time('fetch')
-        const resp = await fetch(x, {
-          headers: { 'user-agent': ua },
-          ...proxy_urls[i] && {
-            client: Deno.createHttpClient({
-              proxy: {
-                url: proxy_urls[i].replace(
-                  /^(https?:|socks5h?:)?\/*/i,
-                  (_, $1) => `${$1?.toLowerCase() || 'http:'}//`,
-                ),
-              },
-            }),
-          },
-        })
-        // console.timeEnd('fetch')
-        // console.time('text')
-        const text = await resp.text()
-        // console.timeEnd('text')
-        if (resp.ok) return [...from(text, meta), /^data:/i.test(x) ? undefined : resp.headers]
-        return [[], 0]
-      } catch (e) {
-        console.error('Fetch Error:', e)
-        return [[], 0]
-      }
+      // console.time('fetch')
+      const resp = await fetch(x, {
+        headers: { 'user-agent': ua },
+        ...proxy_urls[i] && {
+          client: Deno.createHttpClient({
+            proxy: {
+              url: proxy_urls[i].replace(
+                /^(https?:|socks5h?:)?\/*/i,
+                (_, $1) => `${$1?.toLowerCase() || 'http:'}//`,
+              ),
+            },
+          }),
+        },
+      })
+      if (!resp.ok) throw new Error(`${resp.status} ${resp.statusText}`)
+      // console.timeEnd('fetch')
+      // console.time('text')
+      const text = await resp.text()
+      // console.timeEnd('text')
+      return [...from(text, meta), /^data:/i.test(x) ? undefined : resp.headers]
     }
     return from(x, meta)
-  }) as Promise<[Proxy[], number, Record<string, number>, Headers | undefined]>[]
+  })
   let proxies = []
   let total = 0
   const count_unsupported: Record<string, number> = {}
   const subinfo_headers = []
   const other_headers = []
-  for await (const [list, _total, _count_unsupported, headers] of promises) {
-    proxies.push(...list)
-    total += _total
-    for (const [type, count] of Object.entries(_count_unsupported)) {
-      count_unsupported[type] = (count_unsupported[type] || 0) + count
-    }
-    if (headers) {
-      if (headers.has('subscription-userinfo')) {
-        subinfo_headers.push(headers)
-      } else {
-        other_headers.push(headers)
+  const errors = []
+  for (let i = 0; i < promises.length; i++) {
+    try {
+      const [list, _total, _count_unsupported, headers] = await promises[i]
+      proxies.push(...list)
+      total += _total
+      for (const [type, count] of Object.entries(_count_unsupported)) {
+        count_unsupported[type] = (count_unsupported[type] || 0) + count
       }
+      if (headers) {
+        if (headers.has('subscription-userinfo')) {
+          subinfo_headers.push(headers)
+        } else {
+          other_headers.push(headers)
+        }
+      }
+    } catch (e) {
+      errors.push(`${froms[i]} ${e}`.replace(/[\r\n]+/g, ''))
     }
   }
   // console.timeEnd('from')
@@ -202,7 +206,9 @@ export async function cvt(
   // console.time('to')
   const counts = [proxies.length, count_before_filter, total] as [number, number, number]
   const result: [string, [number, number, number], Headers | undefined] = [
-    proxies.length === 0 && _from !== 'empty' ? '' : to(proxies, _to, meta, counts, count_unsupported),
+    proxies.length === 0 && _from !== 'empty'
+      ? errors.length ? `订阅转换失败：\n${errors.join('\n')}` : ''
+      : to(proxies, _to, meta, counts, count_unsupported, errors),
     counts,
     subinfo_headers.length === 1
       ? subinfo_headers[0]

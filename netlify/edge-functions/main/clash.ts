@@ -734,6 +734,7 @@ export function toClash(
   meta = true,
   counts?: [number, number, number],
   count_unsupported?: Record<string, number>,
+  errors?: string[],
 ): string {
   if (proxiesOnly) {
     return ['proxies:\n', ...proxies.map((x) => `- ${JSON.stringify(x)}\n`)].join('')
@@ -755,6 +756,12 @@ export function toClash(
           ]
           : [],
         ...counts[1] > counts[0] ? [`# 按名称排除了 ${counts[1] - counts[0]} 个节点\n`] : [],
+      ]
+      : [],
+    ...errors
+      ? [
+        `# 以下 ${errors.length} 个订阅转换失败：\n`,
+        ...errors.map((x) => `# ${x}\n`),
       ]
       : [],
     'proxies:\n',

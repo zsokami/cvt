@@ -39,6 +39,9 @@ async function main(req: Request) {
   if (!result && !_headers?.has('subscription-userinfo')) {
     return new Response('Not Found', { status: 404, headers })
   }
+  if (result.startsWith('订阅转换失败')) {
+    return new Response(result, { status: 400, headers })
+  }
   if (_headers) {
     Object.assign(
       headers,
