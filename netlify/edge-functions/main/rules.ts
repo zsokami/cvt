@@ -1860,8 +1860,8 @@ export const RULES = `rules:
 - DOMAIN-SUFFIX,client-api.arkoselabs.com,🤖 ‍AI
 - DOMAIN-SUFFIX,copilot.cloud.microsoft,🤖 ‍AI
 - DOMAIN-SUFFIX,copilot.microsoft.com,🤖 ‍AI
-- DOMAIN-SUFFIX,curosr.com,🤖 ‍AI
-- DOMAIN-SUFFIX,curosr.sh,🤖 ‍AI
+- DOMAIN-SUFFIX,cursor.com,🤖 ‍AI
+- DOMAIN-SUFFIX,cursor.sh,🤖 ‍AI
 - DOMAIN-SUFFIX,events.statsigapi.net,🤖 ‍AI
 - DOMAIN-SUFFIX,featuregates.org,🤖 ‍AI
 - DOMAIN-SUFFIX,gemini.google.com,🤖 ‍AI
