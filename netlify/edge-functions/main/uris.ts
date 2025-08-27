@@ -155,7 +155,7 @@ const FROM_URI = {
   vless(uri: string): VLESS {
     const u = new URL(uri)
     const ps = Object.fromEntries(u.searchParams)
-    const { flow, security, sni, alpn, fp, pbk, sid, type } = ps
+    const { flow, security, sni, alpn, fp, pbk, sid, type, encryption } = ps
     const tlsOpts = security === 'tls' || security === 'reality' || type === 'grpc' || type === 'h2'
       ? {
         tls: true,
@@ -171,6 +171,7 @@ const FROM_URI = {
       uuid: urlDecode(u.username),
       ...networkFrom(ps),
       ...flow && { flow },
+      ...encryption && { encryption },
       ...tlsOpts,
       ...udp,
     }
@@ -349,12 +350,13 @@ const TO_URI = {
   },
   vless(proxy: Proxy): string {
     checkType(proxy, 'vless')
-    const { uuid, flow, tls, servername, alpn, 'client-fingerprint': fp } = proxy
+    const { uuid, flow, encryption, tls, servername, alpn, 'client-fingerprint': fp } = proxy
     const u = baseTo(proxy)
     u.username = uuid
     u.search = new URLSearchParams({
       ...networkToStd(proxy),
       ...flow && { flow },
+      ...encryption && { encryption },
       ...tls && {
         ...realityTo(proxy, { security: 'tls' }),
         ...servername && { sni: servername },

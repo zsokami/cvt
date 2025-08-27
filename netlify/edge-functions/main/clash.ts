@@ -101,7 +101,7 @@ const FROM_CLASH = createPure({
       username: String(o.username),
       password: String(o.password),
       transport: String(o.transport),
-      ...pickNonEmptyString(o, 'multiplexing'),
+      ...pickNonEmptyString(o, 'multiplexing', 'handshake-mode'),
       ...udp,
     }
   },
@@ -129,7 +129,7 @@ const FROM_CLASH = createPure({
       ...(o.tls || 'network' in networkOpts && (networkOpts.network === 'grpc' || networkOpts.network === 'h2')) && {
         tls: true,
         ...pickNonEmptyString(o, 'servername', 'fingerprint', 'client-fingerprint'),
-        ...Array.isArray(o.alpn) && o.alpn.length && { alpn: o.alpn as string[] },
+        ...Array.isArray(o.alpn) && { alpn: o.alpn as string[] },
         ...echFrom(o),
         ...realityFrom(o),
         ...scv,
@@ -143,12 +143,12 @@ const FROM_CLASH = createPure({
     return {
       ...baseFrom(o),
       uuid: String(o.uuid),
-      ...pickNonEmptyString(o, 'flow', 'packet-encoding'),
+      ...pickNonEmptyString(o, 'flow', 'packet-encoding', 'encryption'),
       ...networkOpts,
       ...(o.tls || 'network' in networkOpts && (networkOpts.network === 'grpc' || networkOpts.network === 'h2')) && {
         tls: true,
         ...pickNonEmptyString(o, 'servername', 'fingerprint', 'client-fingerprint'),
-        ...Array.isArray(o.alpn) && o.alpn.length && { alpn: o.alpn as string[] },
+        ...Array.isArray(o.alpn) && { alpn: o.alpn as string[] },
         ...echFrom(o),
         ...realityFrom(o),
         ...scv,
@@ -168,7 +168,7 @@ const FROM_CLASH = createPure({
       password: String(o.password),
       ...networkOpts,
       ...pickNonEmptyString(o, 'sni', 'fingerprint', 'client-fingerprint'),
-      ...Array.isArray(o.alpn) && o.alpn.length && { alpn: o.alpn as string[] },
+      ...Array.isArray(o.alpn) && { alpn: o.alpn as string[] },
       ...echFrom(o),
       ...realityFrom(o),
       ...scv,
@@ -192,7 +192,7 @@ const FROM_CLASH = createPure({
       up: String(o.up),
       down: String(o.down),
       ...pickNonEmptyString(o, 'obfs', 'protocol', 'sni', 'fingerprint', 'ca-str'),
-      ...Array.isArray(o.alpn) && o.alpn.length && { alpn: o.alpn as string[] },
+      ...Array.isArray(o.alpn) && { alpn: o.alpn as string[] },
       ...echFrom(o),
       ...scv,
       ...pickNumber(o, 'recv-window-conn', 'recv-window'),
@@ -206,7 +206,7 @@ const FROM_CLASH = createPure({
       password: String(o.password || o.auth),
       ...pickNumber(o, 'hop-interval'),
       ...pickNonEmptyString(o, 'up', 'down', 'obfs', 'obfs-password', 'sni', 'fingerprint', 'ca-str'),
-      ...Array.isArray(o.alpn) && o.alpn.length && { alpn: o.alpn as string[] },
+      ...Array.isArray(o.alpn) && { alpn: o.alpn as string[] },
       ...echFrom(o),
       ...scv,
       ...pickNumber(
@@ -236,7 +236,7 @@ const FROM_CLASH = createPure({
         'fingerprint',
         'ca-str',
       ),
-      ...Array.isArray(o.alpn) && o.alpn.length && { alpn: o.alpn as string[] },
+      ...Array.isArray(o.alpn) && { alpn: o.alpn as string[] },
       ...echFrom(o),
       ...scv,
       ...pickNumber(
@@ -265,17 +265,7 @@ const FROM_CLASH = createPure({
       ...pickNumber(o, 'workers', 'mtu', 'persistent-keepalive', 'refresh-server-ip-interval'),
       ...isRecord(o['amnezia-wg-option']) &&
         {
-          'amnezia-wg-option': o['amnezia-wg-option'] as {
-            jc: number
-            jmin: number
-            jmax: number
-            s1: number
-            s2: number
-            h1: number
-            h2: number
-            h4: number
-            h3: number
-          },
+          'amnezia-wg-option': o['amnezia-wg-option'],
         },
       ...pickTrue(o, 'remote-dns-resolve'),
       ...Array.isArray(o.dns) && o.dns.length && { dns: o.dns as string[] },
@@ -299,7 +289,7 @@ const FROM_CLASH = createPure({
       ...baseFrom(o),
       password: String(o.password),
       ...pickNonEmptyString(o, 'sni', 'fingerprint', 'client-fingerprint'),
-      ...Array.isArray(o.alpn) && o.alpn.length && { alpn: o.alpn as string[] },
+      ...Array.isArray(o.alpn) && { alpn: o.alpn as string[] },
       ...echFrom(o),
       ...scv,
       ...udp,
@@ -425,7 +415,7 @@ function pluginFrom(
             ...pickNonEmptyString(opts, 'password'),
             ...pickNumber(opts, 'version'),
             ...pickNonEmptyString(opts, 'fingerprint'),
-            ...Array.isArray(opts.alpn) && opts.alpn.length && { alpn: opts.alpn as string[] },
+            ...Array.isArray(opts.alpn) && { alpn: opts.alpn as string[] },
             ...scv,
           },
         }

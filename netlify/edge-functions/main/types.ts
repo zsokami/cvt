@@ -128,6 +128,7 @@ interface MieruBase extends ProxyBase {
   password: string
   transport: string
   multiplexing?: string
+  'handshake-mode'?: string
   udp?: boolean
 }
 
@@ -166,6 +167,7 @@ export interface VLESSBase extends ProxyBase {
   uuid: string
   flow?: string
   'packet-encoding'?: string
+  encryption?: string
   tls?: boolean
   servername?: string
   fingerprint?: string
@@ -356,15 +358,24 @@ export interface WireGuard extends ProxyBase {
   'persistent-keepalive'?: number
   'refresh-server-ip-interval'?: number
   'amnezia-wg-option'?: {
-    jc: number
-    jmin: number
-    jmax: number
-    s1: number
-    s2: number
-    h1: number
-    h2: number
-    h4: number
-    h3: number
+    jc?: number
+    jmin?: number
+    jmax?: number
+    s1?: number
+    s2?: number
+    h1?: number
+    h2?: number
+    h4?: number
+    h3?: number
+    i1?: string
+    i2?: string
+    i3?: string
+    i4?: string
+    i5?: string
+    j1?: string
+    j2?: string
+    j3?: string
+    itime?: number
   }
   // peers?: {
   //   server: string
