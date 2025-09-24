@@ -356,7 +356,7 @@ function baseFromForPortRange<T extends Proxy['type']>(
   if (!('name' in o && 'server' in o)) throw new Error('Invalid proxy')
   const ports = {
     ...pickNumber(o, 'port'),
-    ...pickNonEmptyString(o, 'port-range'),
+    ...pickNonEmptyString(o, 'port', 'port-range'),
   }
   if (!('port' in ports || 'port-range' in ports)) throw new Error('Invalid proxy')
   return {

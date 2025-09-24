@@ -57,8 +57,11 @@ export function pickNumber<T, K>(o: T, ...keys: K[]): Partial<Record<K & keyof T
   for (const k of keys) {
     // @ts-ignore:
     const v = o[k]
-    // @ts-ignore:
-    if (v != null && v !== '') r[k] = Number(v)
+    if (v != null && v !== '') {
+      const n = Number(v)
+      // @ts-ignore:
+      if (!isNaN(n)) r[k] = n
+    }
   }
   return r
 }

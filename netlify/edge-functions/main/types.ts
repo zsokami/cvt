@@ -159,7 +159,7 @@ export interface SSR extends ProxyBase {
   udp?: boolean
 }
 
-export type PortOrPortRange = { port: number } | { 'port-range': string }
+export type PortOrPortRange = { port: number | string } | { 'port-range': string }
 
 interface MieruBase extends ProxyBase {
   type: 'mieru'
