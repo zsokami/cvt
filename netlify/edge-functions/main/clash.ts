@@ -8,6 +8,7 @@ import type {
   HTTPNetwork,
   Hysteria,
   Hysteria2,
+  KcpTunPlugin,
   Mieru,
   ObfsPlugin,
   Option,
@@ -373,7 +374,7 @@ function baseFromForPortRange<T extends Proxy['type']>(
 
 function pluginFrom(
   o: { type: 'ss'; [key: string]: unknown },
-): Option<ObfsPlugin | V2rayPlugin | GostPlugin | ShadowTlsPlugin | RestlsPlugin> {
+): Option<ObfsPlugin | V2rayPlugin | GostPlugin | ShadowTlsPlugin | RestlsPlugin | KcpTunPlugin> {
   const { plugin } = o
   const opts = o['plugin-opts'] as Record<string, unknown> | undefined
   if (isRecord(opts)) {
@@ -441,6 +442,38 @@ function pluginFrom(
             password: String(opts.password),
             'version-hint': String(opts['version-hint']),
             ...pickNonEmptyString(opts, 'restls-script'),
+          },
+        }
+      case 'kcptun':
+        return {
+          plugin,
+          'plugin-opts': {
+            ...pickNonEmptyString(opts, 'key', 'crypt', 'mode'),
+            ...pickNumber(
+              opts,
+              'conn',
+              'autoexpire',
+              'scavengettl',
+              'mtu',
+              'sndwnd',
+              'rcvwnd',
+              'datashard',
+              'parityshard',
+              'dscp',
+            ),
+            ...pickTrue(opts, 'nocomp', 'acknodelay'),
+            ...pickNumber(
+              opts,
+              'nodelay',
+              'interval',
+              'resend',
+              'nc',
+              'sockbuf',
+              'smuxver',
+              'smuxbuf',
+              'streambuf',
+              'keepalive',
+            ),
           },
         }
     }

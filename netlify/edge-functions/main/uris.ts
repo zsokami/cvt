@@ -7,6 +7,7 @@ import type {
   HTTPNetwork,
   Hysteria,
   Hysteria2,
+  KcpTunPlugin,
   ObfsPlugin,
   Option,
   PortOrPorts,
@@ -545,7 +546,7 @@ function pluginFromSearchParam(p: string | null): Option<ObfsPlugin | V2rayPlugi
 }
 
 function pluginToSearchParam(
-  p: Option<ObfsPlugin | V2rayPlugin | GostPlugin | ShadowTlsPlugin | RestlsPlugin>,
+  p: Option<ObfsPlugin | V2rayPlugin | GostPlugin | ShadowTlsPlugin | RestlsPlugin | KcpTunPlugin>,
 ): string {
   const { plugin, 'plugin-opts': opts } = p
   if (!plugin) return ''

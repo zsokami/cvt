@@ -116,7 +116,36 @@ export interface RestlsPlugin {
   }
 }
 
-export type SS = SSBase & Option<ObfsPlugin | V2rayPlugin | GostPlugin | ShadowTlsPlugin | RestlsPlugin>
+export interface KcpTunPlugin {
+  plugin: 'kcptun'
+  'plugin-opts': {
+    key?: string
+    crypt?: string
+    mode?: string
+    conn?: number
+    autoexpire?: number
+    scavengettl?: number
+    mtu?: number
+    sndwnd?: number
+    rcvwnd?: number
+    datashard?: number
+    parityshard?: number
+    dscp?: number
+    nocomp?: boolean
+    acknodelay?: boolean
+    nodelay?: number
+    interval?: number
+    resend?: number
+    nc?: number
+    sockbuf?: number
+    smuxver?: number
+    smuxbuf?: number
+    streambuf?: number
+    keepalive?: number
+  }
+}
+
+export type SS = SSBase & Option<ObfsPlugin | V2rayPlugin | GostPlugin | ShadowTlsPlugin | RestlsPlugin | KcpTunPlugin>
 
 export interface SSR extends ProxyBase {
   type: 'ssr'
