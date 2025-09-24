@@ -19,6 +19,8 @@ export interface HTTP extends ProxyBase {
   tls?: boolean
   sni?: string
   fingerprint?: string
+  certificate?: string
+  'private-key'?: string
   'skip-cert-verify'?: boolean
   headers?: Record<string, string>
 }
@@ -30,6 +32,8 @@ export interface Socks5 extends ProxyBase {
   password?: string
   tls?: boolean
   fingerprint?: string
+  certificate?: string
+  'private-key'?: string
   'skip-cert-verify'?: boolean
   udp?: boolean
 }
@@ -60,6 +64,8 @@ export interface V2rayPlugin {
     path?: string
     tls?: boolean
     fingerprint?: string
+    certificate?: string
+    'private-key'?: string
     'skip-cert-verify'?: boolean
     headers?: Record<string, string>
     mux?: boolean
@@ -76,6 +82,8 @@ export interface GostPlugin {
     path?: string
     tls?: boolean
     fingerprint?: string
+    certificate?: string
+    'private-key'?: string
     'skip-cert-verify'?: boolean
     headers?: Record<string, string>
     mux?: boolean
@@ -90,6 +98,8 @@ export interface ShadowTlsPlugin {
     password?: string
     version?: number
     fingerprint?: string
+    certificate?: string
+    'private-key'?: string
     alpn?: string[]
     'skip-cert-verify'?: boolean
   }
@@ -155,6 +165,8 @@ export interface VMessBase extends ProxyBase {
   tls?: boolean
   servername?: string
   fingerprint?: string
+  certificate?: string
+  'private-key'?: string
   'client-fingerprint'?: string
   alpn?: string[]
   'skip-cert-verify'?: boolean
@@ -171,6 +183,8 @@ export interface VLESSBase extends ProxyBase {
   tls?: boolean
   servername?: string
   fingerprint?: string
+  certificate?: string
+  'private-key'?: string
   'client-fingerprint'?: string
   alpn?: string[]
   'skip-cert-verify'?: boolean
@@ -183,6 +197,8 @@ export interface TrojanBase extends ProxyBase {
   password: string
   sni?: string
   fingerprint?: string
+  certificate?: string
+  'private-key'?: string
   'client-fingerprint'?: string
   alpn?: string[]
   'skip-cert-verify'?: boolean
@@ -275,6 +291,8 @@ interface HysteriaBase extends ProxyBase {
   protocol?: string
   sni?: string
   fingerprint?: string
+  certificate?: string
+  'private-key'?: string
   'ca-str'?: string
   alpn?: string[]
   'skip-cert-verify'?: boolean
@@ -298,6 +316,8 @@ interface Hysteria2Base extends ProxyBase {
   'obfs-password'?: string
   sni?: string
   fingerprint?: string
+  certificate?: string
+  'private-key'?: string
   'ca-str'?: string
   alpn?: string[]
   'skip-cert-verify'?: boolean
@@ -322,6 +342,8 @@ export interface TUICBase extends ProxyBase {
   'udp-relay-mode'?: string
   sni?: string
   fingerprint?: string
+  certificate?: string
+  'private-key'?: string
   'ca-str'?: string
   alpn?: string[]
   'skip-cert-verify'?: boolean
@@ -407,6 +429,8 @@ export interface AnyTLSBase extends ProxyBase {
   password: string
   sni?: string
   fingerprint?: string
+  certificate?: string
+  'private-key'?: string
   'client-fingerprint'?: string
   alpn?: string[]
   'skip-cert-verify'?: boolean
