@@ -411,10 +411,12 @@ export interface WireGuard extends ProxyBase {
     jmax?: number
     s1?: number
     s2?: number
-    h1?: number
-    h2?: number
-    h4?: number
-    h3?: number
+    s3?: number
+    s4?: number
+    h1?: string
+    h2?: string
+    h3?: string
+    h4?: string
     i1?: string
     i2?: string
     i3?: string
