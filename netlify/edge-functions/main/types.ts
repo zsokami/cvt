@@ -322,7 +322,6 @@ interface HysteriaBase extends ProxyBase {
   fingerprint?: string
   certificate?: string
   'private-key'?: string
-  'ca-str'?: string
   alpn?: string[]
   'skip-cert-verify'?: boolean
   'recv-window-conn'?: number
@@ -347,7 +346,6 @@ interface Hysteria2Base extends ProxyBase {
   fingerprint?: string
   certificate?: string
   'private-key'?: string
-  'ca-str'?: string
   alpn?: string[]
   'skip-cert-verify'?: boolean
   'cwnd'?: number
@@ -373,7 +371,6 @@ export interface TUICBase extends ProxyBase {
   fingerprint?: string
   certificate?: string
   'private-key'?: string
-  'ca-str'?: string
   alpn?: string[]
   'skip-cert-verify'?: boolean
   'max-udp-relay-packet-size'?: number
