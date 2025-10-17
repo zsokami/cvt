@@ -4,8 +4,7 @@ EXPOSE 8000
 
 WORKDIR /app
 
-COPY deno.json .
-COPY scripts/server.ts scripts/
+COPY main.ts ./
 COPY netlify/edge-functions/main/ netlify/edge-functions/main/
 
-CMD ["run", "-A", "scripts/server.ts"]
+CMD ["run", "-A", "main.ts"]

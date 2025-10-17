@@ -1,5 +1,5 @@
-import handler from '../netlify/edge-functions/main/main.ts'
-import { splitRight } from '../netlify/edge-functions/main/utils.ts'
+import handler from './netlify/edge-functions/main/main.ts'
+import { splitRight } from './netlify/edge-functions/main/utils.ts'
 
 let hostname = Deno.env.get('HOST') || Deno.env.get('IP')
 let port = Number(Deno.env.get('PORT')) || undefined

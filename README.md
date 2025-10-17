@@ -65,7 +65,7 @@ Demo: `https://arx.cc/`
 
 #### Deno Deploy
 
-先 Fork 仓库，然后登录 [Deno Deploy](https://dash.deno.com/new_project) 选择仓库，Entrypoint 选 `scripts/server.ts`，点击部署即可
+[![Deploy on Deno](https://deno.com/button)](https://console.deno.com/new?clone=https://github.com/zsokami/cvt)
 
 Demo: `https://d.arx.cc/`
 
@@ -84,25 +84,25 @@ Demo: `https://cvt.koyeb.app/`
 运行
 
 ```sh
-deno run -A https://raw.githubusercontent.com/zsokami/cvt/main/scripts/server.ts
+deno run -A https://raw.githubusercontent.com/zsokami/cvt/main/main.ts
 ```
 
 指定端口
 
 ```sh
-deno run -A https://raw.githubusercontent.com/zsokami/cvt/main/scripts/server.ts 8000
+deno run -A https://raw.githubusercontent.com/zsokami/cvt/main/main.ts 8000
 ```
 
 指定主机名/IP:端口
 
 ```sh
-deno run -A https://raw.githubusercontent.com/zsokami/cvt/main/scripts/server.ts [::1]:8000
+deno run -A https://raw.githubusercontent.com/zsokami/cvt/main/main.ts [::1]:8000
 ```
 
 更新版本并运行
 
 ```sh
-deno run -A -r https://raw.githubusercontent.com/zsokami/cvt/main/scripts/server.ts
+deno run -A -r https://raw.githubusercontent.com/zsokami/cvt/main/main.ts
 ```
 
 查看版本
