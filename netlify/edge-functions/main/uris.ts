@@ -172,7 +172,7 @@ const FROM_URI = {
       uuid: urlDecode(u.username),
       ...networkFrom(ps),
       ...flow && { flow },
-      ...encryption && { encryption },
+      ...encryption && encryption !== 'none' && { encryption },
       ...tlsOpts,
       ...udp,
     }
