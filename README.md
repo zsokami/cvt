@@ -5,7 +5,7 @@
 emoji、代理策略组和路由规则与 [ACL4SSR_Online_Full_Mannix.ini](https://github.com/zsokami/ACL4SSR) 大致相同，url-test 间隔时间改为随节点数变化，最少 15 秒
 
 ||URI|Clash|
-|-|-|-|
+|-|:-:|:-:|
 |http|✅|✅|
 |socks5|✅|✅|
 |ss|✅|✅|
