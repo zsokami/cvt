@@ -87,6 +87,7 @@ const FROM_URI = {
     return {
       ...baseFrom(u),
       ...(username || password) && { username, password },
+      ...u.protocol === 'socks5+tls:' && { tls: true, ...scv },
       ...udp,
     }
   },
@@ -697,6 +698,7 @@ const TYPE_MAP: Record<string, keyof typeof FROM_URI | undefined> = createPure({
   https: 'http',
   socks: 'socks5',
   socks5: 'socks5',
+  'socks5+tls': 'socks5',
   ss: 'ss',
   ssr: 'ssr',
   vmess: 'vmess',
