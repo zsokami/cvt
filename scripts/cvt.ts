@@ -1,16 +1,30 @@
 import { cvt } from '../netlify/edge-functions/main/cvt.ts'
 
-const oidx = Deno.args.indexOf('-o')
-let out_path = ''
-if (~oidx) {
-  out_path = Deno.args[oidx + 1]
-  Deno.args.splice(oidx, 2)
+let out_path, ua, ndl
+
+const args = []
+
+for (let i = 0; i < Deno.args.length; i++) {
+  const arg = Deno.args[i]
+  switch (arg) {
+    case '-o':
+      out_path = Deno.args[++i]
+      break
+    case '-ua':
+      ua = Deno.args[++i]
+      break
+    case '-ndl':
+      ndl = true
+      break
+    default:
+      args.push(arg)
+  }
 }
 
-if (!Deno.args.length) {
+if (!args.length) {
   console.log(`用于在 Clash(Meta/mihomo)、Clash proxies、base64 和 uri 订阅格式之间进行快速转换
 
-deno run -A cvt.ts [-o <path>] [<from>] [<to>] [<ua>]
+deno run -A cvt.ts [-o <path>] [<from>] [<to>] [-ua <ua>] [-ndl]
   -o <path>
   输出路径
 
@@ -21,12 +35,15 @@ deno run -A cvt.ts [-o <path>] [<from>] [<to>] [<ua>]
   <to>
   clash、clash-proxies、base64、uri 或 auto(若 ua 含 clash 则 clash 否则 base64)
 
-  <ua>
-  User-Agent 请求头`)
+  -ua <ua>
+  User-Agent 请求头
+  
+  -ndl
+  无 DNS 泄漏`)
   Deno.exit()
 }
 
-const [result, counts, headers] = await cvt(Deno.args[0], Deno.args[1], Deno.args[2])
+const [result, counts, headers] = await cvt(args[0], args[1], { ua, ndl })
 
 if (out_path) {
   Deno.writeTextFileSync(out_path, result)

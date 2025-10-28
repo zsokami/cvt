@@ -29,6 +29,7 @@ function to(
   proxies: Proxy[],
   target = 'clash',
   meta = true,
+  ndl = false,
   counts?: [number, number, number],
   count_unsupported?: Record<string, number>,
   errors?: string[],
@@ -40,6 +41,7 @@ function to(
         proxies,
         target === 'clash-proxies',
         meta,
+        ndl,
         counts,
         count_unsupported,
         errors,
@@ -133,9 +135,9 @@ function renameDuplicates(proxies: Proxy[]): Proxy[] {
 export async function cvt(
   _from: string,
   _to: string = 'clash',
-  ua: string = 'ClashMetaForAndroid/2.11.5.Meta',
-  proxy?: string,
+  { ua, ndl, proxy }: { ua?: string; ndl?: boolean; proxy?: string } = {},
 ): Promise<[string, [number, number, number], Headers | undefined]> {
+  ua ||= 'ClashMetaForAndroid/2.11.18.Meta'
   const ua_lower = ua.toLowerCase()
   const clash = ua_lower.includes('clash')
   const meta = !clash || /meta|mihomo|verge|nyanpasu/.test(ua_lower)
@@ -216,7 +218,7 @@ export async function cvt(
   const result: [string, [number, number, number], Headers | undefined] = [
     proxies.length === 0 && _from !== 'empty'
       ? errors.length ? `订阅转换失败：\n${errors.join('\n')}` : ''
-      : to(proxies, _to, meta, counts, count_unsupported, errors),
+      : to(proxies, _to, meta, ndl, counts, count_unsupported, errors),
     counts,
     subinfo_headers.length === 1
       ? subinfo_headers[0]

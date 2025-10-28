@@ -29,8 +29,11 @@ async function main(req: Request) {
   const [result, counts, _headers] = await cvt(
     from,
     to,
-    args['ua'] || req.headers.get('user-agent') || undefined,
-    args['proxy'],
+    {
+      ua: args['ua'] || req.headers.get('user-agent') || undefined,
+      ndl: 'ndl' in args,
+      proxy: args['proxy'],
+    },
   )
 
   const headers: Record<string, string> = {

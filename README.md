@@ -41,6 +41,7 @@ https://arx.cc[/!<args>]/<from>
 | to | clash | 目标订阅格式，支持 clash、clash-proxies、base64、uri 或 auto(Clash 客户端则 clash 否则 base64)，该参数可省略 `to=` 前缀 |
 | ua | 无 | 覆盖 User-Agent 请求头 |
 | filename | 无 | 覆盖文件名 |
+| ndl | 无 | 存在该参数则返回无 DNS 泄漏(No_DNS_Leak)配置 |
 
 `<from>`
 
@@ -58,7 +59,7 @@ http/s 订阅链接、用 base64/base64url 编码的订阅内容或 Data URL
 https://arx.cc/https://example.com/subscribe?token=xxx
 ```
 ```
-https://arx.cc/!auto/https://example.com/subscribe?token=xxx
+https://arx.cc/!auto&ndl/https://example.com/subscribe?token=xxx
 ```
 
 ### Serverless / Edge 部署
@@ -136,7 +137,7 @@ http://127.0.0.1:8000/version
 用法
 
 ```sh
-deno run -A https://raw.githubusercontent.com/zsokami/cvt/main/scripts/cvt.ts [-o <path>] [<from>] [<to>] [<ua>]
+deno run -A https://raw.githubusercontent.com/zsokami/cvt/main/scripts/cvt.ts [-o <path>] [<from>] [<to>] [-ua <ua>] [-ndl]
 ```
 
 参数
@@ -147,7 +148,9 @@ deno run -A https://raw.githubusercontent.com/zsokami/cvt/main/scripts/cvt.ts [-
 
 - `<to>` clash、clash-proxies、base64、uri 或 auto(若 ua 含 clash 则 clash 否则 base64)
 
-- `<ua>` User-Agent 请求头
+- `-ua <ua>` User-Agent 请求头
+
+- `-ndl` 无 DNS 泄漏
 
 例子
 

@@ -766,6 +766,7 @@ export function toClash(
   proxies: Proxy[],
   proxiesOnly = false,
   meta = true,
+  ndl = false,
   counts?: [number, number, number],
   count_unsupported?: Record<string, number>,
   errors?: string[],
@@ -802,6 +803,6 @@ export function toClash(
     ...proxies.map((x) => `- ${JSON.stringify(x)}\n`),
     'proxy-groups:\n',
     ...genProxyGroups(proxies, meta).map((x) => `- ${JSON.stringify(x)}\n`),
-    RULES,
+    ...!ndl ? [RULES] : [RULES.slice(0, -18), ',no-resolve', RULES.slice(-18)],
   ].join('')
 }
