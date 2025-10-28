@@ -1,6 +1,7 @@
 import { fromURIs, toURIs } from './uris.ts'
 import { fromClash, toClash } from './clash.ts'
 import { decodeBase64Url, encodeBase64 } from './utils.ts'
+import { geoip } from './geoip.ts'
 import { Proxy } from './types.ts'
 
 import { RE_EMOJI, RE_EMOJI_CN, RE_EMOJI_INFO, RE_EMOJI_SINGLE, RE_EXCLUDE } from './consts.ts'
@@ -55,7 +56,7 @@ function filter(proxies: Proxy[]): Proxy[] {
   return proxies.filter((x) => !RE_EXCLUDE.test(x.name))
 }
 
-function handleEmoji(name: string): string {
+async function handleEmoji(name: string, server: string): Promise<string> {
   const flags = name.match(/[🇦-🇿]{2}/ug)
   if (flags?.some((flag) => flag !== '🇨🇳')) return name
 
@@ -98,9 +99,13 @@ function handleEmoji(name: string): string {
     return `${arr[0][1]} ${name}`
   }
 
-  if (!flags) {
-    if (RE_EMOJI_CN.test(name)) return `🇨🇳 ${name}`
-    if (!name.includes('ℹ️') && RE_EMOJI_INFO.test(name)) return `ℹ️ ${name}`
+  if (!name.includes('ℹ️')) {
+    if (RE_EMOJI_INFO.test(name)) return `ℹ️ ${name}`
+
+    const flag = await geoip(server)
+    if (flag) return `${flag} ${name}`
+
+    if (!flags && RE_EMOJI_CN.test(name)) return `🇨🇳 ${name}`
   }
 
   return name
@@ -200,7 +205,7 @@ export async function cvt(
   // console.timeEnd('filter')
   // console.time('handleEmoji')
   for (const proxy of proxies) {
-    proxy.name = handleEmoji(proxy.name)
+    proxy.name = await handleEmoji(proxy.name, proxy.server)
   }
   // console.timeEnd('handleEmoji')
   // console.time('renameDuplicates')
