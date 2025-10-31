@@ -10,7 +10,7 @@ jobs:
     - uses: denoland/setup-deno@v2
     - name: Install @fastly/js-compute
       run: npm install -g @fastly/js-compute
-    - uses: fastly/compute-actions@v11
+    - uses: fastly/compute-actions@v12
       env:
         FASTLY_API_TOKEN: ${{ secrets.FASTLY_API_TOKEN }}
         FASTLY_SERVICE_ID: ${{ vars.FASTLY_SERVICE_ID }}
