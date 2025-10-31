@@ -46,11 +46,20 @@ async function main(req: Request) {
     return new Response(result, { status: 400, headers })
   }
   if (_headers) {
+    const subinfo = _headers.get('subscription-userinfo')
+    if (subinfo) {
+      headers['subscription-userinfo'] = subinfo.replaceAll(/(?<==)[^;]+/g, (value) => {
+        value = value.trim()
+        if (!value) return ''
+        const m = value.match(/^(\d+)(?:\.\d*)?$/)
+        if (!m) return '0'
+        return m[1]
+      })
+    }
     Object.assign(
       headers,
       pickTruthy(
         Object.fromEntries(_headers),
-        'subscription-userinfo',
         'profile-update-interval',
         'profile-web-page-url',
       ),
