@@ -140,9 +140,13 @@ export async function cvt(
   ua ||= 'ClashMetaForAndroid/2.11.18.Meta'
   const ua_lower = ua.toLowerCase()
   const clash = ua_lower.includes('clash')
-  const meta = !clash || /meta|mihomo|verge|nyanpasu/.test(ua_lower)
+  const hiddify = ua_lower.includes('hiddify')
+  const meta = !clash || hiddify || /meta|mihomo|verge|nyanpasu/.test(ua_lower)
   if (_to === 'auto') {
-    _to = clash ? 'clash' : 'base64'
+    _to = hiddify ? 'clash-proxies' : clash ? 'clash' : 'base64'
+  }
+  if (hiddify) {
+    ua = 'ClashMeta'
   }
   // console.time('from')
   const proxy_urls = proxy?.split('|') ?? []
