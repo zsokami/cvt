@@ -71,11 +71,13 @@ async function handleEmoji(name: string, server: string): Promise<string> {
     }
   }
   if (arr.length) {
-    arr.sort((a, b) => b[0] - a[0])
-    const re_relay = /中[轉转繼继]/y
-    for (const [i, flag] of arr) {
-      re_relay.lastIndex = i
-      if (!re_relay.test(name)) return `${flag} ${name}`
+    if (arr.length > 1) {
+      arr.sort((a, b) => b[0] - a[0])
+      const re_relay = /中[轉转繼继]/y
+      for (const [i, flag] of arr) {
+        re_relay.lastIndex = i
+        if (!re_relay.test(name)) return `${flag} ${name}`
+      }
     }
     return `${arr[0][1]} ${name}`
   }
@@ -94,9 +96,15 @@ async function handleEmoji(name: string, server: string): Promise<string> {
     }
   }
   if (arr.length) {
-    arr.sort((a, b) => b[0] - a[0])
-    for (const [i, flag] of arr) {
-      if (name[i] !== '.' && name[i] !== '-') return `${flag} ${name}`
+    if (arr.length > 1) {
+      arr.sort((a, b) => b[0] - a[0])
+      if (/^[\da-z.-]*\.[\da-z.-]*$/i.test(name.slice(arr[arr.length - 1][0], arr[arr.length - 2][0]))) {
+        return `${arr[arr.length - 1][1]} ${name}`
+      }
+      for (let [i, flag] of arr) {
+        while ('0' <= name[i] && name[i] <= '9') ++i
+        if (name[i] !== '.' && name[i] !== '-') return `${flag} ${name}`
+      }
     }
     return `${arr[0][1]} ${name}`
   }
