@@ -113,8 +113,8 @@ async function handleEmoji(name: string, server: string): Promise<string> {
   if (!name.includes('ℹ️')) {
     if (RE_EMOJI_INFO.test(name)) return `ℹ️ ${name}`
 
-    const m = name.match(/(?<!\d)\d{1,3}(?:\.\d{1,3}){3}(?!\d)/)
-    const flag = (m && await geoip(m[0])) || await geoip(server)
+    const m = name.match(/(?<!\d)\d{1,3}(?:\.\d{1,3}){3}(?!\d)/g)
+    const flag = (m && await geoip(m[m.length - 1])) || await geoip(server)
     if (flag) return `${flag} ${name}`
 
     if (!flags && RE_EMOJI_CN.test(name)) return `🇨🇳 ${name}`
