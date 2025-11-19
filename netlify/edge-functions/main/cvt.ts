@@ -59,8 +59,7 @@ function filter(proxies: Proxy[]): Proxy[] {
 }
 
 async function handleEmoji(name: string, server: string): Promise<string> {
-  if (name.startsWith('🎏')) return name
-  const flags = name.match(/[🇦-🇿]{2}/ug)
+  const flags = name.match(/[🇦-🇿]{2}|🎏/ug)
   if (flags?.some((flag) => flag !== '🇨🇳')) return name
 
   const arr: [number, string][] = []
