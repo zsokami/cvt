@@ -698,6 +698,7 @@ const TYPE_MAP: Record<string, keyof typeof FROM_URI | undefined> = createPure({
   https: 'http',
   socks: 'socks5',
   socks5: 'socks5',
+  socks5h: 'socks5',
   'socks5+tls': 'socks5',
   ss: 'ss',
   ssr: 'ssr',
