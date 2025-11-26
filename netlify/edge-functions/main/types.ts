@@ -9,6 +9,7 @@ export interface ProxyBase {
   'ip-version'?: string
   'interface-name'?: string
   'routing-mark'?: number
+  'dialer-proxy'?: string
 }
 
 export interface HTTP extends ProxyBase {

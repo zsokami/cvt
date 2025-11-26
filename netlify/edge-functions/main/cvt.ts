@@ -6,7 +6,14 @@ import { Proxy } from './types.ts'
 
 import { RE_EMOJI, RE_EMOJI_CN, RE_EMOJI_INFO, RE_EMOJI_SINGLE, RE_EXCLUDE } from './consts.ts'
 
-function from(input: string, meta = true): [Proxy[], number, Record<string, number>] {
+interface Node {
+  proxy: Proxy
+  flag1?: string
+  dialer?: Node
+  included?: boolean
+}
+
+function from(input: string, meta = true): [Node[], number, Record<string, number>] {
   // console.time('decodeBase64Url')
   try {
     input = decodeBase64Url(input)
@@ -22,11 +29,36 @@ function from(input: string, meta = true): [Proxy[], number, Record<string, numb
     ;[proxies, total, count_unsupported] = fromClash(input, meta)
     // console.timeEnd('fromClash')
   }
-  return [proxies, total, count_unsupported]
+  const nodes: Node[] = []
+  nodes.length = proxies.length
+  const name2node: Record<string, Node> = Object.create(null)
+  const name2nexts: Record<string, Node[]> = Object.create(null)
+  for (let i = 0; i < proxies.length; i++) {
+    const proxy = proxies[i]
+    nodes[i] = { proxy }
+    const nexts = name2nexts[proxy.name]
+    if (nexts) {
+      for (const next of nexts) {
+        next.dialer = nodes[i]
+      }
+      delete name2nexts[proxy.name]
+    }
+    const dialer = proxy['dialer-proxy']
+    if (dialer) {
+      const dialerNode = name2node[dialer]
+      if (dialerNode) {
+        nodes[i].dialer = dialerNode
+      } else {
+        ;(name2nexts[dialer] ??= []).push(nodes[i])
+      }
+    }
+    name2node[proxy.name] = nodes[i]
+  }
+  return [nodes, total, count_unsupported]
 }
 
 function to(
-  proxies: Proxy[],
+  nodes: Node[],
   target = 'clash',
   meta = true,
   ndl = false,
@@ -34,6 +66,10 @@ function to(
   count_unsupported?: Record<string, number>,
   errors?: string[],
 ): string {
+  const proxies = nodes.map(({ proxy, dialer }) => {
+    if (dialer) proxy['dialer-proxy'] = dialer.proxy.name
+    return proxy
+  })
   switch (target) {
     case 'clash':
     case 'clash-proxies':
@@ -54,13 +90,30 @@ function to(
   throw new Error(`Unknown target: ${target}`)
 }
 
-function filter(proxies: Proxy[]): Proxy[] {
-  return proxies.filter((x) => !RE_EXCLUDE.test(x.name))
+function filter(nodes: Node[]): Node[] {
+  const dfs = (node: Node): boolean => {
+    if (node.included !== undefined) return node.included
+    node.included = false
+    const dialerIncluded = node.dialer ? dfs(node.dialer) : true
+    return node.included = dialerIncluded && !RE_EXCLUDE.test(node.proxy.name)
+  }
+  let i = 0
+  for (const node of nodes) {
+    if (dfs(node)) nodes[i++] = node
+  }
+  nodes.length = i
+  return nodes
 }
 
-async function handleEmoji(name: string, server: string): Promise<string> {
+function joinEmoji(flag1: string, flag2: string, name: string, joinCN = true): string {
+  if (!flag1 || flag1 === flag2) return flag2 && (joinCN || flag2 !== '🇨🇳') ? `${flag2} ${name}` : name
+  return `${flag1 === '🇨🇳' ? '' : flag1}->${flag2 || '🎏'} ${name}`
+}
+
+async function handleEmoji(name: string, server: string, preFlag1: string): Promise<[string, string]> {
   const flags = name.match(/[🇦-🇿]{2}|🎏/ug)
-  if (flags?.some((flag) => flag !== '🇨🇳')) return name
+  const _flag = flags?.find((flag) => flag !== '🇨🇳')
+  if (_flag) return [name, _flag]
 
   const arr: [number, string][] = []
   for (const [flag, zh] of RE_EMOJI) {
@@ -76,15 +129,15 @@ async function handleEmoji(name: string, server: string): Promise<string> {
       const re_relay = /中[轉转繼继]/y
       for (const [i, flag] of arr) {
         re_relay.lastIndex = i
-        if (!re_relay.test(name)) return `${flag} ${name}`
+        if (!re_relay.test(name)) return [joinEmoji(preFlag1, flag, name), flag]
       }
     }
-    return `${arr[0][1]} ${name}`
+    return [joinEmoji(preFlag1, arr[0][1], name), arr[0][1]]
   }
 
   for (const [flag, zh] of RE_EMOJI_SINGLE) {
     if (!flags || flag === '🇭🇰' || flag === '🇹🇼' || flag === '🇲🇴') {
-      if (zh.test(name)) return `${flag} ${name}`
+      if (zh.test(name)) return [joinEmoji(preFlag1, flag, name), flag]
     }
   }
 
@@ -99,54 +152,68 @@ async function handleEmoji(name: string, server: string): Promise<string> {
     if (arr.length > 1) {
       arr.sort((a, b) => b[0] - a[0])
       if (/^[\da-z.-]*\.[\da-z.-]*$/i.test(name.slice(arr[arr.length - 1][0], arr[arr.length - 2][0]))) {
-        return `${arr[arr.length - 1][1]} ${name}`
+        return [joinEmoji(preFlag1, arr[arr.length - 1][1], name), arr[arr.length - 1][1]]
       }
       for (let [i, flag] of arr) {
         while ('0' <= name[i] && name[i] <= '9') ++i
-        if (name[i] !== '.' && name[i] !== '-') return `${flag} ${name}`
+        if (name[i] !== '.' && name[i] !== '-') return [joinEmoji(preFlag1, flag, name), flag]
       }
     }
-    return `${arr[0][1]} ${name}`
+    return [joinEmoji(preFlag1, arr[0][1], name), arr[0][1]]
   }
 
   if (!name.includes('ℹ️')) {
-    if (RE_EMOJI_INFO.test(name)) return `ℹ️ ${name}`
+    if (RE_EMOJI_INFO.test(name)) return [`ℹ️ ${name}`, '🎏']
 
     const m = name.match(/(?<!\d)\d{1,3}(?:\.\d{1,3}){3}(?!\d)/g)
+    let flag1 = m && m.length === 2 ? await geoip(m[0]) : ''
     let flag2 = m ? await geoip(m[m.length - 1]) : ''
-    if (m && m.length === 2) {
-      const flag1 = await geoip(m[0])
-      if (flag1 && flag2 && flag1 !== flag2) return `${flag1 === '🇨🇳' ? '' : flag1}->${flag2} ${name}`
-      flag2 ||= flag1
-    }
-    const flag1 = await geoip(server)
-    if (flag1 && flag2 && flag1 !== flag2) return `${flag1 === '🇨🇳' ? '' : flag1}->${flag2} ${name}`
+    const joinCN = !flags
+    if (preFlag1) return [joinEmoji(preFlag1, flag2 || flag1 || await geoip(server), name, joinCN), preFlag1]
+    if (flag1 && flag2 && flag1 !== flag2) return [joinEmoji(flag1, flag2, name), flag1]
     flag2 ||= flag1
-    if (flag2 && flag2 !== '🇨🇳') return `${flag2} ${name}`
+    flag1 = await geoip(server)
+    if (flag1 && flag2 && flag1 !== flag2) return [joinEmoji(flag1, flag2, name), flag1]
+    flag2 ||= flag1
+    if (flag2 && flag2 !== '🇨🇳') return [`${flag2} ${name}`, flag2]
 
-    if (!flags && (flag2 || RE_EMOJI_CN.test(name))) return `🇨🇳 ${name}`
+    if (joinCN && (flag2 || RE_EMOJI_CN.test(name))) return [`🇨🇳 ${name}`, '🇨🇳']
   }
 
-  return name
+  return [name, '🎏']
 }
 
-function renameDuplicates(proxies: Proxy[]): Proxy[] {
+async function handleAllEmoji(nodes: Node[]): Promise<Node[]> {
+  const dfs = async (node: Node): Promise<string> => {
+    if (node.flag1) return node.flag1
+    const preFlag1 = node.dialer ? await dfs(node.dialer) : ''
+    const [name, flag1] = await handleEmoji(node.proxy.name, node.proxy.server, preFlag1)
+    node.proxy.name = name
+    return node.flag1 = preFlag1 || flag1
+  }
+  for (const node of nodes) {
+    await dfs(node)
+  }
+  return nodes
+}
+
+function renameDuplicates(nodes: Node[]): Node[] {
   const counter: Record<string, number> = Object.create(null)
-  for (const proxy of proxies) {
-    let cnt = counter[proxy.name]
+  for (const node of nodes) {
+    let cnt = counter[node.proxy.name]
     if (!cnt) {
-      counter[proxy.name] = 1
+      counter[node.proxy.name] = 1
       continue
     }
     let new_name
     do {
-      new_name = `${proxy.name} ${++cnt}`
+      new_name = `${node.proxy.name} ${++cnt}`
     } while (counter[new_name])
-    counter[proxy.name] = cnt
+    counter[node.proxy.name] = cnt
     counter[new_name] = 1
-    proxy.name = new_name
+    node.proxy.name = new_name
   }
-  return proxies
+  return nodes
 }
 
 export async function cvt(
@@ -169,7 +236,7 @@ export async function cvt(
   const proxy_urls = proxy?.split('|') ?? []
   const froms = _from.split('|')
   const results = await Promise.allSettled(
-    froms.map(async (x, i): Promise<[Proxy[], number, Record<string, number>, Headers?]> => {
+    froms.map(async (x, i): Promise<[Node[], number, Record<string, number>, Headers?]> => {
       if (/^(?:https?|data):/i.test(x)) {
         // console.time('fetch')
         const resp = await fetch(x, {
@@ -195,7 +262,7 @@ export async function cvt(
       return from(x, meta)
     }),
   )
-  let proxies = []
+  let nodes = []
   let total = 0
   const count_unsupported: Record<string, number> = {}
   const subinfo_headers = []
@@ -208,7 +275,7 @@ export async function cvt(
       continue
     }
     const [list, _total, _count_unsupported, headers] = result.value
-    proxies.push(...list)
+    nodes.push(...list)
     total += _total
     for (const [type, count] of Object.entries(_count_unsupported)) {
       count_unsupported[type] = (count_unsupported[type] || 0) + count
@@ -222,24 +289,22 @@ export async function cvt(
     }
   }
   // console.timeEnd('from')
-  const count_before_filter = proxies.length
+  const count_before_filter = nodes.length
   // console.time('filter')
-  proxies = filter(proxies)
+  nodes = filter(nodes)
   // console.timeEnd('filter')
   // console.time('handleEmoji')
-  for (const proxy of proxies) {
-    proxy.name = await handleEmoji(proxy.name, proxy.server)
-  }
+  nodes = await handleAllEmoji(nodes)
   // console.timeEnd('handleEmoji')
   // console.time('renameDuplicates')
-  proxies = renameDuplicates(proxies)
+  nodes = renameDuplicates(nodes)
   // console.timeEnd('renameDuplicates')
   // console.time('to')
-  const counts = [proxies.length, count_before_filter, total] as [number, number, number]
+  const counts = [nodes.length, count_before_filter, total] as [number, number, number]
   const result: [string, [number, number, number], Headers | undefined] = [
-    proxies.length === 0 && _from !== 'empty'
+    nodes.length === 0 && _from !== 'empty'
       ? errors.length ? `订阅转换失败：\n${errors.join('\n')}` : ''
-      : to(proxies, _to, meta, ndl, counts, count_unsupported, errors),
+      : to(nodes, _to, meta, ndl, counts, count_unsupported, errors),
     counts,
     subinfo_headers.length === 1
       ? subinfo_headers[0]

@@ -327,6 +327,7 @@ function baseFrom<T extends Proxy['type']>(
     ...pickTrue(o, 'tfo', 'mptcp'),
     ...pickNonEmptyString(o, 'ip-version', 'interface-name'),
     ...pickNumber(o, 'routing-mark'),
+    ...pickNonEmptyString(o, 'dialer-proxy'),
   }
 }
 
@@ -347,6 +348,7 @@ function baseFromForPorts<T extends Proxy['type']>(
     ...pickTrue(o, 'tfo', 'mptcp'),
     ...pickNonEmptyString(o, 'ip-version', 'interface-name'),
     ...pickNumber(o, 'routing-mark'),
+    ...pickNonEmptyString(o, 'dialer-proxy'),
   }
 }
 
@@ -367,6 +369,7 @@ function baseFromForPortRange<T extends Proxy['type']>(
     ...pickTrue(o, 'tfo', 'mptcp'),
     ...pickNonEmptyString(o, 'ip-version', 'interface-name'),
     ...pickNumber(o, 'routing-mark'),
+    ...pickNonEmptyString(o, 'dialer-proxy'),
   }
 }
 
@@ -634,7 +637,7 @@ function genProxyGroups(proxies: Proxy[], meta = true) {
     '🎏 ‍其他': [],
   }
   for (const name of all) {
-    const flags = name.match(/[🇦-🇿]{2}/ug)
+    const flags = name.match(/[🇦-🇿]{2}|🎏/ug)
     if (!flags) {
       map['🎏 ‍其他'].push(name)
       continue
