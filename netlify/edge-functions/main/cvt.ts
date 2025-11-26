@@ -62,6 +62,7 @@ function to(
   target = 'clash',
   meta = true,
   ndl = false,
+  hide?: string,
   counts?: [number, number, number],
   count_unsupported?: Record<string, number>,
   errors?: string[],
@@ -70,24 +71,32 @@ function to(
     if (dialer) proxy['dialer-proxy'] = dialer.proxy.name
     return proxy
   })
-  switch (target) {
-    case 'clash':
-    case 'clash-proxies':
-      return toClash(
-        proxies,
-        target === 'clash-proxies',
-        meta,
-        ndl,
-        counts,
-        count_unsupported,
-        errors,
-      )
-    case 'uri':
-      return toURIs(proxies)
-    case 'base64':
-      return encodeBase64(toURIs(proxies))
+  try {
+    switch (target) {
+      case 'clash':
+      case 'clash-proxies':
+        return toClash(
+          proxies,
+          target === 'clash-proxies',
+          meta,
+          ndl,
+          hide,
+          counts,
+          count_unsupported,
+          errors,
+        )
+      case 'uri':
+        return toURIs(proxies)
+      case 'base64':
+        return encodeBase64(toURIs(proxies))
+    }
+  } catch (e) {
+    if (e instanceof SyntaxError) {
+      return `订阅转换失败：${e.message}`
+    }
+    throw e
   }
-  throw new Error(`Unknown target: ${target}`)
+  return `订阅转换失败，不支持的目标格式：${target}`
 }
 
 function filter(nodes: Node[]): Node[] {
@@ -219,7 +228,7 @@ function renameDuplicates(nodes: Node[]): Node[] {
 export async function cvt(
   _from: string,
   _to: string = 'clash',
-  { ua, ndl, proxy }: { ua?: string; ndl?: boolean; proxy?: string } = {},
+  { ua, ndl, hide, proxy }: { ua?: string; ndl?: boolean; hide?: string; proxy?: string } = {},
 ): Promise<[string, [number, number, number], Headers | undefined]> {
   ua ||= 'ClashMetaForAndroid/2.11.18.Meta'
   const ua_lower = ua.toLowerCase()
@@ -304,7 +313,7 @@ export async function cvt(
   const result: [string, [number, number, number], Headers | undefined] = [
     nodes.length === 0 && _from !== 'empty'
       ? errors.length ? `订阅转换失败：\n${errors.join('\n')}` : ''
-      : to(nodes, _to, meta, ndl, counts, count_unsupported, errors),
+      : to(nodes, _to, meta, ndl, hide, counts, count_unsupported, errors),
     counts,
     subinfo_headers.length === 1
       ? subinfo_headers[0]

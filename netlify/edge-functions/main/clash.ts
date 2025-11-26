@@ -624,9 +624,13 @@ export function fromClash(clash: string, meta = true): [Proxy[], number, Record<
   }
 }
 
-function genProxyGroups(proxies: Proxy[], meta = true) {
+function genProxyGroups(proxies: Proxy[], meta = true, hide?: string) {
   const reject = ['REJECT', ...meta ? ['REJECT-DROP'] : []]
-  const all = proxies.map((x) => x.name)
+  let all = proxies.map((x) => x.name)
+  if (hide) {
+    const re = new RegExp(hide, 'iu')
+    all = all.filter((x) => !re.test(x))
+  }
   const map: Record<string, string[]> = {
     '🇭🇰 ‍香港': [],
     '🇹🇼 ‍台湾': [],
@@ -770,6 +774,7 @@ export function toClash(
   proxiesOnly = false,
   meta = true,
   ndl = false,
+  hide?: string,
   counts?: [number, number, number],
   count_unsupported?: Record<string, number>,
   errors?: string[],
@@ -805,7 +810,7 @@ export function toClash(
     'proxies:\n',
     ...proxies.map((x) => `- ${JSON.stringify(x)}\n`),
     'proxy-groups:\n',
-    ...genProxyGroups(proxies, meta).map((x) => `- ${JSON.stringify(x)}\n`),
+    ...genProxyGroups(proxies, meta, hide).map((x) => `- ${JSON.stringify(x)}\n`),
     ...!ndl ? [RULES] : [RULES.slice(0, -18), ',no-resolve', RULES.slice(-18)],
   ].join('')
 }
