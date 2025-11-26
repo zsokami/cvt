@@ -122,9 +122,9 @@ async function handleEmoji(name: string, server: string): Promise<string> {
     const flag1 = await geoip(server)
     if (flag1 && flag2 && flag1 !== flag2) return `${flag1 === '🇨🇳' ? '' : flag1}->${flag2} ${name}`
     flag2 ||= flag1
-    if (flag2) return `${flag2} ${name}`
+    if (flag2 && flag2 !== '🇨🇳') return `${flag2} ${name}`
 
-    if (!flags && RE_EMOJI_CN.test(name)) return `🇨🇳 ${name}`
+    if (!flags && (flag2 || RE_EMOJI_CN.test(name))) return `🇨🇳 ${name}`
   }
 
   return name
