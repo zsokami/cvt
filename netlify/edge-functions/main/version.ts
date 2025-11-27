@@ -1,1 +1,1 @@
-export const VERSION = 'cvt v2.30'
+export const VERSION = 'cvt v2.31'

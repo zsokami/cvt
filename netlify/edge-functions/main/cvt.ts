@@ -13,7 +13,7 @@ interface Node {
   included?: boolean
 }
 
-function from(input: string, meta = true): [Node[], number, Record<string, number>] {
+function from(input: string, meta = true): [Proxy[], number, Record<string, number>] {
   // console.time('decodeBase64Url')
   try {
     input = decodeBase64Url(input)
@@ -29,36 +29,11 @@ function from(input: string, meta = true): [Node[], number, Record<string, numbe
     ;[proxies, total, count_unsupported] = fromClash(input, meta)
     // console.timeEnd('fromClash')
   }
-  const nodes: Node[] = []
-  nodes.length = proxies.length
-  const name2node: Record<string, Node> = Object.create(null)
-  const name2nexts: Record<string, Node[]> = Object.create(null)
-  for (let i = 0; i < proxies.length; i++) {
-    const proxy = proxies[i]
-    nodes[i] = { proxy }
-    const nexts = name2nexts[proxy.name]
-    if (nexts) {
-      for (const next of nexts) {
-        next.dialer = nodes[i]
-      }
-      delete name2nexts[proxy.name]
-    }
-    const dialer = proxy['dialer-proxy']
-    if (dialer) {
-      const dialerNode = name2node[dialer]
-      if (dialerNode) {
-        nodes[i].dialer = dialerNode
-      } else {
-        ;(name2nexts[dialer] ??= []).push(nodes[i])
-      }
-    }
-    name2node[proxy.name] = nodes[i]
-  }
-  return [nodes, total, count_unsupported]
+  return [proxies, total, count_unsupported]
 }
 
 function to(
-  nodes: Node[],
+  proxies: Proxy[],
   target = 'clash',
   meta = true,
   ndl = false,
@@ -67,10 +42,6 @@ function to(
   count_unsupported?: Record<string, number>,
   errors?: string[],
 ): string {
-  const proxies = nodes.map(({ proxy, dialer }) => {
-    if (dialer) proxy['dialer-proxy'] = dialer.proxy.name
-    return proxy
-  })
   try {
     switch (target) {
       case 'clash':
@@ -245,7 +216,7 @@ export async function cvt(
   const proxy_urls = proxy?.split('|') ?? []
   const froms = _from.split('|')
   const results = await Promise.allSettled(
-    froms.map(async (x, i): Promise<[Node[], number, Record<string, number>, Headers?]> => {
+    froms.map(async (x, i): Promise<[Proxy[], number, Record<string, number>, Headers?]> => {
       if (/^(?:https?|data):/i.test(x)) {
         // console.time('fetch')
         const resp = await fetch(x, {
@@ -271,7 +242,9 @@ export async function cvt(
       return from(x, meta)
     }),
   )
-  let nodes = []
+  let nodes: Node[] = []
+  const name2node: Record<string, Node> = Object.create(null)
+  const name2nexts: Record<string, Node[]> = Object.create(null)
   let total = 0
   const count_unsupported: Record<string, number> = {}
   const subinfo_headers = []
@@ -284,7 +257,27 @@ export async function cvt(
       continue
     }
     const [list, _total, _count_unsupported, headers] = result.value
-    nodes.push(...list)
+    for (const proxy of list) {
+      const node: Node = { proxy }
+      nodes.push(node)
+      const nexts = name2nexts[proxy.name]
+      if (nexts) {
+        for (const next of nexts) {
+          next.dialer = node
+        }
+        delete name2nexts[proxy.name]
+      }
+      const dialer = proxy['dialer-proxy']
+      if (dialer) {
+        const dialerNode = name2node[dialer]
+        if (dialerNode) {
+          node.dialer = dialerNode
+        } else {
+          ;(name2nexts[dialer] ??= []).push(node)
+        }
+      }
+      name2node[proxy.name] = node
+    }
     total += _total
     for (const [type, count] of Object.entries(_count_unsupported)) {
       count_unsupported[type] = (count_unsupported[type] || 0) + count
@@ -309,11 +302,15 @@ export async function cvt(
   nodes = renameDuplicates(nodes)
   // console.timeEnd('renameDuplicates')
   // console.time('to')
-  const counts = [nodes.length, count_before_filter, total] as [number, number, number]
+  const proxies = nodes.map(({ proxy, dialer }) => {
+    if (dialer) proxy['dialer-proxy'] = dialer.proxy.name
+    return proxy
+  })
+  const counts = [proxies.length, count_before_filter, total] as [number, number, number]
   const result: [string, [number, number, number], Headers | undefined] = [
-    nodes.length === 0 && _from !== 'empty'
+    proxies.length === 0 && _from !== 'empty'
       ? errors.length ? `订阅转换失败：\n${errors.join('\n')}` : ''
-      : to(nodes, _to, meta, ndl, hide, counts, count_unsupported, errors),
+      : to(proxies, _to, meta, ndl, hide, counts, count_unsupported, errors),
     counts,
     subinfo_headers.length === 1
       ? subinfo_headers[0]
