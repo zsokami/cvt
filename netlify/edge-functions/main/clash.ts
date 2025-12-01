@@ -24,6 +24,7 @@ import type {
   SS,
   SSH,
   SSR,
+  Sudoku,
   Trojan,
   TUIC,
   V2rayPlugin,
@@ -306,6 +307,16 @@ const FROM_CLASH = createPure({
       ...scv,
       ...udp,
       ...pickNumber(o, 'idle-session-check-interval', 'idle-session-timeout', 'min-idle-session'),
+    }
+  },
+  sudoku(o: unknown): Sudoku {
+    checkType(o, 'sudoku')
+    return {
+      ...baseFrom(o),
+      key: String(o.key),
+      ...pickNonEmptyString(o, 'aead-method', 'table-type'),
+      ...pickNumber(o, 'padding-min', 'padding-max'),
+      ...pickTrue(o, 'http-mask'),
     }
   },
 })

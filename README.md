@@ -21,6 +21,7 @@ emoji、代理策略组和路由规则与 [ACL4SSR_Online_Full_Mannix.ini](https
 |wireguard|✅|✅|
 |ssh|❌|✅|
 |anytls|✅|✅|
+|sudoku|❌|✅|
 
 ## 远程转换
 

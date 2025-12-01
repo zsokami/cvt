@@ -471,6 +471,17 @@ export interface AnyTLSBase extends ProxyBase {
 
 export type AnyTLS = AnyTLSBase & Option<ECH>
 
+export interface Sudoku extends ProxyBase {
+  type: 'sudoku'
+  port: number
+  key: string
+  'aead-method'?: string
+  'table-type'?: string
+  'padding-min'?: number
+  'padding-max'?: number
+  'http-mask'?: boolean
+}
+
 export type Proxy =
   | HTTP
   | Socks5
@@ -487,3 +498,4 @@ export type Proxy =
   | WireGuard
   | SSH
   | AnyTLS
+  | Sudoku
