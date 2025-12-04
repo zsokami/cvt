@@ -1,6 +1,7 @@
 import { cvt } from '../netlify/edge-functions/main/cvt.ts'
+import { parseBool } from '../netlify/edge-functions/main/utils.ts'
 
-let out_path, ua, ndl, hide
+let out_path, ua, ndl, hide, meta
 
 const args = []
 
@@ -18,6 +19,9 @@ for (let i = 0; i < Deno.args.length; i++) {
       break
     case '-hide':
       hide = Deno.args[++i]
+      break
+    case '-meta':
+      meta = parseBool(Deno.args[++i])
       break
     default:
       args.push(arg)
@@ -45,11 +49,14 @@ deno run -A cvt.ts [-o <path>] [<from>] [<to>] [-ua <ua>] [-ndl] [-hide <hide>]
   无 DNS 泄漏
 
   -hide <hide>
-  在 proxy-groups 中隐藏指定节点, 在 proxies 中仍保留, 和 dialer-proxy 配合以隐藏前置节点, 使用正则表达式`)
+  在 proxy-groups 中隐藏指定节点, 在 proxies 中仍保留, 和 dialer-proxy 配合以隐藏前置节点, 使用正则表达式
+  
+  -meta <0|1>
+  设置为 0 去除仅 Meta/mihomo 内核支持的节点/策略, 以兼容原版 Clash, 设置为 1 则强制包含 Meta/mihomo 功能, 默认从 User-Agent 中判断`)
   Deno.exit()
 }
 
-const [result, counts, headers] = await cvt(args[0], args[1], { ua, ndl, hide })
+const [result, counts, headers] = await cvt(args[0], args[1], { ua, ndl, hide, meta })
 
 if (out_path) {
   Deno.writeTextFileSync(out_path, result)

@@ -1,5 +1,5 @@
 import { cvt } from './cvt.ts'
-import { pickTruthy, urlDecode } from './utils.ts'
+import { parseBool, pickTruthy, urlDecode } from './utils.ts'
 import { VERSION } from './version.ts'
 
 async function main(req: Request) {
@@ -33,6 +33,7 @@ async function main(req: Request) {
       ua: args['ua'] || req.headers.get('user-agent') || undefined,
       ndl: 'ndl' in args,
       hide: args['hide'],
+      meta: parseBool(args['meta']),
       proxy: args['proxy'],
     },
   )

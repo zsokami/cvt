@@ -44,6 +44,7 @@ https://arx.cc[/!<args>]/<from>
 | filename | 无 | 覆盖文件名 |
 | ndl | 无 | 存在该参数则返回无 DNS 泄漏(No_DNS_Leak)配置 |
 | hide | 无 | 在 proxy-groups 中隐藏指定节点，在 proxies 中仍保留，和 dialer-proxy 配合以隐藏前置节点，使用正则表达式 |
+| meta | 从 User-Agent 中判断 | 设置为 0 去除仅 Meta/mihomo 内核支持的节点/策略，以兼容原版 Clash，设置为 1 则强制包含 Meta/mihomo 功能 |
 
 `<from>`
 
@@ -139,7 +140,7 @@ http://127.0.0.1:8000/version
 用法
 
 ```sh
-deno run -A https://raw.githubusercontent.com/zsokami/cvt/main/scripts/cvt.ts [-o <path>] [<from>] [<to>] [-ua <ua>] [-ndl] [-hide <hide>]
+deno run -A https://raw.githubusercontent.com/zsokami/cvt/main/scripts/cvt.ts [-o <path>] [<from>] [<to>] [-ua <ua>] [-ndl] [-hide <hide>] [-meta <0|1>]
 ```
 
 参数
@@ -155,6 +156,8 @@ deno run -A https://raw.githubusercontent.com/zsokami/cvt/main/scripts/cvt.ts [-
 - `-ndl` 无 DNS 泄漏
 
 - `-hide <hide>` 在 proxy-groups 中隐藏指定节点，在 proxies 中仍保留，和 dialer-proxy 配合以隐藏前置节点，使用正则表达式
+
+- `-meta <0|1>` 设置为 0 去除仅 Meta/mihomo 内核支持的节点/策略，以兼容原版 Clash，设置为 1 则强制包含 Meta/mihomo 功能，默认从 User-Agent 中判断
 
 例子
 

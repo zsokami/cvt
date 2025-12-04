@@ -199,13 +199,13 @@ function renameDuplicates(nodes: Node[]): Node[] {
 export async function cvt(
   _from: string,
   _to: string = 'clash',
-  { ua, ndl, hide, proxy }: { ua?: string; ndl?: boolean; hide?: string; proxy?: string } = {},
+  { ua, ndl, hide, meta, proxy }: { ua?: string; ndl?: boolean; hide?: string; meta?: boolean; proxy?: string } = {},
 ): Promise<[string, [number, number, number], Headers | undefined]> {
   ua ||= 'ClashMetaForAndroid/2.11.18.Meta'
   const ua_lower = ua.toLowerCase()
   const clash = ua_lower.includes('clash')
   const hiddify = ua_lower.includes('hiddify')
-  const meta = !clash || hiddify || /meta|mihomo|verge|nyanpasu/.test(ua_lower)
+  meta ??= !clash || hiddify || /meta|mihomo|verge|nyanpasu/.test(ua_lower)
   if (_to === 'auto') {
     _to = hiddify ? 'clash-proxies' : clash ? 'clash' : 'base64'
   }

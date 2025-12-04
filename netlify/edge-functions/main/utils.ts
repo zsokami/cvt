@@ -108,3 +108,32 @@ export function splitRight(str: string, separator: string, maxSplit = 1): string
 export function createPure<T extends Record<PropertyKey, unknown>>(o: T): T {
   return Object.assign(Object.create(null), o)
 }
+
+const F = new Set(['0', 'f', 'false', 'n', 'no', 'off'])
+const T = new Set(['1', 't', 'true', 'y', 'yes', 'on'])
+
+export function parseBool(value: unknown): boolean | undefined {
+  if (value == null) return undefined
+  if (typeof value === 'string') {
+    const lower = value.trim().toLowerCase()
+    if (F.has(lower)) return false
+    if (T.has(lower)) return true
+    return undefined
+  }
+  if (typeof value === 'boolean') return value
+  if (typeof value === 'number' || typeof value === 'bigint') return Boolean(value)
+  if (typeof value === 'object') {
+    if ('valueOf' in value) {
+      const v = value.valueOf()
+      if (typeof v !== 'object') return parseBool(v)
+    }
+    if ('length' in value && (typeof value.length === 'number' || typeof value.length === 'bigint')) {
+      return Boolean(value.length)
+    }
+    if ('size' in value && (typeof value.size === 'number' || typeof value.size === 'bigint')) {
+      return Boolean(value.size)
+    }
+    return parseBool(String(value))
+  }
+  return undefined
+}
