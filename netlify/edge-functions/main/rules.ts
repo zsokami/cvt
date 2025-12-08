@@ -2,6 +2,7 @@ export const RULES = `rules:
 - DOMAIN-SUFFIX,acl4.ssr,DIRECT
 - DOMAIN-SUFFIX,ip6-localhost,DIRECT
 - DOMAIN-SUFFIX,ip6-loopback,DIRECT
+- DOMAIN-SUFFIX,internal,DIRECT
 - DOMAIN-SUFFIX,lan,DIRECT
 - DOMAIN-SUFFIX,local,DIRECT
 - DOMAIN-SUFFIX,localhost,DIRECT
@@ -9,6 +10,7 @@ export const RULES = `rules:
 - IP-CIDR,10.0.0.0/8,DIRECT,no-resolve
 - IP-CIDR,100.64.0.0/10,DIRECT,no-resolve
 - IP-CIDR,127.0.0.0/8,DIRECT,no-resolve
+- IP-CIDR,169.254.0.0/16,DIRECT,no-resolve
 - IP-CIDR,172.16.0.0/12,DIRECT,no-resolve
 - IP-CIDR,192.168.0.0/16,DIRECT,no-resolve
 - IP-CIDR,198.18.0.0/16,DIRECT,no-resolve
@@ -457,7 +459,6 @@ export const RULES = `rules:
 - DOMAIN-SUFFIX,scupio.com,💩 ‍广告
 - DOMAIN-SUFFIX,shuiguo.com,💩 ‍广告
 - DOMAIN-SUFFIX,shuzilm.cn,💩 ‍广告
-- DOMAIN-SUFFIX,similarweb.com,💩 ‍广告
 - DOMAIN-SUFFIX,sitemeter.com,💩 ‍广告
 - DOMAIN-SUFFIX,sitescout.com,💩 ‍广告
 - DOMAIN-SUFFIX,sitetag.us,💩 ‍广告
@@ -1309,9 +1310,7 @@ export const RULES = `rules:
 - DOMAIN-SUFFIX,log.mix.sina.com.cn,💩 ‍广告
 - DOMAIN-SUFFIX,mobileads.dx.cn,💩 ‍广告
 - DOMAIN-SUFFIX,newspush.sinajs.cn,💩 ‍广告
-- DOMAIN-SUFFIX,pay.mobile.sina.cn,💩 ‍广告
 - DOMAIN-SUFFIX,sax.mobile.sina.cn,💩 ‍广告
-- DOMAIN-SUFFIX,sax.sina.com.cn,💩 ‍广告
 - DOMAIN-SUFFIX,saxd.sina.com.cn,💩 ‍广告
 - DOMAIN-SUFFIX,sdkapp.mobile.sina.cn,💩 ‍广告
 - DOMAIN-SUFFIX,sdkapp.uve.weibo.com,💩 ‍广告
@@ -1712,7 +1711,6 @@ export const RULES = `rules:
 - DOMAIN-SUFFIX,dol.tianyaui.cn,💩 ‍广告
 - DOMAIN-SUFFIX,dw.xcar.com.cn,💩 ‍广告
 - DOMAIN-SUFFIX,e.nexac.com,💩 ‍广告
-- DOMAIN-SUFFIX,eq.10jqka.com.cn,💩 ‍广告
 - DOMAIN-SUFFIX,exp.17wo.cn,💩 ‍广告
 - DOMAIN-SUFFIX,game.51yund.com,💩 ‍广告
 - DOMAIN-SUFFIX,ganjituiguang.ganji.com,💩 ‍广告
@@ -1729,7 +1727,6 @@ export const RULES = `rules:
 - DOMAIN-SUFFIX,mobileads.msn.com,💩 ‍广告
 - DOMAIN-SUFFIX,n.cosbot.cn,💩 ‍广告
 - DOMAIN-SUFFIX,newton-api.ele.me,💩 ‍广告
-- DOMAIN-SUFFIX,ozone.10jqka.com.cn,💩 ‍广告
 - DOMAIN-SUFFIX,pdl.gionee.com,💩 ‍广告
 - DOMAIN-SUFFIX,pica-juicy.picacomic.com,💩 ‍广告
 - DOMAIN-SUFFIX,pixel.wp.com,💩 ‍广告
@@ -1742,7 +1739,6 @@ export const RULES = `rules:
 - DOMAIN-SUFFIX,res.gwifi.com.cn,💩 ‍广告
 - DOMAIN-SUFFIX,ssp.kssws.ks-cdn.com,💩 ‍广告
 - DOMAIN-SUFFIX,sta.ganji.com,💩 ‍广告
-- DOMAIN-SUFFIX,stat.10jqka.com.cn,💩 ‍广告
 - DOMAIN-SUFFIX,stat.it168.com,💩 ‍广告
 - DOMAIN-SUFFIX,stats.chinaz.com,💩 ‍广告
 - DOMAIN-SUFFIX,stats.developingperspective.com,💩 ‍广告
@@ -1750,7 +1746,6 @@ export const RULES = `rules:
 - DOMAIN-SUFFIX,tracker.yhd.com,💩 ‍广告
 - DOMAIN-SUFFIX,tralog.ganji.com,💩 ‍广告
 - DOMAIN-SUFFIX,up.qingdaonews.com,💩 ‍广告
-- DOMAIN-SUFFIX,vaserviece.10jqka.com.cn,💩 ‍广告
 - DOMAIN-SUFFIX,265.com,🛩️ ‍墙内
 - DOMAIN-SUFFIX,2mdn.net,🛩️ ‍墙内
 - DOMAIN-SUFFIX,alt1-mtalk.google.com,🛩️ ‍墙内
@@ -1849,6 +1844,7 @@ export const RULES = `rules:
 - DOMAIN,copilot-proxy.githubusercontent.com,🤖 ‍AI
 - DOMAIN,gemini.google.com,🤖 ‍AI
 - DOMAIN,generativelanguage.googleapis.com,🤖 ‍AI
+- DOMAIN,notebooklm.google.com,🤖 ‍AI
 - DOMAIN,sydney.bing.com,🤖 ‍AI
 - DOMAIN-SUFFIX,ai.azure.com,🤖 ‍AI
 - DOMAIN-SUFFIX,anthropic.com,🤖 ‍AI
@@ -1856,6 +1852,7 @@ export const RULES = `rules:
 - DOMAIN-SUFFIX,bard.google.com,🤖 ‍AI
 - DOMAIN-SUFFIX,chatgpt.com,🤖 ‍AI
 - DOMAIN-SUFFIX,claude.ai,🤖 ‍AI
+- DOMAIN-SUFFIX,claude.com,🤖 ‍AI
 - DOMAIN-SUFFIX,claudeusercontent.com,🤖 ‍AI
 - DOMAIN-SUFFIX,client-api.arkoselabs.com,🤖 ‍AI
 - DOMAIN-SUFFIX,copilot.cloud.microsoft,🤖 ‍AI
@@ -1870,6 +1867,7 @@ export const RULES = `rules:
 - DOMAIN-SUFFIX,identrust.com,🤖 ‍AI
 - DOMAIN-SUFFIX,intercom.io,🤖 ‍AI
 - DOMAIN-SUFFIX,intercomcdn.com,🤖 ‍AI
+- DOMAIN-SUFFIX,jetbrains.ai,🤖 ‍AI
 - DOMAIN-SUFFIX,makersuite.google.com,🤖 ‍AI
 - DOMAIN-SUFFIX,meta.ai,🤖 ‍AI
 - DOMAIN-SUFFIX,mistral.ai,🤖 ‍AI
@@ -1879,6 +1877,7 @@ export const RULES = `rules:
 - DOMAIN-SUFFIX,openaiapi-site.azureedge.net,🤖 ‍AI
 - DOMAIN-SUFFIX,perplexity.ai,🤖 ‍AI
 - DOMAIN-SUFFIX,sora.com,🤖 ‍AI
+- DOMAIN-SUFFIX,x.ai,🤖 ‍AI
 - DOMAIN-SUFFIX,1password.com,✈️ ‍起飞
 - DOMAIN-SUFFIX,adguard.org,✈️ ‍起飞
 - DOMAIN-SUFFIX,bit.no.com,✈️ ‍起飞
@@ -2076,6 +2075,7 @@ export const RULES = `rules:
 - DOMAIN-SUFFIX,91vps.club,✈️ ‍起飞
 - DOMAIN-SUFFIX,92ccav.com,✈️ ‍起飞
 - DOMAIN-SUFFIX,991.com,✈️ ‍起飞
+- DOMAIN-SUFFIX,996.icu,✈️ ‍起飞
 - DOMAIN-SUFFIX,99btgc01.com,✈️ ‍起飞
 - DOMAIN-SUFFIX,99cn.info,✈️ ‍起飞
 - DOMAIN-SUFFIX,9bis.com,✈️ ‍起飞
@@ -2120,6 +2120,7 @@ export const RULES = `rules:
 - DOMAIN-SUFFIX,addictedtocoffee.de,✈️ ‍起飞
 - DOMAIN-SUFFIX,addyoutube.com,✈️ ‍起飞
 - DOMAIN-SUFFIX,adelaidebbs.com,✈️ ‍起飞
+- DOMAIN-SUFFIX,adguard-vpn.com,✈️ ‍起飞
 - DOMAIN-SUFFIX,admob.com,✈️ ‍起飞
 - DOMAIN-SUFFIX,adpl.org.hk,✈️ ‍起飞
 - DOMAIN-SUFFIX,ads-twitter.com,✈️ ‍起飞
@@ -2143,6 +2144,7 @@ export const RULES = `rules:
 - DOMAIN-SUFFIX,agro.hk,✈️ ‍起飞
 - DOMAIN-SUFFIX,ai-kan.net,✈️ ‍起飞
 - DOMAIN-SUFFIX,ai-wen.net,✈️ ‍起飞
+- DOMAIN-SUFFIX,ai.dev,✈️ ‍起飞
 - DOMAIN-SUFFIX,ai.google,✈️ ‍起飞
 - DOMAIN-SUFFIX,aiosearch.com,✈️ ‍起飞
 - DOMAIN-SUFFIX,aiph.net,✈️ ‍起飞
@@ -2280,6 +2282,7 @@ export const RULES = `rules:
 - DOMAIN-SUFFIX,aolnews.com,✈️ ‍起飞
 - DOMAIN-SUFFIX,aomedia.org,✈️ ‍起飞
 - DOMAIN-SUFFIX,aomiwang.com,✈️ ‍起飞
+- DOMAIN-SUFFIX,aoxvpn.com,✈️ ‍起飞
 - DOMAIN-SUFFIX,ap.org,✈️ ‍起飞
 - DOMAIN-SUFFIX,apartmentratings.com,✈️ ‍起飞
 - DOMAIN-SUFFIX,apartments.com,✈️ ‍起飞
@@ -2346,6 +2349,7 @@ export const RULES = `rules:
 - DOMAIN-SUFFIX,asiaharvest.org,✈️ ‍起飞
 - DOMAIN-SUFFIX,asianage.com,✈️ ‍起飞
 - DOMAIN-SUFFIX,asianews.it,✈️ ‍起飞
+- DOMAIN-SUFFIX,asianfanfics.com,✈️ ‍起飞
 - DOMAIN-SUFFIX,asiansexdiary.com,✈️ ‍起飞
 - DOMAIN-SUFFIX,asianspiss.com,✈️ ‍起飞
 - DOMAIN-SUFFIX,asianwomensfilm.de,✈️ ‍起飞
@@ -2501,6 +2505,8 @@ export const RULES = `rules:
 - DOMAIN-SUFFIX,bet365.com,✈️ ‍起飞
 - DOMAIN-SUFFIX,betaclouds.net,✈️ ‍起飞
 - DOMAIN-SUFFIX,betfair.com,✈️ ‍起飞
+- DOMAIN-SUFFIX,bettergpt.chat,✈️ ‍起飞
+- DOMAIN-SUFFIX,betterhash.net,✈️ ‍起飞
 - DOMAIN-SUFFIX,betternet.co,✈️ ‍起飞
 - DOMAIN-SUFFIX,bettervpn.com,✈️ ‍起飞
 - DOMAIN-SUFFIX,bettween.com,✈️ ‍起飞
@@ -2532,6 +2538,7 @@ export const RULES = `rules:
 - DOMAIN-SUFFIX,biliworld.com,✈️ ‍起飞
 - DOMAIN-SUFFIX,billypan.com,✈️ ‍起飞
 - DOMAIN-SUFFIX,binance.com,✈️ ‍起飞
+- DOMAIN-SUFFIX,binance.org,✈️ ‍起飞
 - DOMAIN-SUFFIX,binance.us,✈️ ‍起飞
 - DOMAIN-SUFFIX,binancezh.cc,✈️ ‍起飞
 - DOMAIN-SUFFIX,bing.com,✈️ ‍起飞
@@ -2677,6 +2684,8 @@ export const RULES = `rules:
 - DOMAIN-SUFFIX,bsky.network,✈️ ‍起飞
 - DOMAIN-SUFFIX,bsky.social,✈️ ‍起飞
 - DOMAIN-SUFFIX,bt2mag.com,✈️ ‍起飞
+- DOMAIN-SUFFIX,bt4g.org,✈️ ‍起飞
+- DOMAIN-SUFFIX,bt4gprx.com,✈️ ‍起飞
 - DOMAIN-SUFFIX,bt95.com,✈️ ‍起飞
 - DOMAIN-SUFFIX,btaia.com,✈️ ‍起飞
 - DOMAIN-SUFFIX,btbit.net,✈️ ‍起飞
@@ -2763,6 +2772,7 @@ export const RULES = `rules:
 - DOMAIN-SUFFIX,canadameet.com,✈️ ‍起飞
 - DOMAIN-SUFFIX,canalporno.com,✈️ ‍起飞
 - DOMAIN-SUFFIX,cantonese.asia,✈️ ‍起飞
+- DOMAIN-SUFFIX,canva.com,✈️ ‍起飞
 - DOMAIN-SUFFIX,canyu.org,✈️ ‍起飞
 - DOMAIN-SUFFIX,cao.im,✈️ ‍起飞
 - DOMAIN-SUFFIX,caobian.info,✈️ ‍起飞
@@ -2805,6 +2815,7 @@ export const RULES = `rules:
 - DOMAIN-SUFFIX,ccdtr.org,✈️ ‍起飞
 - DOMAIN-SUFFIX,ccfd.org.tw,✈️ ‍起飞
 - DOMAIN-SUFFIX,cchere.com,✈️ ‍起飞
+- DOMAIN-SUFFIX,cchostvps.xyz,✈️ ‍起飞
 - DOMAIN-SUFFIX,ccim.org,✈️ ‍起飞
 - DOMAIN-SUFFIX,cclife.ca,✈️ ‍起飞
 - DOMAIN-SUFFIX,cclife.org,✈️ ‍起飞
@@ -2867,8 +2878,10 @@ export const RULES = `rules:
 - DOMAIN-SUFFIX,chaos.social,✈️ ‍起飞
 - DOMAIN-SUFFIX,chapm25.com,✈️ ‍起飞
 - DOMAIN-SUFFIX,character.ai,✈️ ‍起飞
+- DOMAIN-SUFFIX,chat.com,✈️ ‍起飞
 - DOMAIN-SUFFIX,chatgpt.com,✈️ ‍起飞
 - DOMAIN-SUFFIX,chatnook.com,✈️ ‍起飞
+- DOMAIN-SUFFIX,chatpdf.com,✈️ ‍起飞
 - DOMAIN-SUFFIX,chaturbate.com,✈️ ‍起飞
 - DOMAIN-SUFFIX,checkgfw.com,✈️ ‍起飞
 - DOMAIN-SUFFIX,chengmingmag.com,✈️ ‍起飞
@@ -3020,6 +3033,7 @@ export const RULES = `rules:
 - DOMAIN-SUFFIX,cloudcone.com,✈️ ‍起飞
 - DOMAIN-SUFFIX,cloudflare-dns.com,✈️ ‍起飞
 - DOMAIN-SUFFIX,cloudflare-ipfs.com,✈️ ‍起飞
+- DOMAIN-SUFFIX,cloudflarestatus.com,✈️ ‍起飞
 - DOMAIN-SUFFIX,cloudfront.net,✈️ ‍起飞
 - DOMAIN-SUFFIX,cloudfunctions.net,✈️ ‍起飞
 - DOMAIN-SUFFIX,club1069.com,✈️ ‍起飞
@@ -3103,6 +3117,7 @@ export const RULES = `rules:
 - DOMAIN-SUFFIX,cotweet.com,✈️ ‍起飞
 - DOMAIN-SUFFIX,counter.social,✈️ ‍起飞
 - DOMAIN-SUFFIX,coursehero.com,✈️ ‍起飞
+- DOMAIN-SUFFIX,covenantswatch.org.tw,✈️ ‍起飞
 - DOMAIN-SUFFIX,coze.com,✈️ ‍起飞
 - DOMAIN-SUFFIX,cpj.org,✈️ ‍起飞
 - DOMAIN-SUFFIX,cpu-monkey.com,✈️ ‍起飞
@@ -3139,6 +3154,7 @@ export const RULES = `rules:
 - DOMAIN-SUFFIX,ct.org.tw,✈️ ‍起飞
 - DOMAIN-SUFFIX,ctao.org,✈️ ‍起飞
 - DOMAIN-SUFFIX,ctfriend.net,✈️ ‍起飞
+- DOMAIN-SUFFIX,ctinets.com,✈️ ‍起飞
 - DOMAIN-SUFFIX,ctinews.com,✈️ ‍起飞
 - DOMAIN-SUFFIX,ctitv.com.tw,✈️ ‍起飞
 - DOMAIN-SUFFIX,ctowc.org,✈️ ‍起飞
@@ -3216,6 +3232,7 @@ export const RULES = `rules:
 - DOMAIN-SUFFIX,daozhongxing.org,✈️ ‍起飞
 - DOMAIN-SUFFIX,darktech.org,✈️ ‍起飞
 - DOMAIN-SUFFIX,darktoy.net,✈️ ‍起飞
+- DOMAIN-SUFFIX,darmau.co,✈️ ‍起飞
 - DOMAIN-SUFFIX,darpa.mil,✈️ ‍起飞
 - DOMAIN-SUFFIX,darrenliuwei.com,✈️ ‍起飞
 - DOMAIN-SUFFIX,dashlane.com,✈️ ‍起飞
@@ -3262,6 +3279,8 @@ export const RULES = `rules:
 - DOMAIN-SUFFIX,demo.opera-mini.net,✈️ ‍起飞
 - DOMAIN-SUFFIX,democrats.org,✈️ ‍起飞
 - DOMAIN-SUFFIX,demosisto.hk,✈️ ‍起飞
+- DOMAIN-SUFFIX,deno.com,✈️ ‍起飞
+- DOMAIN-SUFFIX,deno.dev,✈️ ‍起飞
 - DOMAIN-SUFFIX,depositphotos.com,✈️ ‍起飞
 - DOMAIN-SUFFIX,derekhsu.homeip.net,✈️ ‍起飞
 - DOMAIN-SUFFIX,desc.se,✈️ ‍起飞
@@ -3338,6 +3357,7 @@ export const RULES = `rules:
 - DOMAIN-SUFFIX,doc.new,✈️ ‍起飞
 - DOMAIN-SUFFIX,docker.com,✈️ ‍起飞
 - DOMAIN-SUFFIX,docker.io,✈️ ‍起飞
+- DOMAIN-SUFFIX,dockerstatus.com,✈️ ‍起飞
 - DOMAIN-SUFFIX,docs.cfw.lbyczf.com,✈️ ‍起飞
 - DOMAIN-SUFFIX,docs.new,✈️ ‍起飞
 - DOMAIN-SUFFIX,doctorvoice.org,✈️ ‍起飞
@@ -3779,6 +3799,7 @@ export const RULES = `rules:
 - DOMAIN-SUFFIX,flecheinthepeche.fr,✈️ ‍起飞
 - DOMAIN-SUFFIX,fleshbot.com,✈️ ‍起飞
 - DOMAIN-SUFFIX,fleursdeslettres.com,✈️ ‍起飞
+- DOMAIN-SUFFIX,flexclip.com,✈️ ‍起飞
 - DOMAIN-SUFFIX,flexpool.io,✈️ ‍起飞
 - DOMAIN-SUFFIX,flgg.us,✈️ ‍起飞
 - DOMAIN-SUFFIX,flgjustice.org,✈️ ‍起飞
@@ -3791,6 +3812,7 @@ export const RULES = `rules:
 - DOMAIN-SUFFIX,flitto.com,✈️ ‍起飞
 - DOMAIN-SUFFIX,flnet.org,✈️ ‍起飞
 - DOMAIN-SUFFIX,flog.tw,✈️ ‍起飞
+- DOMAIN-SUFFIX,flowgpt.com,✈️ ‍起飞
 - DOMAIN-SUFFIX,flowhongkong.net,✈️ ‍起飞
 - DOMAIN-SUFFIX,flurry.com,✈️ ‍起飞
 - DOMAIN-SUFFIX,flypool.org,✈️ ‍起飞
@@ -3810,6 +3832,7 @@ export const RULES = `rules:
 - DOMAIN-SUFFIX,fooooo.com,✈️ ‍起飞
 - DOMAIN-SUFFIX,footwiball.com,✈️ ‍起飞
 - DOMAIN-SUFFIX,forbes.com,✈️ ‍起飞
+- DOMAIN-SUFFIX,forefront.ai,✈️ ‍起飞
 - DOMAIN-SUFFIX,foreignaffairs.com,✈️ ‍起飞
 - DOMAIN-SUFFIX,foreignpolicy.com,✈️ ‍起飞
 - DOMAIN-SUFFIX,form.new,✈️ ‍起飞
@@ -3865,6 +3888,8 @@ export const RULES = `rules:
 - DOMAIN-SUFFIX,freefq.com,✈️ ‍起飞
 - DOMAIN-SUFFIX,freefuckvids.com,✈️ ‍起飞
 - DOMAIN-SUFFIX,freegao.com,✈️ ‍起飞
+- DOMAIN-SUFFIX,freegpt.es,✈️ ‍起飞
+- DOMAIN-SUFFIX,freegpt.tech,✈️ ‍起飞
 - DOMAIN-SUFFIX,freehongkong.org,✈️ ‍起飞
 - DOMAIN-SUFFIX,freeilhamtohti.org,✈️ ‍起飞
 - DOMAIN-SUFFIX,freekazakhs.org,✈️ ‍起飞
@@ -3930,6 +3955,8 @@ export const RULES = `rules:
 - DOMAIN-SUFFIX,ftx.com,✈️ ‍起飞
 - DOMAIN-SUFFIX,fucd.com,✈️ ‍起飞
 - DOMAIN-SUFFIX,fuchsia.dev,✈️ ‍起飞
+- DOMAIN-SUFFIX,fuckccp.com,✈️ ‍起飞
+- DOMAIN-SUFFIX,fuckccp.xyz,✈️ ‍起飞
 - DOMAIN-SUFFIX,fuckcnnic.net,✈️ ‍起飞
 - DOMAIN-SUFFIX,fuckgfw.org,✈️ ‍起飞
 - DOMAIN-SUFFIX,fuckgfw233.org,✈️ ‍起飞
@@ -3946,6 +3973,7 @@ export const RULES = `rules:
 - DOMAIN-SUFFIX,furhhdl.org,✈️ ‍起飞
 - DOMAIN-SUFFIX,furinkan.com,✈️ ‍起飞
 - DOMAIN-SUFFIX,furl.net,✈️ ‍起飞
+- DOMAIN-SUFFIX,furrybar.com,✈️ ‍起飞
 - DOMAIN-SUFFIX,futurechinaforum.org,✈️ ‍起飞
 - DOMAIN-SUFFIX,futuremessage.org,✈️ ‍起飞
 - DOMAIN-SUFFIX,fux.com,✈️ ‍起飞
@@ -3990,6 +4018,7 @@ export const RULES = `rules:
 - DOMAIN-SUFFIX,gardennetworks.com,✈️ ‍起飞
 - DOMAIN-SUFFIX,gardennetworks.org,✈️ ‍起飞
 - DOMAIN-SUFFIX,gartlive.com,✈️ ‍起飞
+- DOMAIN-SUFFIX,garudalinux.org,✈️ ‍起飞
 - DOMAIN-SUFFIX,gate-project.com,✈️ ‍起飞
 - DOMAIN-SUFFIX,gate.io,✈️ ‍起飞
 - DOMAIN-SUFFIX,gatecoin.com,✈️ ‍起飞
@@ -4079,6 +4108,7 @@ export const RULES = `rules:
 - DOMAIN-SUFFIX,githubcopilot.com,✈️ ‍起飞
 - DOMAIN-SUFFIX,githubmemory.com,✈️ ‍起飞
 - DOMAIN-SUFFIX,githubusercontent.com,✈️ ‍起飞
+- DOMAIN-SUFFIX,gitlab.com,✈️ ‍起飞
 - DOMAIN-SUFFIX,gitlab.net,✈️ ‍起飞
 - DOMAIN-SUFFIX,gitmemory.com,✈️ ‍起飞
 - DOMAIN-SUFFIX,gizlen.net,✈️ ‍起飞
@@ -4448,6 +4478,7 @@ export const RULES = `rules:
 - DOMAIN-SUFFIX,great-firewall.com,✈️ ‍起飞
 - DOMAIN-SUFFIX,great-roc.org,✈️ ‍起飞
 - DOMAIN-SUFFIX,greatfire.org,✈️ ‍起飞
+- DOMAIN-SUFFIX,greatfirevpn.com,✈️ ‍起飞
 - DOMAIN-SUFFIX,greatfirewall.biz,✈️ ‍起飞
 - DOMAIN-SUFFIX,greatfirewallofchina.net,✈️ ‍起飞
 - DOMAIN-SUFFIX,greatfirewallofchina.org,✈️ ‍起飞
@@ -4537,6 +4568,7 @@ export const RULES = `rules:
 - DOMAIN-SUFFIX,have8.com,✈️ ‍起飞
 - DOMAIN-SUFFIX,hbg.com,✈️ ‍起飞
 - DOMAIN-SUFFIX,hbo.com,✈️ ‍起飞
+- DOMAIN-SUFFIX,hbomax.com,✈️ ‍起飞
 - DOMAIN-SUFFIX,hcaptcha.com,✈️ ‍起飞
 - DOMAIN-SUFFIX,hclips.com,✈️ ‍起飞
 - DOMAIN-SUFFIX,hdlt.me,✈️ ‍起飞
@@ -4571,6 +4603,7 @@ export const RULES = `rules:
 - DOMAIN-SUFFIX,heritage.org,✈️ ‍起飞
 - DOMAIN-SUFFIX,heroku.com,✈️ ‍起飞
 - DOMAIN-SUFFIX,herokuapp.com,✈️ ‍起飞
+- DOMAIN-SUFFIX,herominers.com,✈️ ‍起飞
 - DOMAIN-SUFFIX,heungkongdiscuss.com,✈️ ‍起飞
 - DOMAIN-SUFFIX,hexieshe.com,✈️ ‍起飞
 - DOMAIN-SUFFIX,hexieshe.xyz,✈️ ‍起飞
@@ -4581,6 +4614,7 @@ export const RULES = `rules:
 - DOMAIN-SUFFIX,hhdcb3office.org,✈️ ‍起飞
 - DOMAIN-SUFFIX,hhthesakyatrizin.org,✈️ ‍起飞
 - DOMAIN-SUFFIX,hi-on.org.tw,✈️ ‍起飞
+- DOMAIN-SUFFIX,hicairo.com,✈️ ‍起飞
 - DOMAIN-SUFFIX,hiccears.com,✈️ ‍起飞
 - DOMAIN-SUFFIX,hidden-advent.org,✈️ ‍起飞
 - DOMAIN-SUFFIX,hide.me,✈️ ‍起飞
@@ -4787,6 +4821,7 @@ export const RULES = `rules:
 - DOMAIN-SUFFIX,hxwk.org,✈️ ‍起飞
 - DOMAIN-SUFFIX,hxwq.org,✈️ ‍起飞
 - DOMAIN-SUFFIX,hybrid-analysis.com,✈️ ‍起飞
+- DOMAIN-SUFFIX,hyperbeam.com,✈️ ‍起飞
 - DOMAIN-SUFFIX,hyperrate.com,✈️ ‍起飞
 - DOMAIN-SUFFIX,hypothes.is,✈️ ‍起飞
 - DOMAIN-SUFFIX,hyread.com.tw,✈️ ‍起飞
@@ -4900,6 +4935,7 @@ export const RULES = `rules:
 - DOMAIN-SUFFIX,indsr.org.tw,✈️ ‍起飞
 - DOMAIN-SUFFIX,info-graf.fr,✈️ ‍起飞
 - DOMAIN-SUFFIX,informer.com,✈️ ‍起飞
+- DOMAIN-SUFFIX,infura.io,✈️ ‍起飞
 - DOMAIN-SUFFIX,inherit.live,✈️ ‍起飞
 - DOMAIN-SUFFIX,initiativesforchina.org,✈️ ‍起飞
 - DOMAIN-SUFFIX,inkbunny.net,✈️ ‍起飞
@@ -4920,6 +4956,7 @@ export const RULES = `rules:
 - DOMAIN-SUFFIX,internetdefenseleague.org,✈️ ‍起飞
 - DOMAIN-SUFFIX,internetfreedom.org,✈️ ‍起飞
 - DOMAIN-SUFFIX,internetpopculture.com,✈️ ‍起飞
+- DOMAIN-SUFFIX,interseclab.org,✈️ ‍起飞
 - DOMAIN-SUFFIX,inthenameofconfuciusmovie.com,✈️ ‍起飞
 - DOMAIN-SUFFIX,invidio.us,✈️ ‍起飞
 - DOMAIN-SUFFIX,inxian.com,✈️ ‍起飞
@@ -4934,6 +4971,7 @@ export const RULES = `rules:
 - DOMAIN-SUFFIX,iphonetaiwan.org,✈️ ‍起飞
 - DOMAIN-SUFFIX,iphonix.fr,✈️ ‍起飞
 - DOMAIN-SUFFIX,ipicture.ru,✈️ ‍起飞
+- DOMAIN-SUFFIX,ipify.org,✈️ ‍起飞
 - DOMAIN-SUFFIX,ipinfo.io,✈️ ‍起飞
 - DOMAIN-SUFFIX,ipjetable.net,✈️ ‍起飞
 - DOMAIN-SUFFIX,ipobar.com,✈️ ‍起飞
@@ -4981,9 +5019,11 @@ export const RULES = `rules:
 - DOMAIN-SUFFIX,itaboo.info,✈️ ‍起飞
 - DOMAIN-SUFFIX,italiatibet.org,✈️ ‍起飞
 - DOMAIN-SUFFIX,itasoftware.com,✈️ ‍起飞
+- DOMAIN-SUFFIX,itch.io,✈️ ‍起飞
 - DOMAIN-SUFFIX,itemdb.com,✈️ ‍起飞
 - DOMAIN-SUFFIX,itemfix.com,✈️ ‍起飞
 - DOMAIN-SUFFIX,ithome.com.tw,✈️ ‍起飞
+- DOMAIN-SUFFIX,itiger.com,✈️ ‍起飞
 - DOMAIN-SUFFIX,itsaol.com,✈️ ‍起飞
 - DOMAIN-SUFFIX,itshidden.com,✈️ ‍起飞
 - DOMAIN-SUFFIX,itsky.it,✈️ ‍起飞
@@ -5053,7 +5093,6 @@ export const RULES = `rules:
 - DOMAIN-SUFFIX,jgoodies.com,✈️ ‍起飞
 - DOMAIN-SUFFIX,jiangweiping.com,✈️ ‍起飞
 - DOMAIN-SUFFIX,jiaoyou8.com,✈️ ‍起飞
-- DOMAIN-SUFFIX,jichangtj.com,✈️ ‍起飞
 - DOMAIN-SUFFIX,jiehua.cz,✈️ ‍起飞
 - DOMAIN-SUFFIX,jiepang.com,✈️ ‍起飞
 - DOMAIN-SUFFIX,jieshibaobao.com,✈️ ‍起飞
@@ -5278,6 +5317,7 @@ export const RULES = `rules:
 - DOMAIN-SUFFIX,lester850.info,✈️ ‍起飞
 - DOMAIN-SUFFIX,letou.com,✈️ ‍起飞
 - DOMAIN-SUFFIX,letscorp.net,✈️ ‍起飞
+- DOMAIN-SUFFIX,lexica.art,✈️ ‍起飞
 - DOMAIN-SUFFIX,lflink.com,✈️ ‍起飞
 - DOMAIN-SUFFIX,lflinkup.com,✈️ ‍起飞
 - DOMAIN-SUFFIX,lflinkup.net,✈️ ‍起飞
@@ -5293,6 +5333,7 @@ export const RULES = `rules:
 - DOMAIN-SUFFIX,liberal.org.hk,✈️ ‍起飞
 - DOMAIN-SUFFIX,libertysculpturepark.com,✈️ ‍起飞
 - DOMAIN-SUFFIX,libertytimes.com.tw,✈️ ‍起飞
+- DOMAIN-SUFFIX,library-access.sk,✈️ ‍起飞
 - DOMAIN-SUFFIX,libraryinformationtechnology.com,✈️ ‍起飞
 - DOMAIN-SUFFIX,libredd.it,✈️ ‍起飞
 - DOMAIN-SUFFIX,lidecheng.com,✈️ ‍起飞
@@ -5319,6 +5360,7 @@ export const RULES = `rules:
 - DOMAIN-SUFFIX,linktr.ee,✈️ ‍起飞
 - DOMAIN-SUFFIX,linkuswell.com,✈️ ‍起飞
 - DOMAIN-SUFFIX,linpie.com,✈️ ‍起飞
+- DOMAIN-SUFFIX,linux.do,✈️ ‍起飞
 - DOMAIN-SUFFIX,linux.org.hk,✈️ ‍起飞
 - DOMAIN-SUFFIX,linuxtoy.org,✈️ ‍起飞
 - DOMAIN-SUFFIX,lionsroar.com,✈️ ‍起飞
@@ -5351,6 +5393,7 @@ export const RULES = `rules:
 - DOMAIN-SUFFIX,lizhizhuangbi.com,✈️ ‍起飞
 - DOMAIN-SUFFIX,lkcn.net,✈️ ‍起飞
 - DOMAIN-SUFFIX,llss.me,✈️ ‍起飞
+- DOMAIN-SUFFIX,lmarena.ai,✈️ ‍起飞
 - DOMAIN-SUFFIX,lmsys.org,✈️ ‍起飞
 - DOMAIN-SUFFIX,load.to,✈️ ‍起飞
 - DOMAIN-SUFFIX,lobsangwangyal.com,✈️ ‍起飞
@@ -5388,6 +5431,7 @@ export const RULES = `rules:
 - DOMAIN-SUFFIX,lsxszzg.com,✈️ ‍起飞
 - DOMAIN-SUFFIX,ltn.com.tw,✈️ ‍起飞
 - DOMAIN-SUFFIX,luckydesigner.space,✈️ ‍起飞
+- DOMAIN-SUFFIX,luckymobile.ca,✈️ ‍起飞
 - DOMAIN-SUFFIX,ludepress.com,✈️ ‍起飞
 - DOMAIN-SUFFIX,luke54.com,✈️ ‍起飞
 - DOMAIN-SUFFIX,luke54.org,✈️ ‍起飞
@@ -5400,7 +5444,6 @@ export const RULES = `rules:
 - DOMAIN-SUFFIX,lzjscript.com,✈️ ‍起飞
 - DOMAIN-SUFFIX,lzmtnews.org,✈️ ‍起飞
 - DOMAIN-SUFFIX,m-sport.co.uk,✈️ ‍起飞
-- DOMAIN-SUFFIX,m-team.cc,✈️ ‍起飞
 - DOMAIN-SUFFIX,m.me,✈️ ‍起飞
 - DOMAIN-SUFFIX,m.plixi.com,✈️ ‍起飞
 - DOMAIN-SUFFIX,m.slandr.net,✈️ ‍起飞
@@ -5476,6 +5519,7 @@ export const RULES = `rules:
 - DOMAIN-SUFFIX,mcaf.ee,✈️ ‍起飞
 - DOMAIN-SUFFIX,mcfog.com,✈️ ‍起飞
 - DOMAIN-SUFFIX,mcreasite.com,✈️ ‍起飞
+- DOMAIN-SUFFIX,mcusercontent.com,✈️ ‍起飞
 - DOMAIN-SUFFIX,md-t.org,✈️ ‍起飞
 - DOMAIN-SUFFIX,me.me,✈️ ‍起飞
 - DOMAIN-SUFFIX,meansys.com,✈️ ‍起飞
@@ -5528,6 +5572,7 @@ export const RULES = `rules:
 - DOMAIN-SUFFIX,metacafe.com,✈️ ‍起飞
 - DOMAIN-SUFFIX,metacubex.one,✈️ ‍起飞
 - DOMAIN-SUFFIX,metafilter.com,✈️ ‍起飞
+- DOMAIN-SUFFIX,metamask.io,✈️ ‍起飞
 - DOMAIN-SUFFIX,metart.com,✈️ ‍起飞
 - DOMAIN-SUFFIX,metarthunter.com,✈️ ‍起飞
 - DOMAIN-SUFFIX,meteorshowersonline.com,✈️ ‍起飞
@@ -5550,6 +5595,7 @@ export const RULES = `rules:
 - DOMAIN-SUFFIX,mihk.hk,✈️ ‍起飞
 - DOMAIN-SUFFIX,mihr.com,✈️ ‍起飞
 - DOMAIN-SUFFIX,mihua.org,✈️ ‍起飞
+- DOMAIN-SUFFIX,mij.rip,✈️ ‍起飞
 - DOMAIN-SUFFIX,mikanani.me,✈️ ‍起飞
 - DOMAIN-SUFFIX,mikesoltys.com,✈️ ‍起飞
 - DOMAIN-SUFFIX,mikocon.com,✈️ ‍起飞
@@ -5603,6 +5649,8 @@ export const RULES = `rules:
 - DOMAIN-SUFFIX,mixpod.com,✈️ ‍起飞
 - DOMAIN-SUFFIX,mixx.com,✈️ ‍起飞
 - DOMAIN-SUFFIX,mizzmona.com,✈️ ‍起飞
+- DOMAIN-SUFFIX,mji.rip,✈️ ‍起飞
+- DOMAIN-SUFFIX,mjj.rip,✈️ ‍起飞
 - DOMAIN-SUFFIX,mk5000.com,✈️ ‍起飞
 - DOMAIN-SUFFIX,mlc.ai,✈️ ‍起飞
 - DOMAIN-SUFFIX,mlcool.com,✈️ ‍起飞
@@ -5772,6 +5820,7 @@ export const RULES = `rules:
 - DOMAIN-SUFFIX,nalandawest.org,✈️ ‍起飞
 - DOMAIN-SUFFIX,namgyal.org,✈️ ‍起飞
 - DOMAIN-SUFFIX,namgyalmonastery.org,✈️ ‍起飞
+- DOMAIN-SUFFIX,namu.wiki,✈️ ‍起飞
 - DOMAIN-SUFFIX,nanopool.org,✈️ ‍起飞
 - DOMAIN-SUFFIX,nanyang.com,✈️ ‍起飞
 - DOMAIN-SUFFIX,nanyangpost.com,✈️ ‍起飞
@@ -5790,6 +5839,7 @@ export const RULES = `rules:
 - DOMAIN-SUFFIX,nationsonline.org,✈️ ‍起飞
 - DOMAIN-SUFFIX,nationwide.com,✈️ ‍起飞
 - DOMAIN-SUFFIX,naughtyamerica.com,✈️ ‍起飞
+- DOMAIN-SUFFIX,naver.com,✈️ ‍起飞
 - DOMAIN-SUFFIX,naver.jp,✈️ ‍起飞
 - DOMAIN-SUFFIX,navy.mil,✈️ ‍起飞
 - DOMAIN-SUFFIX,naweeklytimes.com,✈️ ‍起飞
@@ -5898,6 +5948,7 @@ export const RULES = `rules:
 - DOMAIN-SUFFIX,ninjaproxy.ninja,✈️ ‍起飞
 - DOMAIN-SUFFIX,nintendium.com,✈️ ‍起飞
 - DOMAIN-SUFFIX,ninth.biz,✈️ ‍起飞
+- DOMAIN-SUFFIX,nirsoft.net,✈️ ‍起飞
 - DOMAIN-SUFFIX,nitter.cc,✈️ ‍起飞
 - DOMAIN-SUFFIX,nitter.net,✈️ ‍起飞
 - DOMAIN-SUFFIX,niu.moe,✈️ ‍起飞
@@ -5999,6 +6050,7 @@ export const RULES = `rules:
 - DOMAIN-SUFFIX,nzchinese.com,✈️ ‍起飞
 - DOMAIN-SUFFIX,nzchinese.net.nz,✈️ ‍起飞
 - DOMAIN-SUFFIX,o3o.ca,✈️ ‍起飞
+- DOMAIN-SUFFIX,oaiusercontent.com,✈️ ‍起飞
 - DOMAIN-SUFFIX,oanda.com,✈️ ‍起飞
 - DOMAIN-SUFFIX,oann.com,✈️ ‍起飞
 - DOMAIN-SUFFIX,oauth.net,✈️ ‍起飞
@@ -6012,6 +6064,7 @@ export const RULES = `rules:
 - DOMAIN-SUFFIX,ocry.com,✈️ ‍起飞
 - DOMAIN-SUFFIX,ocsp.int-x3.letsencrypt.org,✈️ ‍起飞
 - DOMAIN-SUFFIX,october-review.org,✈️ ‍起飞
+- DOMAIN-SUFFIX,octocaptcha.com,✈️ ‍起飞
 - DOMAIN-SUFFIX,oculus.com,✈️ ‍起飞
 - DOMAIN-SUFFIX,oculuscdn.com,✈️ ‍起飞
 - DOMAIN-SUFFIX,odysee.com,✈️ ‍起飞
@@ -6145,6 +6198,8 @@ export const RULES = `rules:
 - DOMAIN-SUFFIX,paljorpublications.com,✈️ ‍起飞
 - DOMAIN-SUFFIX,palmislife.com,✈️ ‍起飞
 - DOMAIN-SUFFIX,paltalk.com,✈️ ‍起飞
+- DOMAIN-SUFFIX,palworldgame.com,✈️ ‍起飞
+- DOMAIN-SUFFIX,pancakeswap.finance,✈️ ‍起飞
 - DOMAIN-SUFFIX,pandafan.pub,✈️ ‍起飞
 - DOMAIN-SUFFIX,pandapow.co,✈️ ‍起飞
 - DOMAIN-SUFFIX,pandapow.net,✈️ ‍起飞
@@ -6218,6 +6273,7 @@ export const RULES = `rules:
 - DOMAIN-SUFFIX,perplexity.ai,✈️ ‍起飞
 - DOMAIN-SUFFIX,persecutionblog.com,✈️ ‍起飞
 - DOMAIN-SUFFIX,persiankitty.com,✈️ ‍起飞
+- DOMAIN-SUFFIX,pewresearch.org,✈️ ‍起飞
 - DOMAIN-SUFFIX,pfd.org.hk,✈️ ‍起飞
 - DOMAIN-SUFFIX,phapluan.org,✈️ ‍起飞
 - DOMAIN-SUFFIX,phayul.com,✈️ ‍起飞
@@ -6238,6 +6294,7 @@ export const RULES = `rules:
 - DOMAIN-SUFFIX,picasaweb.com,✈️ ‍起飞
 - DOMAIN-SUFFIX,picgo.net,✈️ ‍起飞
 - DOMAIN-SUFFIX,picidae.net,✈️ ‍起飞
+- DOMAIN-SUFFIX,picsart.com,✈️ ‍起飞
 - DOMAIN-SUFFIX,picturedip.com,✈️ ‍起飞
 - DOMAIN-SUFFIX,picturesocial.com,✈️ ‍起飞
 - DOMAIN-SUFFIX,picuki.com,✈️ ‍起飞
@@ -6372,9 +6429,11 @@ export const RULES = `rules:
 - DOMAIN-SUFFIX,primevideo.com,✈️ ‍起飞
 - DOMAIN-SUFFIX,printfriendly.com,✈️ ‍起飞
 - DOMAIN-SUFFIX,prism-break.org,✈️ ‍起飞
+- DOMAIN-SUFFIX,prismic.io,✈️ ‍起飞
 - DOMAIN-SUFFIX,prisoneralert.com,✈️ ‍起飞
 - DOMAIN-SUFFIX,pritunl.com,✈️ ‍起飞
 - DOMAIN-SUFFIX,privacybox.de,✈️ ‍起飞
+- DOMAIN-SUFFIX,privacyguides.org,✈️ ‍起飞
 - DOMAIN-SUFFIX,private.com,✈️ ‍起飞
 - DOMAIN-SUFFIX,privateinternetaccess.com,✈️ ‍起飞
 - DOMAIN-SUFFIX,privatepaste.com,✈️ ‍起飞
@@ -6573,6 +6632,7 @@ export const RULES = `rules:
 - DOMAIN-SUFFIX,religionnews.com,✈️ ‍起飞
 - DOMAIN-SUFFIX,religioustolerance.org,✈️ ‍起飞
 - DOMAIN-SUFFIX,renminbao.com,✈️ ‍起飞
+- DOMAIN-SUFFIX,rentry.co,✈️ ‍起飞
 - DOMAIN-SUFFIX,renyurenquan.org,✈️ ‍起飞
 - DOMAIN-SUFFIX,research.google,✈️ ‍起飞
 - DOMAIN-SUFFIX,resilio.com,✈️ ‍起飞
@@ -6645,6 +6705,7 @@ export const RULES = `rules:
 - DOMAIN-SUFFIX,rumble.com,✈️ ‍起飞
 - DOMAIN-SUFFIX,runbtx.com,✈️ ‍起飞
 - DOMAIN-SUFFIX,rushbee.com,✈️ ‍起飞
+- DOMAIN-SUFFIX,rustdesk.com,✈️ ‍起飞
 - DOMAIN-SUFFIX,rusvpn.com,✈️ ‍起飞
 - DOMAIN-SUFFIX,ruten.com.tw,✈️ ‍起飞
 - DOMAIN-SUFFIX,rutracker.net,✈️ ‍起飞
@@ -6918,6 +6979,7 @@ export const RULES = `rules:
 - DOMAIN-SUFFIX,sndcdn.com,✈️ ‍起飞
 - DOMAIN-SUFFIX,sneakme.net,✈️ ‍起飞
 - DOMAIN-SUFFIX,snowlionpub.com,✈️ ‍起飞
+- DOMAIN-SUFFIX,sntp.uk,✈️ ‍起飞
 - DOMAIN-SUFFIX,sobees.com,✈️ ‍起飞
 - DOMAIN-SUFFIX,soc.mil,✈️ ‍起飞
 - DOMAIN-SUFFIX,social.edu.ci,✈️ ‍起飞
@@ -6947,6 +7009,7 @@ export const RULES = `rules:
 - DOMAIN-SUFFIX,solana.com,✈️ ‍起飞
 - DOMAIN-SUFFIX,solidaritetibet.org,✈️ ‍起飞
 - DOMAIN-SUFFIX,solidfiles.com,✈️ ‍起飞
+- DOMAIN-SUFFIX,solscan.io,✈️ ‍起飞
 - DOMAIN-SUFFIX,solv.finance,✈️ ‍起飞
 - DOMAIN-SUFFIX,somee.com,✈️ ‍起飞
 - DOMAIN-SUFFIX,songjianjun.com,✈️ ‍起飞
@@ -6955,6 +7018,7 @@ export const RULES = `rules:
 - DOMAIN-SUFFIX,sopcast.com,✈️ ‍起飞
 - DOMAIN-SUFFIX,sopcast.org,✈️ ‍起飞
 - DOMAIN-SUFFIX,sophos.com,✈️ ‍起飞
+- DOMAIN-SUFFIX,sora.com,✈️ ‍起飞
 - DOMAIN-SUFFIX,sorazone.net,✈️ ‍起飞
 - DOMAIN-SUFFIX,sorting-algorithms.com,✈️ ‍起飞
 - DOMAIN-SUFFIX,sos.org,✈️ ‍起飞
@@ -7125,6 +7189,7 @@ export const RULES = `rules:
 - DOMAIN-SUFFIX,suyangg.com,✈️ ‍起飞
 - DOMAIN-SUFFIX,svsfx.com,✈️ ‍起飞
 - DOMAIN-SUFFIX,swagbucks.com,✈️ ‍起飞
+- DOMAIN-SUFFIX,swapspace.co,✈️ ‍起飞
 - DOMAIN-SUFFIX,swissinfo.ch,✈️ ‍起飞
 - DOMAIN-SUFFIX,swissvpn.net,✈️ ‍起飞
 - DOMAIN-SUFFIX,switch1.jp,✈️ ‍起飞
@@ -7180,6 +7245,7 @@ export const RULES = `rules:
 - DOMAIN-SUFFIX,taiwanus.net,✈️ ‍起飞
 - DOMAIN-SUFFIX,taiwanyes.com,✈️ ‍起飞
 - DOMAIN-SUFFIX,talk853.com,✈️ ‍起飞
+- DOMAIN-SUFFIX,talkatone.com,✈️ ‍起飞
 - DOMAIN-SUFFIX,talkboxapp.com,✈️ ‍起飞
 - DOMAIN-SUFFIX,talkcc.com,✈️ ‍起飞
 - DOMAIN-SUFFIX,talkonly.net,✈️ ‍起飞
@@ -7187,10 +7253,13 @@ export const RULES = `rules:
 - DOMAIN-SUFFIX,tanc.org,✈️ ‍起飞
 - DOMAIN-SUFFIX,tangben.com,✈️ ‍起飞
 - DOMAIN-SUFFIX,tangren.us,✈️ ‍起飞
+- DOMAIN-SUFFIX,tanks.gg,✈️ ‍起飞
 - DOMAIN-SUFFIX,taoism.net,✈️ ‍起飞
 - DOMAIN-SUFFIX,taolun.info,✈️ ‍起飞
+- DOMAIN-SUFFIX,tap.io,✈️ ‍起飞
 - DOMAIN-SUFFIX,tapanwap.com,✈️ ‍起飞
 - DOMAIN-SUFFIX,tapatalk.com,✈️ ‍起飞
+- DOMAIN-SUFFIX,taptap.io,✈️ ‍起飞
 - DOMAIN-SUFFIX,taragana.com,✈️ ‍起飞
 - DOMAIN-SUFFIX,tardigrade.io,✈️ ‍起飞
 - DOMAIN-SUFFIX,target.com,✈️ ‍起飞
@@ -7248,11 +7317,13 @@ export const RULES = `rules:
 - DOMAIN-SUFFIX,telesco.pe,✈️ ‍起飞
 - DOMAIN-SUFFIX,tellapart.com,✈️ ‍起飞
 - DOMAIN-SUFFIX,tellme.pw,✈️ ‍起飞
+- DOMAIN-SUFFIX,temu.com,✈️ ‍起飞
 - DOMAIN-SUFFIX,tenacy.com,✈️ ‍起飞
 - DOMAIN-SUFFIX,tenor.com,✈️ ‍起飞
 - DOMAIN-SUFFIX,tensorflow.org,✈️ ‍起飞
 - DOMAIN-SUFFIX,tenzinpalmo.com,✈️ ‍起飞
 - DOMAIN-SUFFIX,terabox.com,✈️ ‍起飞
+- DOMAIN-SUFFIX,terobox.com,✈️ ‍起飞
 - DOMAIN-SUFFIX,tew.org,✈️ ‍起飞
 - DOMAIN-SUFFIX,textnow.com,✈️ ‍起飞
 - DOMAIN-SUFFIX,textnow.me,✈️ ‍起飞
@@ -7534,6 +7605,7 @@ export const RULES = `rules:
 - DOMAIN-SUFFIX,truenas.com,✈️ ‍起飞
 - DOMAIN-SUFFIX,truesocial.media,✈️ ‍起飞
 - DOMAIN-SUFFIX,trulyergonomic.com,✈️ ‍起飞
+- DOMAIN-SUFFIX,trustwallet.com,✈️ ‍起飞
 - DOMAIN-SUFFIX,truth101.co.tv,✈️ ‍起飞
 - DOMAIN-SUFFIX,truthontour.org,✈️ ‍起飞
 - DOMAIN-SUFFIX,truthsocial.com,✈️ ‍起飞
@@ -7726,6 +7798,7 @@ export const RULES = `rules:
 - DOMAIN-SUFFIX,udn.com.tw,✈️ ‍起飞
 - DOMAIN-SUFFIX,udnbkk.com,✈️ ‍起飞
 - DOMAIN-SUFFIX,udndata.com,✈️ ‍起飞
+- DOMAIN-SUFFIX,udomain.hk,✈️ ‍起飞
 - DOMAIN-SUFFIX,uforadio.com.tw,✈️ ‍起飞
 - DOMAIN-SUFFIX,ufreevpn.com,✈️ ‍起飞
 - DOMAIN-SUFFIX,ugo.com,✈️ ‍起飞
@@ -7971,6 +8044,7 @@ export const RULES = `rules:
 - DOMAIN-SUFFIX,vpnworldwide.com,✈️ ‍起飞
 - DOMAIN-SUFFIX,vporn.com,✈️ ‍起飞
 - DOMAIN-SUFFIX,vpser.net,✈️ ‍起飞
+- DOMAIN-SUFFIX,vpsxb.net,✈️ ‍起飞
 - DOMAIN-SUFFIX,vraiesagesse.net,✈️ ‍起飞
 - DOMAIN-SUFFIX,vrchat.com,✈️ ‍起飞
 - DOMAIN-SUFFIX,vrmtr.com,✈️ ‍起飞
@@ -8047,6 +8121,7 @@ export const RULES = `rules:
 - DOMAIN-SUFFIX,webrtc.org,✈️ ‍起飞
 - DOMAIN-SUFFIX,webrush.net,✈️ ‍起飞
 - DOMAIN-SUFFIX,webs-tv.net,✈️ ‍起飞
+- DOMAIN-SUFFIX,websdr.org,✈️ ‍起飞
 - DOMAIN-SUFFIX,website.new,✈️ ‍起飞
 - DOMAIN-SUFFIX,websitepulse.com,✈️ ‍起飞
 - DOMAIN-SUFFIX,websnapr.com,✈️ ‍起飞
@@ -8123,9 +8198,11 @@ export const RULES = `rules:
 - DOMAIN-SUFFIX,wikimapia.org,✈️ ‍起飞
 - DOMAIN-SUFFIX,wikimedia.org,✈️ ‍起飞
 - DOMAIN-SUFFIX,wikinews.org,✈️ ‍起飞
+- DOMAIN-SUFFIX,wikipedia.com,✈️ ‍起飞
 - DOMAIN-SUFFIX,wikipedia.org,✈️ ‍起飞
 - DOMAIN-SUFFIX,wikiquote.org,✈️ ‍起飞
 - DOMAIN-SUFFIX,wikisource.org,✈️ ‍起飞
+- DOMAIN-SUFFIX,wikiunblocked.org,✈️ ‍起飞
 - DOMAIN-SUFFIX,wikiversity.org,✈️ ‍起飞
 - DOMAIN-SUFFIX,wikivoyage.org,✈️ ‍起飞
 - DOMAIN-SUFFIX,wikiwand.com,✈️ ‍起飞
@@ -8284,6 +8361,7 @@ export const RULES = `rules:
 - DOMAIN-SUFFIX,xn--11xs86f.icu,✈️ ‍起飞
 - DOMAIN-SUFFIX,xn--4gq171p.com,✈️ ‍起飞
 - DOMAIN-SUFFIX,xn--90wwvt03e.com,✈️ ‍起飞
+- DOMAIN-SUFFIX,xn--9iqy04a7fi01l.com,✈️ ‍起飞
 - DOMAIN-SUFFIX,xn--9pr62r24a.com,✈️ ‍起飞
 - DOMAIN-SUFFIX,xn--czq75pvv1aj5c.org,✈️ ‍起飞
 - DOMAIN-SUFFIX,xn--i2ru8q2qg.com,✈️ ‍起飞
@@ -8291,6 +8369,7 @@ export const RULES = `rules:
 - DOMAIN-SUFFIX,xn--noss43i.com,✈️ ‍起飞
 - DOMAIN-SUFFIX,xn--oiq.cc,✈️ ‍起飞
 - DOMAIN-SUFFIX,xn--p8j9a0d9c9a.xn--q9jyb4c,✈️ ‍起飞
+- DOMAIN-SUFFIX,xn--u2u927b.com,✈️ ‍起飞
 - DOMAIN-SUFFIX,xnpool.com,✈️ ‍起飞
 - DOMAIN-SUFFIX,xnxx-cdn.com,✈️ ‍起飞
 - DOMAIN-SUFFIX,xnxx.com,✈️ ‍起飞
@@ -8438,6 +8517,7 @@ export const RULES = `rules:
 - DOMAIN-SUFFIX,z-lib.gl,✈️ ‍起飞
 - DOMAIN-SUFFIX,z-lib.io,✈️ ‍起飞
 - DOMAIN-SUFFIX,z-lib.org,✈️ ‍起飞
+- DOMAIN-SUFFIX,z-library.ec,✈️ ‍起飞
 - DOMAIN-SUFFIX,z-library.sk,✈️ ‍起飞
 - DOMAIN-SUFFIX,zacebook.com,✈️ ‍起飞
 - DOMAIN-SUFFIX,zalmos.com,✈️ ‍起飞
@@ -8445,6 +8525,7 @@ export const RULES = `rules:
 - DOMAIN-SUFFIX,zannel.com,✈️ ‍起飞
 - DOMAIN-SUFFIX,zaobao.com,✈️ ‍起飞
 - DOMAIN-SUFFIX,zaobao.com.sg,✈️ ‍起飞
+- DOMAIN-SUFFIX,zaochenbao.com,✈️ ‍起飞
 - DOMAIN-SUFFIX,zaozon.com,✈️ ‍起飞
 - DOMAIN-SUFFIX,zapto.org,✈️ ‍起飞
 - DOMAIN-SUFFIX,zattoo.com,✈️ ‍起飞
@@ -8837,6 +8918,7 @@ export const RULES = `rules:
 - DOMAIN-SUFFIX,aliapp.org,🛩️ ‍墙内
 - DOMAIN-SUFFIX,alibaba.com,🛩️ ‍墙内
 - DOMAIN-SUFFIX,alibabacloud.com,🛩️ ‍墙内
+- DOMAIN-SUFFIX,alibabachengdun.com,🛩️ ‍墙内
 - DOMAIN-SUFFIX,alibabausercontent.com,🛩️ ‍墙内
 - DOMAIN-SUFFIX,alicdn.com,🛩️ ‍墙内
 - DOMAIN-SUFFIX,alicloudccp.com,🛩️ ‍墙内
@@ -8855,6 +8937,7 @@ export const RULES = `rules:
 - DOMAIN-SUFFIX,autonavi.com,🛩️ ‍墙内
 - DOMAIN-SUFFIX,dingtalk.com,🛩️ ‍墙内
 - DOMAIN-SUFFIX,ele.me,🛩️ ‍墙内
+- DOMAIN-SUFFIX,elemecdn.com,🛩️ ‍墙内
 - DOMAIN-SUFFIX,hichina.com,🛩️ ‍墙内
 - DOMAIN-SUFFIX,mmstat.com,🛩️ ‍墙内
 - DOMAIN-SUFFIX,mxhichina.com,🛩️ ‍墙内
@@ -8862,6 +8945,7 @@ export const RULES = `rules:
 - DOMAIN-SUFFIX,taobao.com,🛩️ ‍墙内
 - DOMAIN-SUFFIX,taobaocdn.com,🛩️ ‍墙内
 - DOMAIN-SUFFIX,tbcache.com,🛩️ ‍墙内
+- DOMAIN-SUFFIX,tbcdn.cn,🛩️ ‍墙内
 - DOMAIN-SUFFIX,tbcdn.com,🛩️ ‍墙内
 - DOMAIN-SUFFIX,tmall.com,🛩️ ‍墙内
 - DOMAIN-SUFFIX,tmall.hk,🛩️ ‍墙内
@@ -9191,6 +9275,7 @@ export const RULES = `rules:
 - DOMAIN-SUFFIX,air-matters.io,🛩️ ‍墙内
 - DOMAIN-SUFFIX,aixifan.com,🛩️ ‍墙内
 - DOMAIN-SUFFIX,algocasts.io,🛩️ ‍墙内
+- DOMAIN-SUFFIX,asklink.com,🛩️ ‍墙内
 - DOMAIN-SUFFIX,babytree.com,🛩️ ‍墙内
 - DOMAIN-SUFFIX,babytreeimg.com,🛩️ ‍墙内
 - DOMAIN-SUFFIX,baicizhan.com,🛩️ ‍墙内
