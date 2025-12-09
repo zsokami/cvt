@@ -335,7 +335,7 @@ function baseFrom<T extends Proxy['type']>(
     server: String(o.server),
     port: Number(o.port),
     type: o.type,
-    ...pickTrue(o, 'tfo', 'mptcp'),
+    ...pickTrue(o, 'tfo', 'mptcp', 'hidden'),
     ...pickNonEmptyString(o, 'ip-version', 'interface-name'),
     ...pickNumber(o, 'routing-mark'),
     ...pickNonEmptyString(o, 'dialer-proxy'),
@@ -356,7 +356,7 @@ function baseFromForPorts<T extends Proxy['type']>(
     server: String(o.server),
     ...ports as PortOrPorts,
     type: o.type,
-    ...pickTrue(o, 'tfo', 'mptcp'),
+    ...pickTrue(o, 'tfo', 'mptcp', 'hidden'),
     ...pickNonEmptyString(o, 'ip-version', 'interface-name'),
     ...pickNumber(o, 'routing-mark'),
     ...pickNonEmptyString(o, 'dialer-proxy'),
@@ -377,7 +377,7 @@ function baseFromForPortRange<T extends Proxy['type']>(
     server: String(o.server),
     ...ports as PortOrPortRange,
     type: o.type,
-    ...pickTrue(o, 'tfo', 'mptcp'),
+    ...pickTrue(o, 'tfo', 'mptcp', 'hidden'),
     ...pickNonEmptyString(o, 'ip-version', 'interface-name'),
     ...pickNumber(o, 'routing-mark'),
     ...pickNonEmptyString(o, 'dialer-proxy'),
@@ -635,13 +635,8 @@ export function fromClash(clash: string, meta = true): [Proxy[], number, Record<
   }
 }
 
-function genProxyGroups(proxies: Proxy[], meta = true, hide?: string) {
+function genProxyGroups(all: string[], meta = true) {
   const reject = ['REJECT', ...meta ? ['REJECT-DROP'] : []]
-  let all = proxies.map((x) => x.name)
-  if (hide) {
-    const re = new RegExp(hide, 'iu')
-    all = all.filter((x) => !re.test(x))
-  }
   const map: Record<string, string[]> = {
     '🇭🇰 ‍香港': [],
     '🇹🇼 ‍台湾': [],
@@ -791,7 +786,20 @@ export function toClash(
   errors?: string[],
 ): string {
   if (proxiesOnly) {
+    // 保留 hidden
     return ['proxies:\n', ...proxies.map((x) => `- ${JSON.stringify(x)}\n`)].join('')
+  }
+  const hideRe = hide && new RegExp(hide, 'iu')
+  const nonHiddenProxies = []
+  for (const proxy of proxies) {
+    if (proxy.hidden) {
+      delete proxy.hidden
+      continue
+    }
+    if (hideRe && hideRe.test(proxy.name)) {
+      continue
+    }
+    nonHiddenProxies.push(proxy.name)
   }
   return [
     'mixed-port: 7890\n',
@@ -821,7 +829,7 @@ export function toClash(
     'proxies:\n',
     ...proxies.map((x) => `- ${JSON.stringify(x)}\n`),
     'proxy-groups:\n',
-    ...genProxyGroups(proxies, meta, hide).map((x) => `- ${JSON.stringify(x)}\n`),
+    ...genProxyGroups(nonHiddenProxies, meta).map((x) => `- ${JSON.stringify(x)}\n`),
     ...!ndl ? [RULES] : [RULES.slice(0, -18), ',no-resolve', RULES.slice(-18)],
   ].join('')
 }

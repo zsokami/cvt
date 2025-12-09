@@ -10,6 +10,7 @@ export interface ProxyBase {
   'interface-name'?: string
   'routing-mark'?: number
   'dialer-proxy'?: string
+  hidden?: boolean // 在 proxy-groups 中隐藏该节点，在 proxies 中仍保留
 }
 
 export interface HTTP extends ProxyBase {
