@@ -6,22 +6,22 @@ emoji、代理策略组和路由规则与 [ACL4SSR_Online_Full_Mannix.ini](https
 
 ||URI|Clash|
 |-|:-:|:-:|
-|http|✅|✅|
-|socks5|✅|✅|
-|ss|✅|✅|
-|ssr|✅|✅|
-|mieru|❌|✅|
-|snell|❌|✅|
-|vmess|✅|✅|
-|vless|✅|✅|
-|trojan|✅|✅|
-|hysteria|✅|✅|
-|hysteria2|✅|✅|
-|tuic|✅|✅|
-|wireguard|✅|✅|
-|ssh|❌|✅|
-|anytls|✅|✅|
-|sudoku|❌|✅|
+|http|✔️|✔️|
+|socks5|✔️|✔️|
+|ss|✔️|✔️|
+|ssr|✔️|✔️|
+|mieru|❌|✔️|
+|snell|❌|✔️|
+|vmess|✔️|✔️|
+|vless|✔️|✔️|
+|trojan|✔️|✔️|
+|hysteria|✔️|✔️|
+|hysteria2|✔️|✔️|
+|tuic|✔️|✔️|
+|wireguard|✔️|✔️|
+|ssh|❌|✔️|
+|anytls|✔️|✔️|
+|sudoku|❌|✔️|
 
 ## 远程转换
 
