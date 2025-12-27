@@ -43,7 +43,8 @@ https://arx.cc[/!<args>]/<from>
 | ua | 无 | 覆盖 User-Agent 请求头 |
 | filename | 无 | 覆盖文件名 |
 | ndl | 无 | 存在该参数则返回无 DNS 泄漏(No_DNS_Leak)配置 |
-| hide | 无 | 在 proxy-groups 中隐藏指定节点，在 proxies 中仍保留，和 dialer-proxy 配合以隐藏前置节点，使用正则表达式 |
+| filter | 无 | 筛选节点，见 [筛选语法](#筛选语法) |
+| hide | 无 | 在 proxy-groups 中隐藏指定节点，在 proxies 中仍保留，和 dialer-proxy 配合以隐藏前置节点，见 [筛选语法](#筛选语法) |
 | meta | 从 User-Agent 中判断 | 设置为 0 去除仅 Meta/mihomo 内核支持的节点/策略，以兼容原版 Clash，设置为 1 则强制包含 Meta/mihomo 功能 |
 
 `<from>`
@@ -64,6 +65,47 @@ https://arx.cc/https://example.com/subscribe?token=xxx
 ```
 https://arx.cc/!auto&ndl/https://example.com/subscribe?token=xxx
 ```
+
+### 筛选语法
+
+基本条件语法：`[[<字段>] <匹配运算符>] <正则表达式>`
+
+字段、运算符、正则表达式之间的空格会被忽略
+
+<字段>
+
+要匹配的节点字段，可使用 `.` 和 `[]` 表示字段路径，如
+
+- `name`（省略字段默认为 `name`）
+- `type`
+- `plugin-opts.tls`
+- `alpn[0]`
+- `$`（表示所有字段）
+
+若字段为对象或数组，则有任一子孙字段匹配即条件成立
+
+<匹配运算符>
+
+- `:` 表示部分匹配，且忽略大小写，对应否定运算符：`!:` 或 `!`
+- `=` 表示完整匹配，且区分大小写，对应否定运算符：`!=`
+
+省略字段和运算符默认为 `name:`
+
+可使用 `and`、`or`、`not` 和括号 `()` 组合多个条件
+
+例子
+
+- `CN`、`name:CN` 名称**包含** CN 的节点，**忽略**大小写
+- `=CN`、`name=CN` 名称**为** CN 的节点，**区分**大小写
+- `^CN$` 名称**为** CN 的节点，**忽略**大小写
+- `=.*CN.*` 名称**包含** CN 的节点，**区分**大小写
+- `not CN`、`not name:CN`、`!:CN`、`name!:CN` 名称**不**包含 CN 的节点，忽略大小写
+- `^(🇭🇰|🇸🇬)` 名称开头为 🇭🇰 或 🇸🇬 的节点
+- `type=ss` 类型为 ss 的节点
+- `ws-opts.headers.Host:^hk` WS Host 开头为 hk 的节点
+- `reality-opts:.*` 使用了 Reality 的节点
+- `alpn=h3` alpn 中包含 h3 的节点
+- `中转 and type=ss` 名称包含 “中转” 且类型为 ss 的节点
 
 ### Serverless / Edge 部署
 
@@ -140,7 +182,7 @@ http://127.0.0.1:8000/version
 用法
 
 ```sh
-deno run -A https://raw.githubusercontent.com/zsokami/cvt/main/scripts/cvt.ts [-o <path>] [<from>] [<to>] [-ua <ua>] [-ndl] [-hide <hide>] [-meta <0|1>]
+deno run -A https://raw.githubusercontent.com/zsokami/cvt/main/scripts/cvt.ts [-o <path>] [<from>] [<to>] [-ua <ua>] [-ndl] [-filter <filter>] [-hide <hide>] [-meta <0|1>]
 ```
 
 参数
@@ -155,7 +197,9 @@ deno run -A https://raw.githubusercontent.com/zsokami/cvt/main/scripts/cvt.ts [-
 
 - `-ndl` 无 DNS 泄漏
 
-- `-hide <hide>` 在 proxy-groups 中隐藏指定节点，在 proxies 中仍保留，和 dialer-proxy 配合以隐藏前置节点，使用正则表达式
+- `-filter <filter>` 筛选节点，见 [筛选语法](#筛选语法)
+
+- `-hide <hide>` 在 proxy-groups 中隐藏指定节点，在 proxies 中仍保留，和 dialer-proxy 配合以隐藏前置节点，见 [筛选语法](#筛选语法)
 
 - `-meta <0|1>` 设置为 0 去除仅 Meta/mihomo 内核支持的节点/策略，以兼容原版 Clash，设置为 1 则强制包含 Meta/mihomo 功能，默认从 User-Agent 中判断
 

@@ -32,6 +32,7 @@ async function main(req: Request) {
     {
       ua: args['ua'] || req.headers.get('user-agent') || undefined,
       ndl: 'ndl' in args,
+      filter: args['filter'],
       hide: args['hide'],
       meta: parseBool(args['meta']),
       proxy: args['proxy'],

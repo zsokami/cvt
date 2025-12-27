@@ -36,6 +36,7 @@ import type {
 import { createPure, parseYAML, pickNonEmptyString, pickNumber, pickTrue } from './utils.ts'
 import { requireOldClashSupport } from './proxy_utils.ts'
 import { RULES, scv, udp } from './consts.ts'
+import { Filter } from './filter.ts'
 
 const FROM_CLASH = createPure({
   http(o: unknown): HTTP {
@@ -789,14 +790,14 @@ export function toClash(
     // 保留 hidden
     return ['proxies:\n', ...proxies.map((x) => `- ${JSON.stringify(x)}\n`)].join('')
   }
-  const hideRe = hide && new RegExp(hide, 'iu')
+  const hideFilter = hide && new Filter(hide)
   const nonHiddenProxies = []
   for (const proxy of proxies) {
     if (proxy.hidden) {
       delete proxy.hidden
       continue
     }
-    if (hideRe && hideRe.test(proxy.name)) {
+    if (hideFilter && hideFilter.test(proxy)) {
       continue
     }
     nonHiddenProxies.push(proxy.name)
@@ -817,7 +818,7 @@ export function toClash(
             }\n`,
           ]
           : [],
-        ...counts[1] > counts[0] ? [`# 按名称排除了 ${counts[1] - counts[0]} 个节点\n`] : [],
+        ...counts[1] > counts[0] ? [`# 排除了 ${counts[1] - counts[0]} 个节点\n`] : [],
       ]
       : [],
     ...errors?.length

@@ -3,6 +3,7 @@ import { fromClash, toClash } from './clash.ts'
 import { decodeBase64Url, encodeBase64 } from './utils.ts'
 import { geoip } from './geoip.ts'
 import { Proxy } from './types.ts'
+import { Filter } from './filter.ts'
 
 import { RE_EMOJI, RE_EMOJI_CN, RE_EMOJI_INFO, RE_EMOJI_SINGLE, RE_EXCLUDE } from './consts.ts'
 
@@ -70,18 +71,21 @@ function to(
   return `订阅转换失败，不支持的目标格式：${target}`
 }
 
-function filter(nodes: Node[]): Node[] {
+function filter(nodes: Node[], predicate: (proxy: Proxy) => boolean): Node[] {
   const dfs = (node: Node): boolean => {
     if (node.included !== undefined) return node.included
     node.included = false
     const dialerIncluded = node.dialer ? dfs(node.dialer) : true
-    return node.included = dialerIncluded && !RE_EXCLUDE.test(node.proxy.name)
+    return node.included = dialerIncluded && predicate(node.proxy)
   }
   let i = 0
   for (const node of nodes) {
     if (dfs(node)) nodes[i++] = node
   }
   nodes.length = i
+  for (const node of nodes) {
+    delete node.included
+  }
   return nodes
 }
 
@@ -199,7 +203,14 @@ function renameDuplicates(nodes: Node[]): Node[] {
 export async function cvt(
   _from: string,
   _to: string = 'clash',
-  { ua, ndl, hide, meta, proxy }: { ua?: string; ndl?: boolean; hide?: string; meta?: boolean; proxy?: string } = {},
+  { ua, ndl, filter: filterExpr, hide, meta, proxy }: {
+    ua?: string
+    ndl?: boolean
+    filter?: string
+    hide?: string
+    meta?: boolean
+    proxy?: string
+  } = {},
 ): Promise<[string, [number, number, number], Headers | undefined]> {
   ua ||= 'ClashMetaForAndroid/2.11.18.Meta'
   const ua_lower = ua.toLowerCase()
@@ -293,11 +304,15 @@ export async function cvt(
   // console.timeEnd('from')
   const count_before_filter = nodes.length
   // console.time('filter')
-  nodes = filter(nodes)
+  nodes = filter(nodes, (proxy) => !RE_EXCLUDE.test(proxy.name))
   // console.timeEnd('filter')
   // console.time('handleEmoji')
   nodes = await handleAllEmoji(nodes)
   // console.timeEnd('handleEmoji')
+  if (filterExpr) {
+    const f = new Filter(filterExpr)
+    nodes = filter(nodes, (proxy) => f.test(proxy))
+  }
   // console.time('renameDuplicates')
   nodes = renameDuplicates(nodes)
   // console.timeEnd('renameDuplicates')
