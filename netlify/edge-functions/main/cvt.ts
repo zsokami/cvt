@@ -64,7 +64,7 @@ function to(
     }
   } catch (e) {
     if (e instanceof SyntaxError) {
-      return `订阅转换失败：${e.message}`
+      return `订阅转换失败：hide 语法错误：${e.message}`
     }
     throw e
   }
@@ -310,8 +310,17 @@ export async function cvt(
   nodes = await handleAllEmoji(nodes)
   // console.timeEnd('handleEmoji')
   if (filterExpr) {
-    const f = new Filter(filterExpr)
-    nodes = filter(nodes, (proxy) => f.test(proxy))
+    try {
+      const f = new Filter(filterExpr)
+      nodes = filter(nodes, (proxy) => f.test(proxy))
+    } catch (e) {
+      if (e instanceof SyntaxError) {
+        errors.push(`filter 语法错误：${e.message}`)
+        nodes = []
+      } else {
+        throw e
+      }
+    }
   }
   // console.time('renameDuplicates')
   nodes = renameDuplicates(nodes)
@@ -324,7 +333,7 @@ export async function cvt(
   const counts = [proxies.length, count_before_filter, total] as [number, number, number]
   const result: [string, [number, number, number], Headers | undefined] = [
     proxies.length === 0 && _from !== 'empty'
-      ? errors.length ? `订阅转换失败：\n${errors.join('\n')}` : ''
+      ? errors.length ? `订阅转换失败：${errors.length === 1 ? errors[0] : '\n' + errors.join('\n')}` : ''
       : to(proxies, _to, meta, ndl, hide, counts, count_unsupported, errors),
     counts,
     subinfo_headers.length === 1
