@@ -95,7 +95,7 @@ const FROM_URI = {
     const u = new URL(uri)
     let cipher: string, password: string
     if (u.username) {
-      ;[cipher, password] = splitLeft(decodeBase64Url(u.username), ':')
+      ;[cipher, password] = u.password ? [u.username, u.password] : splitLeft(decodeBase64Url(u.username), ':')
     } else {
       const [userinfo, host] = splitRight(decodeBase64Url(u.host), '@')
       u.host = host
