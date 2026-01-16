@@ -128,6 +128,7 @@ export interface KcpTunPlugin {
     autoexpire?: number
     scavengettl?: number
     mtu?: number
+    ratelimit?: number
     sndwnd?: number
     rcvwnd?: number
     datashard?: number
@@ -142,6 +143,7 @@ export interface KcpTunPlugin {
     sockbuf?: number
     smuxver?: number
     smuxbuf?: number
+    framesize?: number
     streambuf?: number
     keepalive?: number
   }
