@@ -35,7 +35,7 @@ import type {
 } from './types.ts'
 import { createPure, parseYAML, pickNonEmptyString, pickNumber, pickTrue } from './utils.ts'
 import { requireOldClashSupport } from './proxy_utils.ts'
-import { RULES, scv, udp } from './consts.ts'
+import { DEFAULT_CLIENT_FINGERPRINT, DEFAULT_GRPC_USER_AGENT, RULES, scv, udp } from './consts.ts'
 import { Filter } from './filter.ts'
 
 const FROM_CLASH = createPure({
@@ -131,7 +131,14 @@ const FROM_CLASH = createPure({
       ...networkOpts,
       ...(o.tls || 'network' in networkOpts && (networkOpts.network === 'grpc' || networkOpts.network === 'h2')) && {
         tls: true,
-        ...pickNonEmptyString(o, 'servername', 'fingerprint', 'certificate', 'private-key', 'client-fingerprint'),
+        ...pickNonEmptyString(
+          o,
+          'servername',
+          'fingerprint',
+          'certificate',
+          'private-key',
+          ['client-fingerprint', DEFAULT_CLIENT_FINGERPRINT],
+        ),
         ...Array.isArray(o.alpn) && { alpn: o.alpn as string[] },
         ...echFrom(o),
         ...realityFrom(o),
@@ -150,7 +157,14 @@ const FROM_CLASH = createPure({
       ...networkOpts,
       ...(o.tls || 'network' in networkOpts && (networkOpts.network === 'grpc' || networkOpts.network === 'h2')) && {
         tls: true,
-        ...pickNonEmptyString(o, 'servername', 'fingerprint', 'certificate', 'private-key', 'client-fingerprint'),
+        ...pickNonEmptyString(
+          o,
+          'servername',
+          'fingerprint',
+          'certificate',
+          'private-key',
+          ['client-fingerprint', DEFAULT_CLIENT_FINGERPRINT],
+        ),
         ...Array.isArray(o.alpn) && { alpn: o.alpn as string[] },
         ...echFrom(o),
         ...realityFrom(o),
@@ -170,7 +184,14 @@ const FROM_CLASH = createPure({
       ...baseFrom(o),
       password: String(o.password),
       ...networkOpts,
-      ...pickNonEmptyString(o, 'sni', 'fingerprint', 'certificate', 'private-key', 'client-fingerprint'),
+      ...pickNonEmptyString(
+        o,
+        'sni',
+        'fingerprint',
+        'certificate',
+        'private-key',
+        ['client-fingerprint', DEFAULT_CLIENT_FINGERPRINT],
+      ),
       ...Array.isArray(o.alpn) && { alpn: o.alpn as string[] },
       ...echFrom(o),
       ...realityFrom(o),
@@ -302,7 +323,14 @@ const FROM_CLASH = createPure({
     return {
       ...baseFrom(o),
       password: String(o.password),
-      ...pickNonEmptyString(o, 'sni', 'fingerprint', 'certificate', 'private-key', 'client-fingerprint'),
+      ...pickNonEmptyString(
+        o,
+        'sni',
+        'fingerprint',
+        'certificate',
+        'private-key',
+        ['client-fingerprint', DEFAULT_CLIENT_FINGERPRINT],
+      ),
       ...Array.isArray(o.alpn) && { alpn: o.alpn as string[] },
       ...echFrom(o),
       ...scv,
@@ -441,7 +469,7 @@ function pluginFrom(
       case 'shadow-tls':
         return {
           plugin,
-          ...pickNonEmptyString(o, 'client-fingerprint'),
+          ...pickNonEmptyString(o, ['client-fingerprint', DEFAULT_CLIENT_FINGERPRINT]),
           'plugin-opts': {
             host: String(opts.host),
             ...pickNonEmptyString(opts, 'password'),
@@ -454,7 +482,7 @@ function pluginFrom(
       case 'restls':
         return {
           plugin,
-          ...pickNonEmptyString(o, 'client-fingerprint'),
+          ...pickNonEmptyString(o, ['client-fingerprint', DEFAULT_CLIENT_FINGERPRINT]),
           'plugin-opts': {
             host: String(opts.host),
             password: String(opts.password),
@@ -533,15 +561,13 @@ function networkFrom(o: Record<string, unknown>): Option<WSNetwork | GRPCNetwork
       }
     }
     case 'grpc': {
-      const opts1 = o['grpc-opts'] as Record<string, unknown>
-      const opts2: Option<{ 'grpc-service-name': string }> = isRecord(opts1)
-        ? {
-          ...pickNonEmptyString(opts1, 'grpc-service-name'),
-        }
-        : {}
       return {
         network,
-        ...opts2['grpc-service-name'] && { 'grpc-opts': opts2 },
+        'grpc-opts': pickNonEmptyString(
+          o['grpc-opts'],
+          'grpc-service-name',
+          ['grpc-user-agent', DEFAULT_GRPC_USER_AGENT],
+        ),
       }
     }
     case 'http': {
@@ -815,7 +841,6 @@ export function toClash(
     'external-controller: :9090\n',
     'unified-delay: true\n',
     'tcp-concurrent: true\n',
-    'global-client-fingerprint: chrome\n',
     ...counts
       ? [
         ...counts[2] > counts[1]

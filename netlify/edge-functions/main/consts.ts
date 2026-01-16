@@ -4,6 +4,10 @@ export { RULES } from './rules.ts'
 export const udp = { udp: true } as const
 export const scv = { 'skip-cert-verify': true } as const
 
+export const DEFAULT_CLIENT_FINGERPRINT = 'chrome'
+export const DEFAULT_GRPC_USER_AGENT =
+  'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36'
+
 export const TYPES_OLD_CLASH_SUPPORTED = new Set([
   'http',
   'socks5',

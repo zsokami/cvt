@@ -40,7 +40,7 @@ import {
   urlDecodePlus,
 } from './utils.ts'
 import { requireOldClashSupport } from './proxy_utils.ts'
-import { scv, TYPES_OLD_CLASH_SUPPORTED, udp } from './consts.ts'
+import { DEFAULT_CLIENT_FINGERPRINT, DEFAULT_GRPC_USER_AGENT, scv, TYPES_OLD_CLASH_SUPPORTED, udp } from './consts.ts'
 
 const FROM_URI = {
   http(uri: string): HTTP {
@@ -137,7 +137,7 @@ const FROM_URI = {
         tls: true,
         ...sni && { servername: sni },
         ...alpn && { alpn: alpn.split(',') },
-        ...fp && { 'client-fingerprint': fp },
+        'client-fingerprint': fp || DEFAULT_CLIENT_FINGERPRINT,
         ...scv,
       }
       : {}
@@ -163,7 +163,7 @@ const FROM_URI = {
         tls: true,
         ...sni && { servername: sni },
         ...alpn && { alpn: alpn.split(',') },
-        ...fp && { 'client-fingerprint': fp },
+        'client-fingerprint': fp || DEFAULT_CLIENT_FINGERPRINT,
         ...realityFrom(pbk, sid),
         ...scv,
       }
@@ -194,7 +194,7 @@ const FROM_URI = {
       ...netOpts,
       ...sni && { sni },
       ...alpn && { alpn: alpn.split(',') },
-      ...fp && { 'client-fingerprint': fp },
+      'client-fingerprint': fp || DEFAULT_CLIENT_FINGERPRINT,
       ...realityFrom(pbk, sid),
       ...scv,
       ...udp,
@@ -598,6 +598,7 @@ function networkFrom(
         network,
         'grpc-opts': {
           'grpc-service-name': serviceName || path,
+          'grpc-user-agent': DEFAULT_GRPC_USER_AGENT,
         },
       }
     case 'http':

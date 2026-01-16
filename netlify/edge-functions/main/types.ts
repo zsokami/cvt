@@ -258,7 +258,8 @@ export interface WSNetwork {
 export interface GRPCNetwork {
   network: 'grpc'
   'grpc-opts'?: {
-    'grpc-service-name': string
+    'grpc-service-name'?: string
+    'grpc-user-agent'?: string
   }
 }
 

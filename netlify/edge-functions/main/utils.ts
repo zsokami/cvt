@@ -39,14 +39,17 @@ export function pickTruthy<T, K>(o: T, ...keys: K[]): Partial<Pick<T, K & keyof 
   return r
 }
 
-export function pickNonEmptyString<T, K>(o: T, ...keys: K[]): Partial<Record<K & keyof T, string>> {
+export function pickNonEmptyString<T, K>(o: T, ...keys: (K | [K, string])[]): Partial<Record<K & keyof T, string>> {
   const r = {}
   if (!o) return r
-  for (const k of keys) {
+  for (const x of keys) {
+    const [k, defaultValue] = Array.isArray(x) ? x : [x, undefined]
     // @ts-ignore:
     const v = o[k]
     // @ts-ignore:
     if (v != null && v !== '') r[k] = String(v)
+    // @ts-ignore:
+    else if (defaultValue) r[k] = defaultValue
   }
   return r
 }
