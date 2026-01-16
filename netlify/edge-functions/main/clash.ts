@@ -315,9 +315,14 @@ const FROM_CLASH = createPure({
     return {
       ...baseFrom(o),
       key: String(o.key),
-      ...pickNonEmptyString(o, 'aead-method', 'table-type'),
+      ...pickNonEmptyString(o, 'aead-method', 'table-type', 'custom-table'),
+      ...Array.isArray(o['custom-tables']) && { 'custom-tables': o['custom-tables'] as string[] },
       ...pickNumber(o, 'padding-min', 'padding-max'),
+      ...o['enable-pure-downlink'] === false && { 'enable-pure-downlink': false },
       ...pickTrue(o, 'http-mask'),
+      ...pickNonEmptyString(o, 'http-mask-mode'),
+      ...pickTrue(o, 'http-mask-tls'),
+      ...pickNonEmptyString(o, 'http-mask-host', 'path-root', 'http-mask-multiplex'),
     }
   },
 })

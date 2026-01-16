@@ -478,9 +478,17 @@ export interface Sudoku extends ProxyBase {
   key: string
   'aead-method'?: string
   'table-type'?: string
+  'custom-table'?: string
+  'custom-tables'?: string[]
   'padding-min'?: number
   'padding-max'?: number
+  'enable-pure-downlink'?: boolean
   'http-mask'?: boolean
+  'http-mask-mode'?: string
+  'http-mask-tls'?: boolean
+  'http-mask-host'?: string
+  'path-root'?: string
+  'http-mask-multiplex'?: string
 }
 
 export type Proxy =
