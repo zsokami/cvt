@@ -40,7 +40,13 @@ import {
   urlDecodePlus,
 } from './utils.ts'
 import { requireOldClashSupport } from './proxy_utils.ts'
-import { DEFAULT_CLIENT_FINGERPRINT, DEFAULT_GRPC_USER_AGENT, scv, TYPES_OLD_CLASH_SUPPORTED, udp } from './consts.ts'
+import {
+  DEFAULT_CLIENT_FINGERPRINT,
+  DEFAULT_GRPC_USER_AGENT,
+  DEFAULT_SCV,
+  DEFAULT_UDP,
+  TYPES_OLD_CLASH_SUPPORTED,
+} from './consts.ts'
 
 const FROM_URI = {
   http(uri: string): HTTP {
@@ -64,7 +70,7 @@ const FROM_URI = {
     return {
       ...baseFrom(u),
       ...(username || password) && { username, password },
-      ...u.protocol === 'https:' && { tls: true, ...scv },
+      ...u.protocol === 'https:' && { tls: true, 'skip-cert-verify': DEFAULT_SCV },
     }
   },
   socks5(uri: string): Socks5 {
@@ -87,8 +93,8 @@ const FROM_URI = {
     return {
       ...baseFrom(u),
       ...(username || password) && { username, password },
-      ...u.protocol === 'socks5+tls:' && { tls: true, ...scv },
-      ...udp,
+      ...u.protocol === 'socks5+tls:' && { tls: true, 'skip-cert-verify': DEFAULT_SCV },
+      udp: DEFAULT_UDP,
     }
   },
   ss(uri: string): SS {
@@ -106,7 +112,7 @@ const FROM_URI = {
       cipher,
       password,
       ...pluginFromSearchParam(u.searchParams.get('plugin')),
-      ...udp,
+      udp: DEFAULT_UDP,
     }
   },
   ssr(uri: string): SSR {
@@ -126,7 +132,7 @@ const FROM_URI = {
       protocol,
       ...obfsparam && { 'obfs-param': obfsparam },
       ...protoparam && { 'protocol-param': protoparam },
-      ...udp,
+      udp: DEFAULT_UDP,
     }
   },
   vmess(uri: string): VMess {
@@ -138,7 +144,7 @@ const FROM_URI = {
         ...sni && { servername: sni },
         ...alpn && { alpn: alpn.split(',') },
         'client-fingerprint': fp || DEFAULT_CLIENT_FINGERPRINT,
-        ...scv,
+        'skip-cert-verify': DEFAULT_SCV,
       }
       : {}
     return {
@@ -151,7 +157,8 @@ const FROM_URI = {
       cipher: scy || 'auto',
       ...networkFrom(j),
       ...tlsOpts,
-      ...udp,
+      udp: DEFAULT_UDP,
+      ...DEFAULT_UDP && { 'packet-encoding': 'xudp' },
     }
   },
   vless(uri: string): VLESS {
@@ -165,7 +172,7 @@ const FROM_URI = {
         ...alpn && { alpn: alpn.split(',') },
         'client-fingerprint': fp || DEFAULT_CLIENT_FINGERPRINT,
         ...realityFrom(pbk, sid),
-        ...scv,
+        'skip-cert-verify': DEFAULT_SCV,
       }
       : {}
     return {
@@ -175,7 +182,7 @@ const FROM_URI = {
       ...flow && { flow },
       ...encryption && encryption !== 'none' && { encryption },
       ...tlsOpts,
-      ...udp,
+      udp: DEFAULT_UDP,
     }
   },
   trojan(uri: string): Trojan {
@@ -196,8 +203,8 @@ const FROM_URI = {
       ...alpn && { alpn: alpn.split(',') },
       'client-fingerprint': fp || DEFAULT_CLIENT_FINGERPRINT,
       ...realityFrom(pbk, sid),
-      ...scv,
-      ...udp,
+      'skip-cert-verify': DEFAULT_SCV,
+      udp: DEFAULT_UDP,
     }
   },
   hysteria(uri: string): Hysteria {
@@ -213,7 +220,7 @@ const FROM_URI = {
       ...protocol && protocol !== 'udp' && { protocol },
       ...peer && { sni: peer },
       ...alpn && alpn !== 'hysteria' && { alpn: alpn.split(',') },
-      ...scv,
+      'skip-cert-verify': DEFAULT_SCV,
       ...fastopen === '1' && { 'fast-open': true },
     }
   },
@@ -226,7 +233,7 @@ const FROM_URI = {
       password: urlDecode(u.username),
       ...pickNonEmptyString(ps, 'up', 'down', 'obfs', 'obfs-password', 'sni'),
       ...alpn && { alpn: alpn.split(',') },
-      ...scv,
+      'skip-cert-verify': DEFAULT_SCV,
     }
   },
   tuic(uri: string): TUIC {
@@ -240,7 +247,7 @@ const FROM_URI = {
       ...alpn && { alpn: alpn.split(',') },
       ...sni && { sni },
       ...congestion_control && { 'congestion-controller': congestion_control },
-      ...scv,
+      'skip-cert-verify': DEFAULT_SCV,
     }
   },
   wireguard(uri: string): WireGuard {
@@ -255,7 +262,7 @@ const FROM_URI = {
       ...reserved && { reserved: reserved.split(',').map(Number) },
       ...ips,
       ...mtu && { mtu: +mtu },
-      ...udp,
+      udp: DEFAULT_UDP,
     }
   },
   anytls(uri: string): AnyTLS {
@@ -267,8 +274,8 @@ const FROM_URI = {
       password: urlDecode(u.username),
       ...pickNonEmptyString(ps, 'sni'),
       ...alpn && { alpn: alpn.split(',') },
-      ...scv,
-      ...udp,
+      'skip-cert-verify': DEFAULT_SCV,
+      udp: DEFAULT_UDP,
     }
   },
 }
@@ -514,7 +521,7 @@ function pluginFromSearchParam(p: string | null): Option<ObfsPlugin | V2rayPlugi
           ...pickNonEmptyString(opts, 'mode', 'host', 'path'),
           ...'tls' in opts && {
             tls: true,
-            ...scv,
+            'skip-cert-verify': DEFAULT_SCV,
           },
           ...!('mux' in opts) && { mux: false },
         },
@@ -526,7 +533,7 @@ function pluginFromSearchParam(p: string | null): Option<ObfsPlugin | V2rayPlugi
           ...pickNonEmptyString(opts, 'mode', 'host', 'path'),
           ...'tls' in opts && {
             tls: true,
-            ...scv,
+            'skip-cert-verify': DEFAULT_SCV,
           },
           ...!('mux' in opts) && { mux: false },
         },
@@ -539,7 +546,7 @@ function pluginFromSearchParam(p: string | null): Option<ObfsPlugin | V2rayPlugi
           ...pickNonEmptyString(opts, 'password'),
           ...pickNumber(opts, 'version'),
           ...opts.alpn && { alpn: opts.alpn.split(',') },
-          ...scv,
+          'skip-cert-verify': DEFAULT_SCV,
         },
       }
   }

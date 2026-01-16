@@ -35,7 +35,7 @@ import type {
 } from './types.ts'
 import { createPure, parseYAML, pickNonEmptyString, pickNumber, pickTrue } from './utils.ts'
 import { requireOldClashSupport } from './proxy_utils.ts'
-import { DEFAULT_CLIENT_FINGERPRINT, DEFAULT_GRPC_USER_AGENT, RULES, scv, udp } from './consts.ts'
+import { DEFAULT_CLIENT_FINGERPRINT, DEFAULT_GRPC_USER_AGENT, DEFAULT_SCV, DEFAULT_UDP, RULES } from './consts.ts'
 import { Filter } from './filter.ts'
 
 const FROM_CLASH = createPure({
@@ -47,7 +47,7 @@ const FROM_CLASH = createPure({
       ...!!o.tls && {
         tls: true,
         ...pickNonEmptyString(o, 'sni', 'fingerprint', 'certificate', 'private-key'),
-        ...scv,
+        ...scvFrom(o),
       },
       ...isRecord(o.headers) && { headers: o.headers as Record<string, string> },
     }
@@ -60,9 +60,9 @@ const FROM_CLASH = createPure({
       ...!!o.tls && {
         tls: true,
         ...pickNonEmptyString(o, 'fingerprint', 'certificate', 'private-key'),
-        ...scv,
+        ...scvFrom(o),
       },
-      ...udp,
+      ...udpFrom(o),
     }
   },
   ss(o: unknown): SS {
@@ -82,7 +82,7 @@ const FROM_CLASH = createPure({
       ...pluginFrom(o),
       ...pickTrue(o, 'udp-over-tcp'),
       ...pickNumber(o, 'udp-over-tcp-version'),
-      ...udp,
+      ...udpFrom(o),
     }
   },
   ssr(o: unknown): SSR {
@@ -94,7 +94,7 @@ const FROM_CLASH = createPure({
       obfs: String(o.obfs),
       protocol: String(o.protocol),
       ...pickNonEmptyString(o, 'obfs-param', 'protocol-param'),
-      ...udp,
+      ...udpFrom(o),
     }
   },
   mieru(o: unknown): Mieru {
@@ -105,7 +105,7 @@ const FROM_CLASH = createPure({
       password: String(o.password),
       transport: String(o.transport),
       ...pickNonEmptyString(o, 'multiplexing', 'handshake-mode'),
-      ...udp,
+      ...udpFrom(o),
     }
   },
   snell(o: unknown): Snell {
@@ -115,18 +115,18 @@ const FROM_CLASH = createPure({
       psk: String(o.psk),
       ...pickNumber(o, 'version'),
       ...isRecord(o['obfs-opts']) && { 'obfs-opts': o['obfs-opts'] as Record<string, string> },
-      ...udp,
+      ...udpFrom(o),
     }
   },
   vmess(o: unknown): VMess {
     checkType(o, 'vmess')
     const networkOpts = networkFrom(o)
+    const udp = udpFrom(o)
     return {
       ...baseFrom(o),
       uuid: String(o.uuid),
       alterId: Number(o.alterId),
       cipher: String(o.cipher),
-      ...pickNonEmptyString(o, 'packet-encoding'),
       ...pickTrue(o, 'global-padding', 'authenticated-length'),
       ...networkOpts,
       ...(o.tls || 'network' in networkOpts && (networkOpts.network === 'grpc' || networkOpts.network === 'h2')) && {
@@ -142,18 +142,20 @@ const FROM_CLASH = createPure({
         ...Array.isArray(o.alpn) && { alpn: o.alpn as string[] },
         ...echFrom(o),
         ...realityFrom(o),
-        ...scv,
+        ...scvFrom(o),
       },
       ...udp,
+      ...udp.udp && pickNonEmptyString(o, ['packet-encoding', 'xudp']),
     }
   },
   vless(o: unknown): VLESS {
     checkType(o, 'vless')
     const networkOpts = networkFrom(o)
+    const udp = udpFrom(o)
     return {
       ...baseFrom(o),
       uuid: String(o.uuid),
-      ...pickNonEmptyString(o, 'flow', 'packet-encoding', 'encryption'),
+      ...pickNonEmptyString(o, 'flow', 'encryption'),
       ...networkOpts,
       ...(o.tls || 'network' in networkOpts && (networkOpts.network === 'grpc' || networkOpts.network === 'h2')) && {
         tls: true,
@@ -168,9 +170,10 @@ const FROM_CLASH = createPure({
         ...Array.isArray(o.alpn) && { alpn: o.alpn as string[] },
         ...echFrom(o),
         ...realityFrom(o),
-        ...scv,
+        ...scvFrom(o),
       },
       ...udp,
+      ...udp.udp && pickNonEmptyString(o, 'packet-encoding'),
     }
   },
   trojan(o: unknown): Trojan {
@@ -195,7 +198,7 @@ const FROM_CLASH = createPure({
       ...Array.isArray(o.alpn) && { alpn: o.alpn as string[] },
       ...echFrom(o),
       ...realityFrom(o),
-      ...scv,
+      ...scvFrom(o),
       ...!!(ssOpts?.enabled && ssOpts.password) && {
         'ss-opts': {
           enabled: true,
@@ -203,7 +206,7 @@ const FROM_CLASH = createPure({
           password: String(ssOpts.password),
         },
       },
-      ...udp,
+      ...udpFrom(o),
     }
   },
   hysteria(o: unknown): Hysteria {
@@ -218,7 +221,7 @@ const FROM_CLASH = createPure({
       ...pickNonEmptyString(o, 'obfs', 'protocol', 'sni', 'fingerprint', 'certificate', 'private-key'),
       ...Array.isArray(o.alpn) && { alpn: o.alpn as string[] },
       ...echFrom(o),
-      ...scv,
+      ...scvFrom(o),
       ...pickNumber(o, 'recv-window-conn', 'recv-window'),
       ...pickTrue(o, 'disable-mtu-discovery', 'fast-open'),
     }
@@ -242,7 +245,7 @@ const FROM_CLASH = createPure({
       ),
       ...Array.isArray(o.alpn) && { alpn: o.alpn as string[] },
       ...echFrom(o),
-      ...scv,
+      ...scvFrom(o),
       ...pickNumber(
         o,
         'cwnd',
@@ -273,7 +276,7 @@ const FROM_CLASH = createPure({
       ),
       ...Array.isArray(o.alpn) && { alpn: o.alpn as string[] },
       ...echFrom(o),
-      ...scv,
+      ...scvFrom(o),
       ...pickNumber(
         o,
         'max-udp-relay-packet-size',
@@ -304,7 +307,7 @@ const FROM_CLASH = createPure({
         },
       ...pickTrue(o, 'remote-dns-resolve'),
       ...Array.isArray(o.dns) && o.dns.length && { dns: o.dns as string[] },
-      ...udp,
+      ...udpFrom(o),
     }
   },
   ssh(o: unknown): SSH {
@@ -333,8 +336,8 @@ const FROM_CLASH = createPure({
       ),
       ...Array.isArray(o.alpn) && { alpn: o.alpn as string[] },
       ...echFrom(o),
-      ...scv,
-      ...udp,
+      ...scvFrom(o),
+      ...udpFrom(o),
       ...pickNumber(o, 'idle-session-check-interval', 'idle-session-timeout', 'min-idle-session'),
     }
   },
@@ -418,6 +421,16 @@ function baseFromForPortRange<T extends Proxy['type']>(
   }
 }
 
+function udpFrom(o: { [key: string]: unknown }) {
+  const { udp } = o
+  return { udp: typeof udp === 'boolean' ? udp : DEFAULT_UDP }
+}
+
+function scvFrom(o: { [key: string]: unknown }) {
+  const scv = o['skip-cert-verify']
+  return { 'skip-cert-verify': typeof scv === 'boolean' ? scv : DEFAULT_SCV }
+}
+
 function pluginFrom(
   o: { type: 'ss'; [key: string]: unknown },
 ): Option<ObfsPlugin | V2rayPlugin | GostPlugin | ShadowTlsPlugin | RestlsPlugin | KcpTunPlugin> {
@@ -443,7 +456,7 @@ function pluginFrom(
               tls: true,
               ...echFrom(opts),
               ...pickNonEmptyString(opts, 'fingerprint', 'certificate', 'private-key'),
-              ...scv,
+              ...scvFrom(opts),
             },
             ...isRecord(opts.headers) && { headers: opts.headers as Record<string, string> },
             ...opts.mux === false && { mux: false },
@@ -460,7 +473,7 @@ function pluginFrom(
               tls: true,
               ...echFrom(opts),
               ...pickNonEmptyString(opts, 'fingerprint', 'certificate', 'private-key'),
-              ...scv,
+              ...scvFrom(opts),
             },
             ...isRecord(opts.headers) && { headers: opts.headers as Record<string, string> },
             ...opts.mux === false && { mux: false },
@@ -476,7 +489,7 @@ function pluginFrom(
             ...pickNumber(opts, 'version'),
             ...pickNonEmptyString(opts, 'fingerprint', 'certificate', 'private-key'),
             ...Array.isArray(opts.alpn) && { alpn: opts.alpn as string[] },
-            ...scv,
+            ...scvFrom(opts),
           },
         }
       case 'restls':
