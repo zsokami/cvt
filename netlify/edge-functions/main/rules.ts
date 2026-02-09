@@ -1871,6 +1871,8 @@ export const RULES = `rules:
 - DOMAIN-SUFFIX,makersuite.google.com,🤖 ‍AI
 - DOMAIN-SUFFIX,meta.ai,🤖 ‍AI
 - DOMAIN-SUFFIX,mistral.ai,🤖 ‍AI
+- DOMAIN-SUFFIX,notebooklm.google,🤖 ‍AI
+- DOMAIN-SUFFIX,notebooklm.google.com,🤖 ‍AI
 - DOMAIN-SUFFIX,oaistatic.com,🤖 ‍AI
 - DOMAIN-SUFFIX,oaiusercontent.com,🤖 ‍AI
 - DOMAIN-SUFFIX,openai.com,🤖 ‍AI
