@@ -9,6 +9,7 @@ import type {
   Hysteria,
   Hysteria2,
   KcpTunPlugin,
+  Masque,
   Mieru,
   ObfsPlugin,
   Option,
@@ -356,6 +357,19 @@ const FROM_CLASH = createPure({
       ...pickNonEmptyString(o, 'http-mask-host', 'path-root', 'http-mask-multiplex'),
     }
   },
+  masque(o: unknown): Masque {
+    checkType(o, 'masque')
+    return {
+      ...baseFrom(o),
+      'private-key': String(o['private-key']),
+      'public-key': String(o['public-key']),
+      ...pickNonEmptyString(o, 'ip', 'ipv6', 'uri', 'sni', 'congestion-controller'),
+      ...pickNumber(o, 'cwnd', 'mtu'),
+      ...pickTrue(o, 'remote-dns-resolve'),
+      ...Array.isArray(o.dns) && o.dns.length && { dns: o.dns as string[] },
+      ...udpFrom(o),
+    }
+  },
 })
 
 function checkType<T extends Proxy['type']>(o: unknown, type: T): asserts o is { type: T; [key: string]: unknown } {
@@ -637,7 +651,7 @@ function echFrom(o: Record<string, unknown>): Option<ECH> {
     ? {
       'ech-opts': {
         enable: true,
-        ...pickNonEmptyString(opts, 'config'),
+        ...pickNonEmptyString(opts, 'config', 'query-server-name'),
       },
     }
     : {}

@@ -32,6 +32,7 @@ import {
   decodeBase64Url,
   encodeBase64,
   encodeBase64Url,
+  parseBool,
   pickNonEmptyString,
   pickNumber,
   splitLeft,
@@ -164,13 +165,14 @@ const FROM_URI = {
   vless(uri: string): VLESS {
     const u = new URL(uri)
     const ps = Object.fromEntries(u.searchParams)
-    const { flow, security, sni, alpn, fp, pbk, sid, type, encryption } = ps
+    const { flow, security, sni, alpn, fp, pcs, pbk, sid, type, encryption } = ps
     const tlsOpts = security === 'tls' || security === 'reality' || type === 'grpc' || type === 'h2'
       ? {
         tls: true,
         ...sni && { servername: sni },
         ...alpn && { alpn: alpn.split(',') },
         'client-fingerprint': fp || DEFAULT_CLIENT_FINGERPRINT,
+        ...pcs && { fingerprint: pcs },
         ...realityFrom(pbk, sid),
         'skip-cert-verify': DEFAULT_SCV,
       }
@@ -194,7 +196,7 @@ const FROM_URI = {
       throw Error(`Unsupported network: ${netOpts.network}`)
     }
 
-    const { sni, alpn, fp, pbk, sid } = ps
+    const { sni, alpn, fp, pcs, pbk, sid, allowInsecure } = ps
     return {
       ...baseFrom(u),
       password: urlDecode(u.username),
@@ -202,15 +204,16 @@ const FROM_URI = {
       ...sni && { sni },
       ...alpn && { alpn: alpn.split(',') },
       'client-fingerprint': fp || DEFAULT_CLIENT_FINGERPRINT,
+      ...pcs && { fingerprint: pcs },
       ...realityFrom(pbk, sid),
-      'skip-cert-verify': DEFAULT_SCV,
+      'skip-cert-verify': parseBool(allowInsecure) ?? DEFAULT_SCV,
       udp: DEFAULT_UDP,
     }
   },
   hysteria(uri: string): Hysteria {
     const u = new URL(uri)
     const ps = Object.fromEntries(u.searchParams)
-    const { protocol, auth, auth_str, peer, upmbps, downmbps, alpn, obfsParam, fastopen } = ps
+    const { protocol, auth, auth_str, peer, upmbps, downmbps, alpn, obfsParam, fastopen, insecure } = ps
     return {
       ...baseFrom(u),
       ...(auth || auth_str) && { 'auth-str': auth || auth_str },
@@ -220,20 +223,21 @@ const FROM_URI = {
       ...protocol && protocol !== 'udp' && { protocol },
       ...peer && { sni: peer },
       ...alpn && alpn !== 'hysteria' && { alpn: alpn.split(',') },
-      'skip-cert-verify': DEFAULT_SCV,
+      'skip-cert-verify': parseBool(insecure) ?? DEFAULT_SCV,
       ...fastopen === '1' && { 'fast-open': true },
     }
   },
   hysteria2(uri: string): Hysteria2 {
     const u = new URL(uri)
     const ps = Object.fromEntries(u.searchParams)
-    const { alpn } = ps
+    const { alpn, pinSHA256, insecure } = ps
     return {
       ...baseFromForPorts(u),
       password: urlDecode(u.username),
       ...pickNonEmptyString(ps, 'up', 'down', 'obfs', 'obfs-password', 'sni'),
       ...alpn && { alpn: alpn.split(',') },
-      'skip-cert-verify': DEFAULT_SCV,
+      ...pinSHA256 && { fingerprint: pinSHA256 },
+      'skip-cert-verify': parseBool(insecure) ?? DEFAULT_SCV,
     }
   },
   tuic(uri: string): TUIC {
@@ -268,13 +272,15 @@ const FROM_URI = {
   anytls(uri: string): AnyTLS {
     const u = new URL(uri)
     const ps = Object.fromEntries(u.searchParams)
-    const { alpn } = ps
+    const { alpn, hpkp, insecure } = ps
     return {
       ...baseFrom(u),
       password: urlDecode(u.username),
       ...pickNonEmptyString(ps, 'sni'),
       ...alpn && { alpn: alpn.split(',') },
-      'skip-cert-verify': DEFAULT_SCV,
+      'client-fingerprint': DEFAULT_CLIENT_FINGERPRINT,
+      ...hpkp && { fingerprint: hpkp },
+      'skip-cert-verify': parseBool(insecure) ?? DEFAULT_SCV,
       udp: DEFAULT_UDP,
     }
   },
@@ -359,7 +365,7 @@ const TO_URI = {
   },
   vless(proxy: Proxy): string {
     checkType(proxy, 'vless')
-    const { uuid, flow, encryption, tls, servername, alpn, 'client-fingerprint': fp } = proxy
+    const { uuid, flow, encryption, tls, servername, alpn, 'client-fingerprint': fp, fingerprint } = proxy
     const u = baseTo(proxy)
     u.username = uuid
     u.search = new URLSearchParams({
@@ -371,13 +377,14 @@ const TO_URI = {
         ...servername && { sni: servername },
         ...alpn?.length && { alpn: alpn.join(',') },
         ...fp && { fp },
+        ...fingerprint && { pcs: fingerprint },
       },
     }).toString()
     return u.href
   },
   trojan(proxy: Proxy): string {
     checkType(proxy, 'trojan')
-    const { password, sni, alpn, 'client-fingerprint': fp } = proxy
+    const { password, sni, alpn, 'client-fingerprint': fp, fingerprint, 'skip-cert-verify': scv } = proxy
     const u = baseTo(proxy)
     u.username = password
     u.search = new URLSearchParams({
@@ -386,12 +393,15 @@ const TO_URI = {
       ...sni && { sni },
       ...alpn?.length && { alpn: alpn.join(',') },
       ...fp && { fp },
+      ...fingerprint && { pcs: fingerprint },
+      allowInsecure: scv ? '1' : '0',
     }).toString()
     return u.href
   },
   hysteria(proxy: Proxy): string {
     checkType(proxy, 'hysteria')
-    const { 'auth-str': auth, up, down, obfs, protocol, sni, alpn, 'fast-open': fastopen } = proxy
+    const { 'auth-str': auth, up, down, obfs, protocol, sni, alpn, 'skip-cert-verify': scv, 'fast-open': fastopen } =
+      proxy
     const u = baseTo(proxy)
     u.search = new URLSearchParams({
       ...protocol && { protocol },
@@ -400,6 +410,7 @@ const TO_URI = {
       upmbps: toMbps(up),
       downmbps: toMbps(down),
       ...alpn?.length && { alpn: alpn.join(',') },
+      insecure: scv ? '1' : '0',
       ...obfs && { obfs: 'xplus', obfsParam: obfs },
       ...fastopen && { fastopen: '1' },
     }).toString()
@@ -407,7 +418,7 @@ const TO_URI = {
   },
   hysteria2(proxy: Proxy): string {
     checkType(proxy, 'hysteria2')
-    const { ports, password, up, down, alpn } = proxy
+    const { ports, password, up, down, alpn, fingerprint, 'skip-cert-verify': scv } = proxy
     const u = baseTo(proxy)
     u.username = password
     u.search = new URLSearchParams({
@@ -416,6 +427,8 @@ const TO_URI = {
       ...down && { down: toMbps(down) },
       ...pickNonEmptyString(proxy, 'obfs', 'obfs-password', 'sni'),
       ...alpn?.length && { alpn: alpn.join(',') },
+      ...fingerprint && { pinSHA256: fingerprint },
+      insecure: scv ? '1' : '0',
     }).toString()
     return u.href
   },
@@ -447,12 +460,14 @@ const TO_URI = {
   },
   anytls(proxy: Proxy): string {
     checkType(proxy, 'anytls')
-    const { password, alpn } = proxy
+    const { password, alpn, fingerprint, 'skip-cert-verify': scv } = proxy
     const u = baseTo(proxy)
     u.username = password
     u.search = new URLSearchParams({
       ...pickNonEmptyString(proxy, 'sni'),
       ...alpn?.length && { alpn: alpn.join(',') },
+      ...fingerprint && { hpkp: fingerprint },
+      insecure: scv ? '1' : '0',
     }).toString()
     return u.href
   },
@@ -541,6 +556,7 @@ function pluginFromSearchParam(p: string | null): Option<ObfsPlugin | V2rayPlugi
     case 'shadow-tls':
       return {
         plugin,
+        'client-fingerprint': DEFAULT_CLIENT_FINGERPRINT,
         'plugin-opts': {
           host: opts.host || '',
           ...pickNonEmptyString(opts, 'password'),

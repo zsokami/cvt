@@ -292,6 +292,7 @@ export interface ECH {
   'ech-opts': {
     enable?: boolean
     config?: string
+    'query-server-name'?: string
   }
 }
 
@@ -494,6 +495,23 @@ export interface Sudoku extends ProxyBase {
   'http-mask-multiplex'?: string
 }
 
+export interface Masque extends ProxyBase {
+  type: 'masque'
+  port: number
+  'private-key': string
+  'public-key': string
+  ip?: string
+  ipv6?: string
+  uri?: string
+  sni?: string
+  'congestion-controller'?: string
+  cwnd?: number
+  mtu?: number
+  'remote-dns-resolve'?: boolean
+  dns?: string[]
+  udp?: boolean
+}
+
 export type Proxy =
   | HTTP
   | Socks5
@@ -511,3 +529,4 @@ export type Proxy =
   | SSH
   | AnyTLS
   | Sudoku
+  | Masque
