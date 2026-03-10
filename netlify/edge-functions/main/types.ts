@@ -172,6 +172,7 @@ interface MieruBase extends ProxyBase {
   transport: string
   multiplexing?: string
   'handshake-mode'?: string
+  'traffic-pattern'?: string
   udp?: boolean
 }
 
@@ -493,6 +494,14 @@ export interface Sudoku extends ProxyBase {
   'http-mask-host'?: string
   'path-root'?: string
   'http-mask-multiplex'?: string
+  httpmask?: {
+    disable?: boolean
+    mode?: string
+    tls?: boolean
+    host?: string
+    'path-root'?: string
+    multiplex?: string
+  }
 }
 
 export interface Masque extends ProxyBase {
@@ -512,6 +521,27 @@ export interface Masque extends ProxyBase {
   udp?: boolean
 }
 
+export interface TrustTunnelBase extends ProxyBase {
+  type: 'trusttunnel'
+  port: number
+  username?: string
+  password?: string
+  sni?: string
+  fingerprint?: string
+  certificate?: string
+  'private-key'?: string
+  'client-fingerprint'?: string
+  alpn?: string[]
+  'skip-cert-verify'?: boolean
+  udp?: boolean
+  'health-check'?: boolean
+  quic?: boolean
+  'congestion-controller'?: string
+  cwnd?: number
+}
+
+export type TrustTunnel = TrustTunnelBase & Option<ECH>
+
 export type Proxy =
   | HTTP
   | Socks5
@@ -530,3 +560,4 @@ export type Proxy =
   | AnyTLS
   | Sudoku
   | Masque
+  | TrustTunnel

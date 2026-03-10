@@ -27,6 +27,7 @@ import type {
   SSR,
   Sudoku,
   Trojan,
+  TrustTunnel,
   TUIC,
   V2rayPlugin,
   VLESS,
@@ -105,7 +106,7 @@ const FROM_CLASH = createPure({
       username: String(o.username),
       password: String(o.password),
       transport: String(o.transport),
-      ...pickNonEmptyString(o, 'multiplexing', 'handshake-mode'),
+      ...pickNonEmptyString(o, 'multiplexing', 'handshake-mode', 'traffic-pattern'),
       ...udpFrom(o),
     }
   },
@@ -355,6 +356,14 @@ const FROM_CLASH = createPure({
       ...pickNonEmptyString(o, 'http-mask-mode'),
       ...pickTrue(o, 'http-mask-tls'),
       ...pickNonEmptyString(o, 'http-mask-host', 'path-root', 'http-mask-multiplex'),
+      ...isRecord(o.httpmask) && {
+        httpmask: {
+          ...pickTrue(o.httpmask, 'disable'),
+          ...pickNonEmptyString(o.httpmask, 'mode'),
+          ...pickTrue(o.httpmask, 'tls'),
+          ...pickNonEmptyString(o.httpmask, 'host', 'path-root', 'multiplex'),
+        },
+      },
     }
   },
   masque(o: unknown): Masque {
@@ -368,6 +377,29 @@ const FROM_CLASH = createPure({
       ...pickTrue(o, 'remote-dns-resolve'),
       ...Array.isArray(o.dns) && o.dns.length && { dns: o.dns as string[] },
       ...udpFrom(o),
+    }
+  },
+  trusttunnel(o: unknown): TrustTunnel {
+    checkType(o, 'trusttunnel')
+    return {
+      ...baseFrom(o),
+      ...pickNonEmptyString(
+        o,
+        'username',
+        'password',
+        'sni',
+        'fingerprint',
+        'certificate',
+        'private-key',
+        ['client-fingerprint', DEFAULT_CLIENT_FINGERPRINT],
+      ),
+      ...Array.isArray(o.alpn) && { alpn: o.alpn as string[] },
+      ...echFrom(o),
+      ...scvFrom(o),
+      ...udpFrom(o),
+      ...pickTrue(o, 'health-check', 'quic'),
+      ...pickNonEmptyString(o, 'congestion-controller'),
+      ...pickNumber(o, 'cwnd'),
     }
   },
 })
