@@ -1,15 +1,15 @@
 import type {
+  AnyNetwork,
   AnyTLS,
   GostPlugin,
-  GRPCNetwork,
-  H2Network,
   HTTP,
-  HTTPNetwork,
   Hysteria,
   Hysteria2,
   KcpTunPlugin,
+  Mieru,
   ObfsPlugin,
   Option,
+  PortOrPortRange,
   PortOrPorts,
   Proxy,
   ProxyBase,
@@ -25,7 +25,8 @@ import type {
   VLESS,
   VMess,
   WireGuard,
-  WSNetwork,
+  XHTTPDownloadSettings,
+  XHTTPNetwork,
 } from './types.ts'
 import {
   createPure,
@@ -136,6 +137,19 @@ const FROM_URI = {
       udp: DEFAULT_UDP,
     }
   },
+  mieru(uri: string): Mieru {
+    const u = new URL(uri)
+    const ps = Object.fromEntries(u.searchParams)
+    const { protocol } = ps
+    return {
+      ...baseFromForPortRange(u),
+      username: urlDecode(u.username),
+      password: urlDecode(u.password),
+      transport: protocol,
+      ...pickNonEmptyString(ps, 'multiplexing', 'handshake-mode', 'traffic-pattern'),
+      udp: DEFAULT_UDP,
+    }
+  },
   vmess(uri: string): VMess {
     const j = JSON.parse(decodeBase64Url(splitLeft(uri, '://')[1]))
     const { ps, add, port, id, aid, scy, net, tls, sni, alpn, fp } = j
@@ -156,7 +170,7 @@ const FROM_URI = {
       uuid: id,
       alterId: +aid || 0,
       cipher: scy || 'auto',
-      ...networkFrom(j),
+      ...networkFrom(j, 'ws', 'grpc', 'http', 'h2'),
       ...tlsOpts,
       udp: DEFAULT_UDP,
       ...DEFAULT_UDP && { 'packet-encoding': 'xudp' },
@@ -190,11 +204,7 @@ const FROM_URI = {
   trojan(uri: string): Trojan {
     const u = new URL(uri)
     const ps = Object.fromEntries(u.searchParams)
-    const netOpts = networkFrom(ps.ws === '1' ? { type: 'ws', host: ps.host, path: ps.wspath } : ps)
-
-    if ('network' in netOpts && netOpts.network !== 'ws' && netOpts.network !== 'grpc') {
-      throw Error(`Unsupported network: ${netOpts.network}`)
-    }
+    const netOpts = networkFrom(ps.ws === '1' ? { type: 'ws', host: ps.host, path: ps.wspath } : ps, 'ws', 'grpc')
 
     const { sni, alpn, fp, pcs, pbk, sid, allowInsecure } = ps
     return {
@@ -342,6 +352,20 @@ const TO_URI = {
       .map(([k, v]) => `${k}=${encodeBase64Url(v!)}`)
       .join('&')
     return `${type}://` + encodeBase64Url(`${ssr}/?${params}`)
+  },
+  mieru(proxy: Proxy): string {
+    checkType(proxy, 'mieru')
+    const { name, server, username, password, transport } = proxy
+    const u = new URL(`mierus://${server.includes(':') ? `[${server}]` : server}`)
+    u.hash = name.replaceAll('%', '%25')
+    u.username = username
+    u.password = password
+    u.search = new URLSearchParams({
+      port: 'port' in proxy ? String(proxy.port) : proxy['port-range'],
+      protocol: transport,
+      ...pickNonEmptyString(proxy, 'multiplexing', 'handshake-mode', 'traffic-pattern'),
+    }).toString()
+    return u.href
   },
   vmess(proxy: Proxy): string {
     checkType(proxy, 'vmess')
@@ -505,6 +529,18 @@ function baseFromForPorts<T extends Proxy['type']>(u: URL): ProxyBase & PortOrPo
   }
 }
 
+function baseFromForPortRange<T extends Proxy['type']>(u: URL): ProxyBase & PortOrPortRange & { type: T } {
+  const { protocol, hostname, hash } = u
+  const port = u.searchParams.get('port') ?? ''
+  return {
+    name: u.searchParams.get('remarks') || hash && urlDecodePlus(hash.substring(1)) || u.searchParams.get('profile') ||
+      `${hostname}:${port}`,
+    server: hostname[0] === '[' ? hostname.slice(1, -1) : hostname,
+    ...port.includes('-') ? { 'port-range': port } : { port: +port },
+    type: TYPE_MAP[protocol.slice(0, -1)] as T,
+  }
+}
+
 function baseTo(p: ProxyBase & Pick<Proxy, 'type'> & { port?: number }): URL {
   const { name, type, server, port } = p
   const u = new URL(`${type}://${server.includes(':') ? `[${server}]` : server}`)
@@ -596,9 +632,16 @@ function pluginToSearchParam(
   throw new Error(`Unsupported plugin: ${plugin}`)
 }
 
-function networkFrom(
-  { net, type, headerType, host, path, serviceName }: Record<string, string>,
-): Option<WSNetwork | GRPCNetwork | HTTPNetwork | H2Network> {
+type NetworkName = AnyNetwork['network']
+type NetworkResult<S extends readonly NetworkName[]> = Option<
+  S extends readonly [] ? AnyNetwork : Extract<AnyNetwork, { network: S[number] }>
+>
+
+function networkFrom<S extends readonly NetworkName[]>(
+  ps: Record<string, string>,
+  ...supported: S
+): NetworkResult<S> {
+  let { net, type, headerType, host, path, serviceName } = ps
   const network = (headerType || type) === 'http' ? 'http' : (net || type)
   if (!network) return {}
   const hosts = host ? host.split(',') : []
@@ -607,7 +650,8 @@ function networkFrom(
     case 'tcp':
       return {}
     case 'ws':
-    case 'httpupgrade':
+    case 'httpupgrade': {
+      if (supported.length !== 0 && !supported.includes('ws')) return {}
       return {
         network: 'ws',
         'ws-opts': {
@@ -615,37 +659,88 @@ function networkFrom(
           ...hosts.length && { headers: { Host: hosts[0] } },
           ...network === 'httpupgrade' && { 'v2ray-http-upgrade': true },
         },
-      }
-    case 'grpc':
+      } as NetworkResult<S>
+    }
+    case 'grpc': {
+      if (supported.length !== 0 && !supported.includes('grpc')) return {}
       return {
         network,
         'grpc-opts': {
           'grpc-service-name': serviceName || path,
           'grpc-user-agent': DEFAULT_GRPC_USER_AGENT,
         },
-      }
-    case 'http':
+      } as NetworkResult<S>
+    }
+    case 'http': {
+      if (supported.length !== 0 && !supported.includes('http')) return {}
       return {
         network,
         'http-opts': {
           path: [path],
           ...hosts.length && { headers: { Host: hosts } },
         },
-      }
-    case 'h2':
+      } as NetworkResult<S>
+    }
+    case 'h2': {
+      if (supported.length !== 0 && !supported.includes('h2')) return {}
       return {
         network,
         'h2-opts': {
           path,
           ...hosts.length && { host: hosts },
         },
-      }
+      } as NetworkResult<S>
+    }
+    case 'xhttp': {
+      if (supported.length !== 0 && !supported.includes('xhttp')) return {}
+      return {
+        network,
+        'xhttp-opts': {
+          ...pickNonEmptyString(ps, 'path', 'host', 'mode'),
+          ...parseXHTTPExtra(ps),
+        },
+      } as NetworkResult<S>
+    }
   }
-  throw new Error(`Unsupported network: ${network}`)
+  return {}
+}
+
+function parseXHTTPExtra(
+  ps: { extra?: string },
+): Pick<NonNullable<XHTTPNetwork['xhttp-opts']>, 'no-grpc-header' | 'x-padding-bytes' | 'download-settings'> {
+  if (!ps.extra) return {}
+  const j = JSON.parse(ps.extra)
+  const ds: XHTTPDownloadSettings = {}
+  if (j.downloadSettings) {
+    const { xhttpSettings } = j.downloadSettings
+    if (xhttpSettings) {
+      Object.assign(ds, pickNonEmptyString(xhttpSettings, 'path', 'host'))
+      if (xhttpSettings.noGrpcHeader) ds['no-grpc-header'] = true
+      if (xhttpSettings.xPaddingBytes) ds['x-padding-bytes'] = String(xhttpSettings.xPaddingBytes)
+    }
+    if (j.downloadSettings.address) ds.server = String(j.downloadSettings.address)
+    if (j.downloadSettings.port) ds.port = Number(j.downloadSettings.port)
+    if (String(j.downloadSettings.security).toLowerCase() === 'tls') {
+      ds.tls = true
+      ds['client-fingerprint'] = DEFAULT_CLIENT_FINGERPRINT
+      const { tlsSettings } = j.downloadSettings
+      if (tlsSettings) {
+        if (tlsSettings.serverName) ds.servername = String(tlsSettings.serverName)
+        if (tlsSettings.fingerprint) ds['client-fingerprint'] = String(tlsSettings.fingerprint)
+        if (Array.isArray(tlsSettings.alpn)) ds.alpn = tlsSettings.alpn
+      }
+      ds['skip-cert-verify'] = DEFAULT_SCV
+    }
+  }
+  return {
+    ...j.noGRPCHeaders && { 'no-grpc-header': true },
+    ...j.xPaddingBytes && { 'x-padding-bytes': String(j.xPaddingBytes) },
+    ...Object.keys(ds).length && { 'download-settings': ds },
+  }
 }
 
 function networkTo(
-  netOpts: Option<WSNetwork | GRPCNetwork | HTTPNetwork | H2Network>,
+  netOpts: Option<AnyNetwork>,
   kNet = 'net',
   kType = 'type',
   kServiceName = 'path',
@@ -683,10 +778,54 @@ function networkTo(
         ...path && { path },
       }
     }
+    case 'xhttp': {
+      const opts = netOpts['xhttp-opts'] || {}
+      return {
+        [kNet]: net,
+        ...pickNonEmptyString(opts, 'path', 'host', 'mode'),
+        ...stringifyXHTTPExtra(opts),
+      }
+    }
   }
 }
 
-function networkToStd(netOpts: Option<WSNetwork | GRPCNetwork | HTTPNetwork | H2Network>) {
+function stringifyXHTTPExtra(
+  o: Pick<NonNullable<XHTTPNetwork['xhttp-opts']>, 'no-grpc-header' | 'x-padding-bytes' | 'download-settings'>,
+): { extra?: string } {
+  const extra: Record<string, unknown> = {}
+
+  if (o['no-grpc-header']) extra.noGRPCHeaders = true
+  if (o['x-padding-bytes']) extra.xPaddingBytes = o['x-padding-bytes']
+
+  const ds = o['download-settings']
+  if (ds) {
+    const downloadSettings: Record<string, unknown> = {}
+
+    const xhttpSettings: Record<string, unknown> = {}
+    Object.assign(xhttpSettings, pickNonEmptyString(ds, 'path', 'host'))
+    if (ds['no-grpc-header']) xhttpSettings.noGrpcHeader = true
+    if (ds['x-padding-bytes']) xhttpSettings.xPaddingBytes = ds['x-padding-bytes']
+    if (Object.keys(xhttpSettings).length) downloadSettings.xhttpSettings = xhttpSettings
+
+    if (ds.server) downloadSettings.address = ds.server
+    if (ds.port) downloadSettings.port = ds.port
+
+    if (ds.tls) {
+      downloadSettings.security = 'tls'
+      const tlsSettings: Record<string, unknown> = {}
+      if (ds.servername) tlsSettings.serverName = ds.servername
+      if (ds['client-fingerprint']) tlsSettings.fingerprint = ds['client-fingerprint']
+      if (ds.alpn) tlsSettings.alpn = ds.alpn
+      if (Object.keys(tlsSettings).length) downloadSettings.tlsSettings = tlsSettings
+    }
+
+    if (Object.keys(downloadSettings).length) extra.downloadSettings = downloadSettings
+  }
+
+  return Object.keys(extra).length ? { extra: JSON.stringify(extra) } : {}
+}
+
+function networkToStd(netOpts: Option<AnyNetwork>) {
   return networkTo(netOpts, 'type', 'headerType', 'serviceName')
 }
 
@@ -726,6 +865,8 @@ const TYPE_MAP: Record<string, keyof typeof FROM_URI | undefined> = createPure({
   'socks5+tls': 'socks5',
   ss: 'ss',
   ssr: 'ssr',
+  mieru: 'mieru',
+  mierus: 'mieru',
   vmess: 'vmess',
   vless: 'vless',
   trojan: 'trojan',

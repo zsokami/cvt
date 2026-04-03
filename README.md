@@ -10,7 +10,7 @@ emoji、代理策略组和路由规则与 [ACL4SSR_Online_Full_Mannix.ini](https
 |socks5|✔️|✔️|
 |ss|✔️|✔️|
 |ssr|✔️|✔️|
-|mieru|❌|✔️|
+|mieru|✔️|✔️|
 |snell|❌|✔️|
 |vmess|✔️|✔️|
 |vless|✔️|✔️|

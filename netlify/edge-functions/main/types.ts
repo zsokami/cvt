@@ -261,6 +261,7 @@ export interface GRPCNetwork {
   'grpc-opts'?: {
     'grpc-service-name'?: string
     'grpc-user-agent'?: string
+    'ping-interval'?: number
   }
 }
 
@@ -280,6 +281,47 @@ export interface H2Network {
     host?: string[]
   }
 }
+
+export interface XHTTPNetwork {
+  network: 'xhttp'
+  'xhttp-opts'?: {
+    path?: string
+    host?: string
+    mode?: string
+    headers?: Record<string, string>
+    'no-grpc-header'?: boolean
+    'x-padding-bytes'?: string
+    'download-settings'?: XHTTPDownloadSettings
+  }
+}
+
+export type XHTTPDownloadSettings =
+  & {
+    path?: string
+    host?: string
+    headers?: Record<string, string>
+    'no-grpc-header'?: boolean
+    'x-padding-bytes'?: string
+    server?: string
+    port?: number
+    tls?: boolean
+    alpn?: string[]
+    'skip-cert-verify'?: boolean
+    fingerprint?: string
+    certificate?: string
+    'private-key'?: string
+    servername?: string
+    'client-fingerprint'?: string
+  }
+  & Option<Reality>
+  & Option<ECH>
+
+export type AnyNetwork =
+  | WSNetwork
+  | GRPCNetwork
+  | HTTPNetwork
+  | H2Network
+  | XHTTPNetwork
 
 export interface Reality {
   'reality-opts': {
@@ -305,7 +347,7 @@ export type VMess =
 
 export type VLESS =
   & VLESSBase
-  & Option<WSNetwork | GRPCNetwork | HTTPNetwork | H2Network>
+  & Option<WSNetwork | GRPCNetwork | HTTPNetwork | H2Network | XHTTPNetwork>
   & Option<Reality>
   & Option<ECH>
 

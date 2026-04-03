@@ -1,11 +1,9 @@
 import type {
+  AnyNetwork,
   AnyTLS,
   ECH,
   GostPlugin,
-  GRPCNetwork,
-  H2Network,
   HTTP,
-  HTTPNetwork,
   Hysteria,
   Hysteria2,
   KcpTunPlugin,
@@ -33,7 +31,8 @@ import type {
   VLESS,
   VMess,
   WireGuard,
-  WSNetwork,
+  XHTTPDownloadSettings,
+  XHTTPNetwork,
 } from './types.ts'
 import { createPure, parseYAML, pickNonEmptyString, pickNumber, pickTrue } from './utils.ts'
 import { requireOldClashSupport } from './proxy_utils.ts'
@@ -122,7 +121,7 @@ const FROM_CLASH = createPure({
   },
   vmess(o: unknown): VMess {
     checkType(o, 'vmess')
-    const networkOpts = networkFrom(o)
+    const networkOpts = networkFrom(o, 'ws', 'grpc', 'http', 'h2')
     const udp = udpFrom(o)
     return {
       ...baseFrom(o),
@@ -181,10 +180,7 @@ const FROM_CLASH = createPure({
   trojan(o: unknown): Trojan {
     checkType(o, 'trojan')
     const ssOpts = o['ss-opts'] as Record<string, unknown> | undefined
-    const networkOpts = networkFrom(o)
-    if (networkOpts.network === 'http' || networkOpts.network === 'h2') {
-      throw new Error('Trojan network not support http/h2')
-    }
+    const networkOpts = networkFrom(o, 'ws', 'grpc')
     return {
       ...baseFrom(o),
       password: String(o.password),
@@ -597,8 +593,17 @@ function pluginFrom(
   return {}
 }
 
-function networkFrom(o: Record<string, unknown>): Option<WSNetwork | GRPCNetwork | HTTPNetwork | H2Network> {
+type NetworkName = AnyNetwork['network']
+type NetworkResult<S extends readonly NetworkName[]> = Option<
+  S extends readonly [] ? AnyNetwork : Extract<AnyNetwork, { network: S[number] }>
+>
+
+function networkFrom<S extends readonly NetworkName[]>(
+  o: Record<string, unknown>,
+  ...supported: S
+): NetworkResult<S> {
   const { network } = o
+  if (supported.length !== 0 && !supported.includes(network as S[number])) return {}
   switch (network) {
     case 'ws': {
       const opts1 = o['ws-opts'] as Record<string, unknown>
@@ -617,17 +622,21 @@ function networkFrom(o: Record<string, unknown>): Option<WSNetwork | GRPCNetwork
       return {
         network,
         ...Object.keys(opts2).length && { 'ws-opts': opts2 },
-      }
+      } as NetworkResult<S>
     }
     case 'grpc': {
+      const opts = o['grpc-opts']
       return {
         network,
-        'grpc-opts': pickNonEmptyString(
-          o['grpc-opts'],
-          'grpc-service-name',
-          ['grpc-user-agent', DEFAULT_GRPC_USER_AGENT],
-        ),
-      }
+        'grpc-opts': {
+          ...pickNonEmptyString(
+            opts,
+            'grpc-service-name',
+            ['grpc-user-agent', DEFAULT_GRPC_USER_AGENT],
+          ),
+          ...pickNumber(opts, 'ping-interval'),
+        },
+      } as NetworkResult<S>
     }
     case 'http': {
       const opts1 = o['http-opts'] as Record<string, unknown>
@@ -641,7 +650,7 @@ function networkFrom(o: Record<string, unknown>): Option<WSNetwork | GRPCNetwork
       return {
         network,
         ...Object.keys(opts2).length && { 'http-opts': opts2 },
-      }
+      } as NetworkResult<S>
     }
     case 'h2': {
       const opts1 = o['h2-opts'] as Record<string, unknown>
@@ -654,10 +663,58 @@ function networkFrom(o: Record<string, unknown>): Option<WSNetwork | GRPCNetwork
       return {
         network,
         ...Object.keys(opts2).length && { 'h2-opts': opts2 },
-      }
+      } as NetworkResult<S>
+    }
+    case 'xhttp': {
+      const opts1 = o['xhttp-opts'] as Record<string, unknown>
+      const opts2 = isRecord(opts1)
+        ? {
+          ...pickNonEmptyString(opts1, 'path', 'host', 'mode'),
+          ...isRecord(opts1.headers) && { headers: opts1.headers as Record<string, string> },
+          ...pickTrue(opts1, 'no-grpc-header'),
+          ...pickNonEmptyString(opts1, 'x-padding-bytes'),
+          ...parseDownloadSettings(opts1),
+        }
+        : {}
+      return {
+        network,
+        ...Object.keys(opts2).length && { 'xhttp-opts': opts2 },
+      } as NetworkResult<S>
     }
   }
   return {}
+}
+
+function parseDownloadSettings(
+  o: Record<string, unknown>,
+): Pick<NonNullable<XHTTPNetwork['xhttp-opts']>, 'download-settings'> {
+  const d = o['download-settings']
+  if (!isRecord(d)) return {}
+  const ds: XHTTPDownloadSettings = {
+    ...pickNonEmptyString(d, 'path', 'host'),
+    ...isRecord(d.headers) && { headers: d.headers as Record<string, string> },
+    ...pickTrue(d, 'no-grpc-header'),
+    ...pickNonEmptyString(d, 'x-padding-bytes', 'server'),
+    ...pickNumber(d, 'port'),
+    ...d.tls
+      ? {
+        tls: true,
+        ...pickNonEmptyString(
+          d,
+          'servername',
+          'fingerprint',
+          'certificate',
+          'private-key',
+          ['client-fingerprint', DEFAULT_CLIENT_FINGERPRINT],
+        ),
+        ...Array.isArray(d.alpn) && { alpn: d.alpn as string[] },
+        ...echFrom(d),
+        ...realityFrom(d),
+        ...scvFrom(d),
+      }
+      : {},
+  }
+  return Object.keys(ds).length ? { 'download-settings': ds } : {}
 }
 
 function isRecord(o: unknown): o is Record<string, unknown> {
