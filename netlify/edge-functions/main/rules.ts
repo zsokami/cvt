@@ -1916,6 +1916,7 @@ export const RULES = `rules:
 - DOMAIN-SUFFIX,6parker.com,✈️ ‍起飞
 - DOMAIN-SUFFIX,6parknews.com,✈️ ‍起飞
 - DOMAIN-SUFFIX,7capture.com,✈️ ‍起飞
+- DOMAIN-SUFFIX,7x24hrs.com,✈️ ‍起飞
 - DOMAIN-SUFFIX,8-d.com,✈️ ‍起飞
 - DOMAIN-SUFFIX,85cc.us,✈️ ‍起飞
 - DOMAIN-SUFFIX,881903.com,✈️ ‍起飞
@@ -4259,6 +4260,7 @@ export const RULES = `rules:
 - DOMAIN-SUFFIX,merit-times.com.tw,✈️ ‍起飞
 - DOMAIN-SUFFIX,messenger.com,✈️ ‍起飞
 - DOMAIN-SUFFIX,meta.com,✈️ ‍起飞
+- DOMAIN-SUFFIX,metaaivm.com,✈️ ‍起飞
 - DOMAIN-SUFFIX,metafilter.com,✈️ ‍起飞
 - DOMAIN-SUFFIX,metamask.io,✈️ ‍起飞
 - DOMAIN-SUFFIX,metart.com,✈️ ‍起飞
