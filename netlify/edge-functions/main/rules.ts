@@ -2059,6 +2059,7 @@ export const RULES = `rules:
 - DOMAIN-SUFFIX,anonymouse.org,✈️ ‍起飞
 - DOMAIN-SUFFIX,antd.org,✈️ ‍起飞
 - DOMAIN-SUFFIX,anthonycalzadilla.com,✈️ ‍起飞
+- DOMAIN-SUFFIX,anthropic.auth0.com,✈️ ‍起飞
 - DOMAIN-SUFFIX,antiwave.net,✈️ ‍起飞
 - DOMAIN-SUFFIX,antpool.com,✈️ ‍起飞
 - DOMAIN-SUFFIX,anuneko.com,✈️ ‍起飞
@@ -2081,6 +2082,7 @@ export const RULES = `rules:
 - DOMAIN-SUFFIX,api.recaptcha.net,✈️ ‍起飞
 - DOMAIN-SUFFIX,api.shuaiapi.com,✈️ ‍起飞
 - DOMAIN-SUFFIX,api.steampowered.com,✈️ ‍起飞
+- DOMAIN-SUFFIX,api.themoviedb.org,✈️ ‍起飞
 - DOMAIN-SUFFIX,apiary.io,✈️ ‍起飞
 - DOMAIN-SUFFIX,apigee.com,✈️ ‍起飞
 - DOMAIN-SUFFIX,apk.support,✈️ ‍起飞
@@ -2365,6 +2367,7 @@ export const RULES = `rules:
 - DOMAIN-SUFFIX,brookings.edu,✈️ ‍起飞
 - DOMAIN-SUFFIX,brutaltgp.com,✈️ ‍起飞
 - DOMAIN-SUFFIX,bsky.app,✈️ ‍起飞
+- DOMAIN-SUFFIX,bsky.chat,✈️ ‍起飞
 - DOMAIN-SUFFIX,bsky.network,✈️ ‍起飞
 - DOMAIN-SUFFIX,bsky.social,✈️ ‍起飞
 - DOMAIN-SUFFIX,bt4g.org,✈️ ‍起飞
@@ -2590,6 +2593,8 @@ export const RULES = `rules:
 - DOMAIN-SUFFIX,ck101.com,✈️ ‍起飞
 - DOMAIN-SUFFIX,clashyun.com,✈️ ‍起飞
 - DOMAIN-SUFFIX,classicalguitarblog.net,✈️ ‍起飞
+- DOMAIN-SUFFIX,claude.app,✈️ ‍起飞
+- DOMAIN-SUFFIX,claudemcpcontent.com,✈️ ‍起飞
 - DOMAIN-SUFFIX,cldr.unicode.org,✈️ ‍起飞
 - DOMAIN-SUFFIX,clearsurance.com,✈️ ‍起飞
 - DOMAIN-SUFFIX,clementine-player.org,✈️ ‍起飞
@@ -5529,6 +5534,7 @@ export const RULES = `rules:
 - DOMAIN-SUFFIX,torproject.org,✈️ ‍起飞
 - DOMAIN-SUFFIX,torrentgalaxy.to,✈️ ‍起飞
 - DOMAIN-SUFFIX,torrentkitty.tv,✈️ ‍起飞
+- DOMAIN-SUFFIX,torrentleech.org,✈️ ‍起飞
 - DOMAIN-SUFFIX,torrentprivacy.com,✈️ ‍起飞
 - DOMAIN-SUFFIX,torrentproject.se,✈️ ‍起飞
 - DOMAIN-SUFFIX,torrenty.org,✈️ ‍起飞
@@ -6136,6 +6142,7 @@ export const RULES = `rules:
 - DOMAIN-SUFFIX,youtubegaming.com,✈️ ‍起飞
 - DOMAIN-SUFFIX,youtubekids.com,✈️ ‍起飞
 - DOMAIN-SUFFIX,youversion.com,✈️ ‍起飞
+- DOMAIN-SUFFIX,youversionapi.com,✈️ ‍起飞
 - DOMAIN-SUFFIX,youwin.com,✈️ ‍起飞
 - DOMAIN-SUFFIX,youxu.info,✈️ ‍起飞
 - DOMAIN-SUFFIX,yt.be,✈️ ‍起飞
