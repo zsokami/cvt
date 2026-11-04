@@ -9,7 +9,7 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v7
     - uses: denoland/setup-deno@v2
     - name: Build
       run: deno run -A scripts/build_cloudflare_workers.ts
