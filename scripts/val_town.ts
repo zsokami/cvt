@@ -1,4 +1,4 @@
-import { ValTown } from 'jsr:@valtown/sdk'
+import ValTown from 'npm:@valtown/sdk'
 
 const repo = Deno.env.get('GITHUB_REPOSITORY')
 const sha = Deno.env.get('GITHUB_SHA')

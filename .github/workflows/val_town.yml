@@ -11,4 +11,4 @@ jobs:
     - name: Update Val
       run: deno run -A scripts/val_town.ts
       env:
-        valtown: ${{ secrets.VAL_TOWN_API_KEY }}
+        VAL_TOWN_API_KEY: ${{ secrets.VAL_TOWN_API_KEY }}
