@@ -1873,6 +1873,7 @@ export const RULES = `rules:
 - DOMAIN-SUFFIX,51.ca,✈️ ‍起飞
 - DOMAIN-SUFFIX,51jav.org,✈️ ‍起飞
 - DOMAIN-SUFFIX,51luoben.com,✈️ ‍起飞
+- DOMAIN-SUFFIX,51papaya.com,✈️ ‍起飞
 - DOMAIN-SUFFIX,5278.cc,✈️ ‍起飞
 - DOMAIN-SUFFIX,611study.com,✈️ ‍起飞
 - DOMAIN-SUFFIX,611study.icu,✈️ ‍起飞
