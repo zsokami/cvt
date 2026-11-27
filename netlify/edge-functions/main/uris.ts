@@ -68,7 +68,19 @@ const FROM_URI = {
       }
     } else {
       username = urlDecode(username)
-      password = urlDecode(password)
+      if (password) {
+        password = urlDecode(password)
+      } else {
+        try {
+          const [left, right] = splitLeft(decodeBase64Url(username), ':')
+          if (right !== undefined) {
+            username = left
+            password = right
+          }
+        } catch {
+          // pass
+        }
+      }
     }
     return {
       ...baseFrom(u),
@@ -91,7 +103,19 @@ const FROM_URI = {
       }
     } else {
       username = urlDecode(username)
-      password = urlDecode(password)
+      if (password) {
+        password = urlDecode(password)
+      } else {
+        try {
+          const [left, right] = splitLeft(decodeBase64Url(username), ':')
+          if (right !== undefined) {
+            username = left
+            password = right
+          }
+        } catch {
+          // pass
+        }
+      }
     }
     return {
       ...baseFrom(u),
